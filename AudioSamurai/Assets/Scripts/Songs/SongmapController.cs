@@ -12,6 +12,8 @@ public class SongmapController : MonoBehaviour
     void Start()
     {
         ensureApplicationFolders();
+        Songmap m = new Songmap();
+        m.save();
     }
 
     // Update is called once per frame

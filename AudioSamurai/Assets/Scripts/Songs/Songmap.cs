@@ -3,18 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Schema;
 
 /*
  * Songmap is a definition on how a song should be populated and how difficult it is.
  * Each songmap object usually defines how a single difficulty should be played out.
- * Here is some definitions to help out what they mean.
+ * A songmaps audioFilename marks the songmaps folder name in %localappdata%\AudioSamurai\Songs and the audio file inside that given folder.
  * 
  * AR (Approach rate): How much time the player has before they see the approaching map object. Calculated with = AR_DURATION / approachRate
  * HAL (Hit accuracy level): How much time does the player have to hit/parry map object on beat. Calculated with = HAL_DEFAULT_DURATION - HAL_DIFF * hitAccuracyLevel)
  */
-[Serializable()]
-[System.Xml.Serialization.XmlRoot("Songmap")]
-public class Songmap
+
+public class Songmap : IXmlSerializable
 {
     /* Constants */
     public static readonly string SONGS_FOLDER = SongmapController.APPLICATION_FOLDER + "\\Songs";
@@ -29,37 +31,40 @@ public class Songmap
     public static readonly float HAL_DIFF = 5;
     public static readonly float HAL_DEFAULT_DURATION = 100 + HAL_DIFF;
 
+    public static readonly string XML_AUDIO_FILENAME = "AudioFilename";
+    public static readonly string XML_DIFF_TITLE = "DifficultyTitle";
+    public static readonly string XML_AR = "ApproachRate";
+    public static readonly string XML_HAL = "HitAccuracyLevel";
+
     /* general */
-    [System.Xml.Serialization.XmlElement("AudioFilename")]
     private string audioFilename;
 
     /* Difficulty */
-    [System.Xml.Serialization.XmlElement("ApproachRate")]
+    private string difficultyTitle;
     private float approachRate;
-
-    [System.Xml.Serialization.XmlElement("HitAccuracyLevel")]
     private float hitAccuracyLevel;
 
     /* map specific points */
-    [System.Xml.Serialization.XmlArray("Timing")]
-    [System.Xml.Serialization.XmlArrayItem("TimingItem", typeof(TimingListItem))]
-    private List<(float, float)> timingList = new List<(float, float)>();
+    // [System.Xml.Serialization.XmlArray("Timing")]
+    // [System.Xml.Serialization.XmlArrayItem("TimingItem", typeof(TimingListItem))]
+    // private List<(float, float)> timingList = new List<(float, float)>();
 
-    [System.Xml.Serialization.XmlArray("MapObjects")]
-    [System.Xml.Serialization.XmlArrayItem("MapObjectItem", typeof(MapObjectItem))]
-    private List<(float, string)> mapObjects = new List<(float, string)>();
+    // [System.Xml.Serialization.XmlArray("MapObjects")]
+    // [System.Xml.Serialization.XmlArrayItem("MapObjectItem", typeof(MapObjectItem))]
+    // private List<(float, string)> mapObjects = new List<(float, string)>();
 
     /* Constructs an new Songmap based on the given audio file */
     public Songmap()
     {
-        audioFilename = "asd";
+        audioFilename = "Uinuka uinuka lai lai lai";
+        difficultyTitle = "[easy]";
         approachRate = 1;
         hitAccuracyLevel = 5;
+        /*
         timingList.Add((500, 220));
         timingList.Add((1000, 110));
         mapObjects.Add((500, "asd"));
-        mapObjects.Add((1000, "dasd"));
-        serialize();
+        mapObjects.Add((1000, "dasd"));*/
     }
 
     /*
@@ -71,7 +76,7 @@ public class Songmap
     {
         if (songmapFilePath.Contains(SONG_MIME_TYPE))
         {
-            deserialize(songmapFilePath);
+            load(songmapFilePath);
         }
         else
         {
@@ -91,9 +96,19 @@ public class Songmap
     /*
      * Exports the given songmap as independent difficulty file with SONG_MIME_TYPE file ending. The class is serialized as XML type.
      */
-    public void serialize()
+    public void save()
     {
-
+        string folder = getSongmapFolderPath();
+        if (!Directory.Exists(folder))
+        {
+            Directory.CreateDirectory(folder);
+        }
+        using (var writer = new System.IO.StreamWriter(getSongmapFilePath()))
+        {
+            var serializer = new System.Xml.Serialization.XmlSerializer(this.GetType());
+            serializer.Serialize(writer, this);
+            writer.Flush();
+        }
     }
 
     public float getAR()
@@ -106,33 +121,61 @@ public class Songmap
         return HAL_DEFAULT_DURATION - hitAccuracyLevel * HAL_DIFF;
     }
 
+    /* XML Serialization interface */
+    public XmlSchema GetSchema()
+    {
+        return null;
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+        if (reader.MoveToContent() == XmlNodeType.Element && reader.LocalName == GetType().ToString())
+        {
+            audioFilename = reader.GetAttribute(XML_AUDIO_FILENAME);
+            difficultyTitle = reader.GetAttribute(XML_DIFF_TITLE);
+            approachRate = float.Parse(reader.GetAttribute(XML_AR));
+            hitAccuracyLevel = float.Parse(reader.GetAttribute(XML_HAL));
+        }
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        writer.WriteElementString(XML_AUDIO_FILENAME, audioFilename);
+        writer.WriteElementString(XML_DIFF_TITLE, difficultyTitle);
+        writer.WriteElementString(XML_AR, $"{approachRate}");
+        writer.WriteElementString(XML_HAL, $"{hitAccuracyLevel}");
+    }
 
     /* Private methods */
 
     /*
      * Attempts to deserialize songmap information from the given file and verifies it.
      */
-    private void deserialize(string filePath)
+    private static Songmap load(string filePath)
     {
-        FileStream fs = File.OpenRead(filePath);
-
+        using (var stream = System.IO.File.OpenRead(filePath))
+        {
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Songmap));
+            return serializer.Deserialize(stream) as Songmap;
+        }
     }
-}
 
-/* XML Helper classes */
-public class TimingListItem
-{
-    [System.Xml.Serialization.XmlAttribute("Position")]
-    public float Position { get; set; }
-    [System.Xml.Serialization.XmlAttribute("BPM")]
-    public float BPM { get; set; }
-}
+    /* Returns filepath to currently selected audio files folder */
+    private string getSongmapFolderPath()
+    {
+        return $"{SONGS_FOLDER}\\{getSimplifiedAudioName()}"; 
+    }
 
-public class MapObjectItem
-{
-    [System.Xml.Serialization.XmlAttribute("Position")]
-    public float Position { get; set; }
-    [System.Xml.Serialization.XmlAttribute("ObjectType")]
-    public float ObjectType { get; set; }
+    /* Returns filepath to this songmaps difficulty file */
+    private string getSongmapFilePath()
+    {
+        return $"{getSongmapFolderPath()}\\{getSimplifiedAudioName()} {difficultyTitle}";
+    }
+
+    /* Returns the currently selected audioFilename without the extension */
+    private string getSimplifiedAudioName()
+    {
+        return audioFilename.Contains(".mp3") || audioFilename.Contains(".ogg") ? audioFilename.Split(new string[] { ".mp3", ".ogg" }, StringSplitOptions.None)[0] : audioFilename;
+    }
 }
 
