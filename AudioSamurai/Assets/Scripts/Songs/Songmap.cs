@@ -20,21 +20,28 @@ public class Songmap : IXmlSerializable
 {
     /* Constants */
     public static readonly string SONGS_FOLDER = SongmapController.APPLICATION_FOLDER + "\\Songs";
-    public static readonly string SONG_MIME_TYPE = ".ausa";
+    public const string SONG_MIME_TYPE = ".ausa";
    
-    public static readonly float MIN_AR = 1;
-    public static readonly float MAX_AR = 5;
-    public static readonly float AR_DURATION = 1000;
+    public const float MIN_AR = 1;
+    public const float MAX_AR = 5;
+    public const float AR_DURATION = 1000;
 
-    public static readonly float MIN_HAL = 1;
-    public static readonly float MAX_HAL = 10;
-    public static readonly float HAL_DIFF = 5;
-    public static readonly float HAL_DEFAULT_DURATION = 100 + HAL_DIFF;
+    public const float MIN_HAL = 1;
+    public const float MAX_HAL = 10;
+    public const float HAL_DIFF = 5;
+    public const float HAL_DEFAULT_DURATION = 100 + HAL_DIFF;
 
-    public static readonly string XML_AUDIO_FILENAME = "AudioFilename";
-    public static readonly string XML_DIFF_TITLE = "DifficultyTitle";
-    public static readonly string XML_AR = "ApproachRate";
-    public static readonly string XML_HAL = "HitAccuracyLevel";
+    public const string XML_AUDIO_FILENAME = "AudioFilename";
+    public const string XML_DIFF_TITLE = "DifficultyTitle";
+    public const string XML_AR = "ApproachRate";
+    public const string XML_HAL = "HitAccuracyLevel";
+    public const string XML_TIMING = "TimingList";
+    public const string XML_TIMING_ITEM = "TimingListItem";
+    public const string XML_MS_POS = "MsPosition";
+    public const string XML_MAP_OBJ = "MapObjectList";
+    public const string XML_MAP_OBJ_ITEM= "MapObjectItem";
+    public const string XML_BPM = "BPM";
+    public const string XML_MAP_OBJ_TYPE = "MapObjectType";
 
     /* general */
     private string audioFilename;
@@ -45,26 +52,14 @@ public class Songmap : IXmlSerializable
     private float hitAccuracyLevel;
 
     /* map specific points */
-    // [System.Xml.Serialization.XmlArray("Timing")]
-    // [System.Xml.Serialization.XmlArrayItem("TimingItem", typeof(TimingListItem))]
-    // private List<(float, float)> timingList = new List<(float, float)>();
+    private List<(float, float)> timingList = new List<(float, float)>();
 
-    // [System.Xml.Serialization.XmlArray("MapObjects")]
-    // [System.Xml.Serialization.XmlArrayItem("MapObjectItem", typeof(MapObjectItem))]
-    // private List<(float, string)> mapObjects = new List<(float, string)>();
+    private List<(float, string)> mapObjects = new List<(float, string)>();
 
     /* Constructs an new Songmap based on the given audio file */
     public Songmap()
     {
-        audioFilename = "Uinuka uinuka lai lai lai";
-        difficultyTitle = "[easy]";
-        approachRate = 1;
-        hitAccuracyLevel = 5;
-        /*
-        timingList.Add((500, 220));
-        timingList.Add((1000, 110));
-        mapObjects.Add((500, "asd"));
-        mapObjects.Add((1000, "dasd"));*/
+
     }
 
     /*
@@ -111,6 +106,18 @@ public class Songmap : IXmlSerializable
         }
     }
 
+    /*
+     * Attempts to deserialize songmap information from the given file and verifies it.
+     */
+    public static Songmap load(string filePath)
+    {
+        using (var stream = System.IO.File.OpenRead(filePath))
+        {
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Songmap));
+            return serializer.Deserialize(stream) as Songmap;
+        }
+    }
+
     public float getAR()
     {
         return AR_DURATION / approachRate;
@@ -131,10 +138,76 @@ public class Songmap : IXmlSerializable
     {
         if (reader.MoveToContent() == XmlNodeType.Element && reader.LocalName == GetType().ToString())
         {
-            audioFilename = reader.GetAttribute(XML_AUDIO_FILENAME);
-            difficultyTitle = reader.GetAttribute(XML_DIFF_TITLE);
-            approachRate = float.Parse(reader.GetAttribute(XML_AR));
-            hitAccuracyLevel = float.Parse(reader.GetAttribute(XML_HAL));
+            do
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    switch (reader.Name)
+                    {
+                        case XML_AUDIO_FILENAME when reader.Read():
+                            audioFilename = reader.Value;
+                            break;
+                        case XML_DIFF_TITLE when reader.Read():
+                            difficultyTitle = reader.Value;
+                            break;
+                        case XML_AR when reader.Read():
+                            approachRate = float.Parse(reader.Value);
+                            break;
+                        case XML_HAL when reader.Read():
+                            hitAccuracyLevel = float.Parse(reader.Value);
+                            break;
+                        case XML_TIMING:
+                            if (reader.ReadToFollowing(XML_TIMING_ITEM))
+                            {
+                                do
+                                {
+                                    reader.ReadToDescendant(XML_MS_POS);
+                                    var ms = reader.ReadElementContentAsFloat();
+                                    var bpm = reader.ReadElementContentAsFloat();
+                                    timingList.Add((ms, bpm));
+                                } while (reader.ReadToNextSibling(XML_TIMING_ITEM));
+                            }
+                            break;
+                        case XML_MAP_OBJ:
+                            if (reader.ReadToFollowing(XML_MAP_OBJ_ITEM))
+                            {
+                                do
+                                {
+                                    reader.ReadToDescendant(XML_MS_POS);
+                                    var ms = reader.ReadElementContentAsFloat();
+                                    var type = reader.ReadElementContentAsString();
+                                    mapObjects.Add((ms, type));
+                                } while (reader.ReadToNextSibling(XML_MAP_OBJ_ITEM));
+                            }
+                            break;
+                    }
+                }
+            } while (reader.Read());
+            /*
+            reader.ReadStartElement()
+            audioFilename = reader.ReadContentAsString();
+            reader.ReadToFollowing(XML_DIFF_TITLE);
+            difficultyTitle = reader.ReadContentAsString();
+            reader.ReadToFollowing(XML_AR);
+            approachRate = reader.ReadContentAsFloat();
+            reader.ReadToFollowing(XML_HAL);
+            hitAccuracyLevel = reader.ReadContentAsFloat();
+            reader.ReadToFollowing(XML_TIMING);
+            if (reader.ReadToDescendant(XML_TIMING_ITEM))
+            {
+                do
+                {
+                    timingList.Add((reader.ReadElementContentAsFloat(XML_MS_POS, reader.NamespaceURI), reader.ReadElementContentAsFloat(XML_BPM, reader.NamespaceURI)));
+                } while (reader.ReadToNextSibling(XML_TIMING_ITEM));
+            }
+            reader.ReadToFollowing(XML_MAP_OBJ);
+            if (reader.ReadToDescendant(XML_MAP_OBJ_ITEM))
+            {
+                do
+                {
+                    mapObjects.Add((reader.ReadElementContentAsFloat(XML_MS_POS, reader.NamespaceURI), reader.ReadElementContentAsString(XML_MAP_OBJ_TYPE, reader.NamespaceURI)));
+                } while (reader.ReadToNextSibling(XML_MAP_OBJ_ITEM));
+            }*/
         }
     }
 
@@ -144,21 +217,27 @@ public class Songmap : IXmlSerializable
         writer.WriteElementString(XML_DIFF_TITLE, difficultyTitle);
         writer.WriteElementString(XML_AR, $"{approachRate}");
         writer.WriteElementString(XML_HAL, $"{hitAccuracyLevel}");
+        writer.WriteStartElement(XML_TIMING);
+        foreach ((float, float) timingItem in timingList) 
+        {
+            writer.WriteStartElement(XML_TIMING_ITEM);
+            writer.WriteElementString(XML_MS_POS, $"{timingItem.Item1}");
+            writer.WriteElementString(XML_BPM, $"{timingItem.Item2}");
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
+        writer.WriteStartElement(XML_MAP_OBJ);
+        foreach ((float, string) mapObj in mapObjects)
+        {
+            writer.WriteStartElement(XML_MAP_OBJ_ITEM);
+            writer.WriteElementString(XML_MS_POS, $"{mapObj.Item1}");
+            writer.WriteElementString(XML_MAP_OBJ_TYPE, $"{mapObj.Item2}");
+            writer.WriteEndElement();
+        }
+        writer.WriteEndElement();
     }
 
     /* Private methods */
-
-    /*
-     * Attempts to deserialize songmap information from the given file and verifies it.
-     */
-    private static Songmap load(string filePath)
-    {
-        using (var stream = System.IO.File.OpenRead(filePath))
-        {
-            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Songmap));
-            return serializer.Deserialize(stream) as Songmap;
-        }
-    }
 
     /* Returns filepath to currently selected audio files folder */
     private string getSongmapFolderPath()

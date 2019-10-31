@@ -12,8 +12,7 @@ public class SongmapController : MonoBehaviour
     void Start()
     {
         ensureApplicationFolders();
-        Songmap m = new Songmap();
-        m.save();
+        Songmap m = Songmap.load("C:\\Users\\shyle\\AppData\\Local\\AudioSamurai\\Songs\\Uinuka uinuka lai lai lai\\Uinuka uinuka lai lai lai [easy]");
     }
 
     // Update is called once per frame
