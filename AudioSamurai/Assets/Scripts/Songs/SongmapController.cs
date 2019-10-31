@@ -12,7 +12,10 @@ public class SongmapController : MonoBehaviour
     void Start()
     {
         ensureApplicationFolders();
-        Songmap m = Songmap.load("C:\\Users\\shyle\\AppData\\Local\\AudioSamurai\\Songs\\Uinuka uinuka lai lai lai\\Uinuka uinuka lai lai lai [easy]");
+        Songmap m = new Songmap("S:\\Music\\ROY KNOX - Earthquake [NCS Release].ogg");
+        m.DifficultyTitle = "[Normal]";
+        m.save();
+        Songmap m2 = Songmap.load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal]");
     }
 
     // Update is called once per frame

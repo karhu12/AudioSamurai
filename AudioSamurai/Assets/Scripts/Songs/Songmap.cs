@@ -21,7 +21,7 @@ public class Songmap : IXmlSerializable
     /* Constants */
     public static readonly string SONGS_FOLDER = SongmapController.APPLICATION_FOLDER + "\\Songs";
     public const string SONG_MIME_TYPE = ".ausa";
-   
+
     public const float MIN_AR = 1;
     public const float MAX_AR = 5;
     public const float AR_DURATION = 1000;
@@ -39,7 +39,7 @@ public class Songmap : IXmlSerializable
     public const string XML_TIMING_ITEM = "TimingListItem";
     public const string XML_MS_POS = "MsPosition";
     public const string XML_MAP_OBJ = "MapObjectList";
-    public const string XML_MAP_OBJ_ITEM= "MapObjectItem";
+    public const string XML_MAP_OBJ_ITEM = "MapObjectItem";
     public const string XML_BPM = "BPM";
     public const string XML_MAP_OBJ_TYPE = "MapObjectType";
 
@@ -48,44 +48,101 @@ public class Songmap : IXmlSerializable
 
     /* Difficulty */
     private string difficultyTitle;
+    public string DifficultyTitle { 
+        get => difficultyTitle;
+        set { if (value.Length <= 12) difficultyTitle = value; }
+    }
+
     private float approachRate;
+    public float ApproachRate { 
+        get => approachRate;
+        set { if (value >= MIN_AR && value <= MAX_AR) approachRate = value; }
+    }
+
     private float hitAccuracyLevel;
+    public float HitAccuracyLevel
+    {
+        get => hitAccuracyLevel;
+        set { if (value >= MIN_HAL && value <= MAX_HAL) hitAccuracyLevel = value; }
+    }
 
     /* map specific points */
     private List<(float, float)> timingList = new List<(float, float)>();
 
     private List<(float, string)> mapObjects = new List<(float, string)>();
 
-    /* Constructs an new Songmap based on the given audio file */
+    /* Default constructor. Not recommended to use because it does not initialize the map correctly. */
     public Songmap()
     {
-
+        approachRate = MIN_AR;
+        hitAccuracyLevel = MIN_HAL;
+        difficultyTitle = "";
     }
 
     /*
-     * Deserializes the songmap object based on the '.as' xml file found from the maps folder (Songs folder found at User/AppData/local/AudioSamurai/Songs)
-     * songmapFile : path to the songmap file that contains information on how the file should be constructed.
-     * Exceptions : 
+     * Constructs an new Songmap based on the given audio file. Creates a new folder to the SONGS_FOLDER based on the given audioFile and copies it there.
+     * audioFilePath : path to the original audio file.
+     * throws : exception in case file operations fails or passed audio file does not exist.
      */
-    public Songmap(string songmapFilePath)
+    public Songmap(string audioFilePath)
     {
-        if (songmapFilePath.Contains(SONG_MIME_TYPE))
+        if (File.Exists(audioFilePath))
         {
-            load(songmapFilePath);
-        }
-        else
+            audioFilename = Path.GetFileName(audioFilePath);
+            string path = getSongmapFolderPath();
+            if (Directory.Exists(path))
+            {
+                if (!File.Exists(getSongmapAudioFilePath()))
+                {
+                    File.Copy(audioFilePath, getSongmapAudioFilePath());
+                }
+            } 
+            else
+            {
+                Directory.CreateDirectory(path);
+                File.Copy(audioFilePath, getSongmapAudioFilePath());
+            }
+        } else
         {
-            throw new Exception("Invalid songmap file type");
+            throw new Exception("Given audio file did not exist");
         }
+        approachRate = MIN_AR;
+        hitAccuracyLevel = MIN_HAL;
+        difficultyTitle = "";
+    }
+
+    /*
+     * Constructs an new Songmap based on the given audio file. Creates a new folder to the SONGS_FOLDER based on the given audioFile and copies it there. Also sets the difficultyTitle to passed value.
+     * audioFilePath : path to the original audio file.
+     * difficultyTitle : name of this songmaps difficulty
+     * throws : exception in case file operations fail
+     */
+    public Songmap(string audioFilePath, string difficultyTitle) : this(audioFilePath)
+    {
+        difficultyTitle = difficultyTitle;
     }
 
     /* 
      * Places an single map object of given type to the position in milliseconds.
      * pos : position in milliseconds where the object should be placed on map.
+     * objectType : type of mapObject to be added to the given position.
      */
     public void placeMapObject(float pos, string objectType)
     {
-
+        bool hasDuplicate = false;
+        foreach ((float, string) objTuple in mapObjects)
+        {
+            if (objTuple.Item1 == pos)
+                hasDuplicate = true;
+                break;
+        }
+        if (!hasDuplicate)
+        {
+            /*
+             TODO: if (objectType is valid) { add } 
+             */
+            mapObjects.Add((pos, objectType));
+        }
     }
 
     /*
@@ -93,16 +150,23 @@ public class Songmap : IXmlSerializable
      */
     public void save()
     {
-        string folder = getSongmapFolderPath();
-        if (!Directory.Exists(folder))
+        if (validate())
         {
-            Directory.CreateDirectory(folder);
+            string folder = getSongmapFolderPath();
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            using (var writer = new System.IO.StreamWriter(getSongmapPath()))
+            {
+                var serializer = new System.Xml.Serialization.XmlSerializer(this.GetType());
+                serializer.Serialize(writer, this);
+                writer.Flush();
+            }
         }
-        using (var writer = new System.IO.StreamWriter(getSongmapFilePath()))
+        else
         {
-            var serializer = new System.Xml.Serialization.XmlSerializer(this.GetType());
-            serializer.Serialize(writer, this);
-            writer.Flush();
+            throw new Exception("Songmap failed validation");
         }
     }
 
@@ -183,31 +247,6 @@ public class Songmap : IXmlSerializable
                     }
                 }
             } while (reader.Read());
-            /*
-            reader.ReadStartElement()
-            audioFilename = reader.ReadContentAsString();
-            reader.ReadToFollowing(XML_DIFF_TITLE);
-            difficultyTitle = reader.ReadContentAsString();
-            reader.ReadToFollowing(XML_AR);
-            approachRate = reader.ReadContentAsFloat();
-            reader.ReadToFollowing(XML_HAL);
-            hitAccuracyLevel = reader.ReadContentAsFloat();
-            reader.ReadToFollowing(XML_TIMING);
-            if (reader.ReadToDescendant(XML_TIMING_ITEM))
-            {
-                do
-                {
-                    timingList.Add((reader.ReadElementContentAsFloat(XML_MS_POS, reader.NamespaceURI), reader.ReadElementContentAsFloat(XML_BPM, reader.NamespaceURI)));
-                } while (reader.ReadToNextSibling(XML_TIMING_ITEM));
-            }
-            reader.ReadToFollowing(XML_MAP_OBJ);
-            if (reader.ReadToDescendant(XML_MAP_OBJ_ITEM))
-            {
-                do
-                {
-                    mapObjects.Add((reader.ReadElementContentAsFloat(XML_MS_POS, reader.NamespaceURI), reader.ReadElementContentAsString(XML_MAP_OBJ_TYPE, reader.NamespaceURI)));
-                } while (reader.ReadToNextSibling(XML_MAP_OBJ_ITEM));
-            }*/
         }
     }
 
@@ -218,7 +257,7 @@ public class Songmap : IXmlSerializable
         writer.WriteElementString(XML_AR, $"{approachRate}");
         writer.WriteElementString(XML_HAL, $"{hitAccuracyLevel}");
         writer.WriteStartElement(XML_TIMING);
-        foreach ((float, float) timingItem in timingList) 
+        foreach ((float, float) timingItem in timingList)
         {
             writer.WriteStartElement(XML_TIMING_ITEM);
             writer.WriteElementString(XML_MS_POS, $"{timingItem.Item1}");
@@ -239,22 +278,32 @@ public class Songmap : IXmlSerializable
 
     /* Private methods */
 
+    /* Validates the songmap attributes if it's an functional songmap */
+    private bool validate()
+    {
+        if (!File.Exists($"{getSongmapFolderPath()}\\{audioFilename}"))
+        {
+            return false;
+        }
+        return true;
+    }
+
     /* Returns filepath to currently selected audio files folder */
     private string getSongmapFolderPath()
     {
-        return $"{SONGS_FOLDER}\\{getSimplifiedAudioName()}"; 
+        return $"{SONGS_FOLDER}\\{Path.GetFileNameWithoutExtension(audioFilename)}";
     }
 
     /* Returns filepath to this songmaps difficulty file */
-    private string getSongmapFilePath()
+    private string getSongmapPath()
     {
-        return $"{getSongmapFolderPath()}\\{getSimplifiedAudioName()} {difficultyTitle}";
+        return $"{getSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}";
     }
 
-    /* Returns the currently selected audioFilename without the extension */
-    private string getSimplifiedAudioName()
+    /* Returns filepath to this songmaps audio file */
+    private string getSongmapAudioFilePath()
     {
-        return audioFilename.Contains(".mp3") || audioFilename.Contains(".ogg") ? audioFilename.Split(new string[] { ".mp3", ".ogg" }, StringSplitOptions.None)[0] : audioFilename;
+        return $"{getSongmapFolderPath()}\\{audioFilename}";
     }
 }
 
