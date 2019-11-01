@@ -93,18 +93,18 @@ public class Songmap : IXmlSerializable
         if (File.Exists(audioFilePath))
         {
             audioFilename = Path.GetFileName(audioFilePath);
-            string path = getSongmapFolderPath();
+            string path = GetSongmapFolderPath();
             if (Directory.Exists(path))
             {
-                if (!File.Exists(getSongmapAudioFilePath()))
+                if (!File.Exists(GetSongmapAudioFilePath()))
                 {
-                    File.Copy(audioFilePath, getSongmapAudioFilePath());
+                    File.Copy(audioFilePath, GetSongmapAudioFilePath());
                 }
             } 
             else
             {
                 Directory.CreateDirectory(path);
-                File.Copy(audioFilePath, getSongmapAudioFilePath());
+                File.Copy(audioFilePath, GetSongmapAudioFilePath());
             }
         } else
         {
@@ -126,8 +126,8 @@ public class Songmap : IXmlSerializable
         this.difficultyTitle = difficultyTitle;
     }
 
-    /* Returns readonly list from mapObjects. mapObjects can be edited only by using addMapObject and editMapObject methods */
-    public IList<(float, string)> getMapObjects()
+    /* Returns readonly list from mapObjects. mapObjects can be edited only by using addMapObject, editMapObject and removeMapObject methods */
+    public IList<(float, string)> GetMapObjects()
     {
         return mapObjects.AsReadOnly();
     }
@@ -138,32 +138,47 @@ public class Songmap : IXmlSerializable
      * objectType : type of mapObject to be added to the given position.
      * returns boolean whether the object was added or not.
      */
-    public bool addMapObject(float pos, string objectType)
+    public bool AddMapObject(float pos, string objectType)
     {
-        if (getPositionDuplicate(ref mapObjects, pos) == DUPLICATE_NOT_FOUND)
+        if (GetPositionDuplicate(ref mapObjects, pos) == DUPLICATE_NOT_FOUND)
         {
             /*
              TODO: if (objectType is valid) { add } 
              */
             mapObjects.Add((pos, objectType));
+            mapObjects.Sort((x, y) => y.Item1.CompareTo(x.Item1));
             return true;
         }
         return false;
     }
 
-    public bool editMapObject(float pos, string objectType)
+    /* Replaces the mapObject at given pos by newMapObj. return boolean whether the objectse was replaced or not. */
+    public bool EditMapObject(float pos, (float, string) newMapObj)
     {
         int dupePos;
-        if ((dupePos = getPositionDuplicate(ref mapObjects, pos)) != DUPLICATE_NOT_FOUND)
+        if ((dupePos = GetPositionDuplicate(ref mapObjects, pos)) != DUPLICATE_NOT_FOUND)
         {
-            mapObjects[dupePos] = (pos, objectType);
+            mapObjects[dupePos] = newMapObj;
+            mapObjects.Sort((x, y) => y.Item1.CompareTo(x.Item1));
             return true;
         }
         return false;
     }
 
-    /* Returns an readonly version of timingList. timingList can be edited only by using addTiming and editTiming methods */
-    public IList<(float, float, int)> getTimingList()
+    /* Removes an mapObject from given pos. Returns boolean wether an item was removed or not. */
+    public bool RemoveMapObject(float pos)
+    {
+        int dupePos;
+        if ((dupePos = GetPositionDuplicate(ref mapObjects, pos)) != DUPLICATE_NOT_FOUND)
+        {
+            mapObjects.RemoveAt(dupePos);
+            return true;
+        }
+        return false;
+    }
+
+    /* Returns an readonly version of timingList. timingList can be edited only by using addTiming, editTiming and removeTiming methods */
+    public IList<(float, float, int)> GetTimingList()
     {
         return timingList.AsReadOnly();
     }
@@ -175,14 +190,15 @@ public class Songmap : IXmlSerializable
      * measureDivisor : how many notes should be per measure starting from pos (default 4 == 4/4)
      * returns boolean whether it was added
      */
-    public bool addTiming(float pos, float bpm, int measureDivisor = 4)
+    public bool AddTiming(float pos, float bpm, int measureDivisor = 4)
     {
 
-        if (getPositionDuplicate(ref timingList, pos) == -1)
+        if (GetPositionDuplicate(ref timingList, pos) == -1)
         {
             if (bpm > 0 && measureDivisor <= 8 && measureDivisor >= 1)
             {
                 timingList.Add((pos, bpm, measureDivisor));
+                timingList.Sort((x, y) => y.Item1.CompareTo(x.Item1));
                 return true;
             }
         }
@@ -194,12 +210,29 @@ public class Songmap : IXmlSerializable
      * pos : position of the editable timing
      * newTiming : the new timing item which should replace the old timing
      */
-    public bool editTiming(float pos, (float, float, int) newTiming)
+    public bool EditTiming(float pos, (float, float, int) newTiming)
     {
         int dupePos;
-        if ((dupePos = getPositionDuplicate(ref timingList, pos)) != DUPLICATE_NOT_FOUND)
+        if ((dupePos = GetPositionDuplicate(ref timingList, pos)) != DUPLICATE_NOT_FOUND)
         {
             timingList[dupePos] = newTiming;
+            timingList.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+            return true;
+        }
+        return false;
+    }
+
+    /*
+     * Removes timing item from given ms pos.
+     * pos : position in milliseconds where to remove an timing from
+     * returns an boolean whether item was removed or not.
+     */
+    public bool RemoveTiming(float pos)
+    {
+        int dupePos;
+        if ((dupePos = GetPositionDuplicate(ref timingList, pos)) != DUPLICATE_NOT_FOUND)
+        {
+            timingList.RemoveAt(dupePos);
             return true;
         }
         return false;
@@ -208,16 +241,16 @@ public class Songmap : IXmlSerializable
     /*
      * Exports the given songmap as independent difficulty file with SONG_MIME_TYPE file ending. The class is serialized as XML type.
      */
-    public void save()
+    public void Save()
     {
-        if (validate())
+        if (Validate())
         {
-            string folder = getSongmapFolderPath();
+            string folder = GetSongmapFolderPath();
             if (!Directory.Exists(folder))
             {
                 Directory.CreateDirectory(folder);
             }
-            using (var writer = new System.IO.StreamWriter(getSongmapPath()))
+            using (var writer = new System.IO.StreamWriter(GetSongmapPath()))
             {
                 var serializer = new System.Xml.Serialization.XmlSerializer(this.GetType());
                 serializer.Serialize(writer, this);
@@ -234,13 +267,13 @@ public class Songmap : IXmlSerializable
      * Attempts to deserialize songmap information from the given file, verifies it and returns the Songmap.
      * throws : Exception if the loaded songmap is not valid
      */
-    public static Songmap load(string filePath)
+    public static Songmap Load(string filePath)
     {
         using (var stream = System.IO.File.OpenRead(filePath))
         {
             var serializer = new System.Xml.Serialization.XmlSerializer(typeof(Songmap));
             Songmap newSongmap = serializer.Deserialize(stream) as Songmap;
-            if (newSongmap.validate())
+            if (newSongmap.Validate())
             {
                 return newSongmap;
             }
@@ -248,12 +281,14 @@ public class Songmap : IXmlSerializable
         }
     }
 
-    public float getAR()
+    /* Returns the calculated approach rate of map in milliseconds on how fast the objects should become visible at. */
+    public float GetApproachRate()
     {
         return AR_DURATION / approachRate;
     }
 
-    public float getHALDuration()
+    /* returns the calculated HAL which tells what is the windows of accurate hitting on mapObjects. */
+    public float GetHitAccuracyLevel()
     {
         return HAL_DEFAULT_DURATION - hitAccuracyLevel * HAL_DIFF;
     }
@@ -348,22 +383,22 @@ public class Songmap : IXmlSerializable
     /* Private methods */
 
     /* Validates the songmap attributes if it's an functional songmap */
-    private bool validate()
+    private bool Validate()
     {
         List<bool> checks = new List<bool>();
-        checks.Add(hasAudioFile());
-        checks.Add(hasValidContent());
+        checks.Add(HasAudioFile());
+        checks.Add(HasValidContent());
         return !checks.Contains(false);
     }
 
     /* Checks if the audioFile of given songmap is in their respective song folder */
-    private bool hasAudioFile()
+    private bool HasAudioFile()
     {
-        return File.Exists($"{getSongmapFolderPath()}\\{audioFilename}");
+        return File.Exists($"{GetSongmapFolderPath()}\\{audioFilename}");
     }
 
     /* Validates that the contents (timings and mapObjects) are valid and usable */
-    private bool hasValidContent()
+    private bool HasValidContent()
     {
         if (timingList.Count > 0)
         {
@@ -400,7 +435,7 @@ public class Songmap : IXmlSerializable
      * pos : position in milliseconds
      * returns the position of duplicate in the list if found, -1 else.
      */
-    private int getPositionDuplicate(ref List<(float, float, int)> timingList, float pos)
+    private int GetPositionDuplicate(ref List<(float, float, int)> timingList, float pos)
     {
         foreach ((float, float, int) timingItem in timingList)
         {
@@ -411,7 +446,7 @@ public class Songmap : IXmlSerializable
     }
 
     /* Performs same operation as method above, but to an map object list */
-    private int getPositionDuplicate(ref List<(float, string)> mapObjList, float pos)
+    private int GetPositionDuplicate(ref List<(float, string)> mapObjList, float pos)
     {
 
         foreach ((float, string) mapObj in mapObjList)
@@ -423,21 +458,20 @@ public class Songmap : IXmlSerializable
     }
 
     /* Returns filepath to currently selected audio files folder */
-    private string getSongmapFolderPath()
+    private string GetSongmapFolderPath()
     {
         return $"{SONGS_FOLDER}\\{Path.GetFileNameWithoutExtension(audioFilename)}";
     }
 
     /* Returns filepath to this songmaps difficulty file */
-    private string getSongmapPath()
+    private string GetSongmapPath()
     {
-        return $"{getSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
+        return $"{GetSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
     }
 
     /* Returns filepath to this songmaps audio file */
-    private string getSongmapAudioFilePath()
+    private string GetSongmapAudioFilePath()
     {
-        return $"{getSongmapFolderPath()}\\{audioFilename}";
+        return $"{GetSongmapFolderPath()}\\{audioFilename}";
     }
 }
-

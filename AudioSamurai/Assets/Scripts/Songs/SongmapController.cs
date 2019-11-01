@@ -11,11 +11,11 @@ public class SongmapController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ensureApplicationFolders();
+        EnsureApplicationFolders();
         Songmap m = new Songmap("S:\\Music\\ROY KNOX - Earthquake [NCS Release].ogg", "[Normal]");
-        m.addTiming(0, 120);
-        m.save();
-        Songmap m2 = Songmap.load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
+        m.AddTiming(0, 120);
+        m.Save();
+        Songmap m2 = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
     }
 
     // Update is called once per frame
@@ -27,7 +27,7 @@ public class SongmapController : MonoBehaviour
     /*
      * Ensures that the required application folders exists in the local application data and creates them if they dont.
      */
-    private void ensureApplicationFolders()
+    private void EnsureApplicationFolders()
     {
 
         try
@@ -43,7 +43,7 @@ public class SongmapController : MonoBehaviour
         }
         catch (Exception e)
         {
-            Console.WriteLine("Exception occurred during application folder creation: " + e.ToString());
+            print("Exception occurred during application folder creation: " + e.ToString());
         }
     }
 }
