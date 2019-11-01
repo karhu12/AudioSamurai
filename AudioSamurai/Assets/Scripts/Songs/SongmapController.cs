@@ -12,10 +12,10 @@ public class SongmapController : MonoBehaviour
     void Start()
     {
         ensureApplicationFolders();
-        Songmap m = new Songmap("S:\\Music\\ROY KNOX - Earthquake [NCS Release].ogg");
-        m.DifficultyTitle = "[Normal]";
+        Songmap m = new Songmap("S:\\Music\\ROY KNOX - Earthquake [NCS Release].ogg", "[Normal]");
+        m.addTiming(0, 120);
         m.save();
-        Songmap m2 = Songmap.load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal]");
+        Songmap m2 = Songmap.load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
     }
 
     // Update is called once per frame
