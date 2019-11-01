@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Xml.Schema;
+using System.Linq;
 
 /*
  * Songmap is a definition on how a song should be populated and how difficult it is.
@@ -237,6 +238,57 @@ public class Songmap : IXmlSerializable
         }
         return false;
     }
+
+    /*
+     * Returns an list of floats which indicate that when beats happen based on the start position and timingList. An empty list is returned if position is not valid compared to timingList (eg. before first timing).
+     * pos : position in milliseconds from where on to fetch the beat list.
+     * count : how many beats to fetch.
+     */
+    public List<float> getBeatList(float pos, int count = 10)
+    {
+        List<float> beatList = new List<float>();
+        if (timingList.Count > 0)
+        {
+            float currentBeat = pos;
+            int timingLoop = -1;
+            do
+            {
+                timingLoop++;
+                (float, float, int) closestTiming = timingList.Aggregate((x, y) => Math.Abs(x.Item1 - currentBeat) < Math.Abs(y.Item1 - currentBeat) ? x : y);
+
+                if (closestTiming.Item1 > currentBeat)
+                    break;
+
+                float beatTime = ((60 / closestTiming.Item2) / closestTiming.Item3) * 1000;
+
+                if (timingLoop == 0)
+                {
+                    currentBeat = (int)((currentBeat - closestTiming.Item1) / beatTime) * beatTime;
+                }
+                beatList.Add(currentBeat);
+
+
+                float nextTimingPos = timingList.FirstOrDefault(x => x.Item1 > currentBeat).Item1;
+                nextTimingPos = nextTimingPos > currentBeat ? nextTimingPos : -1;
+
+                while (beatList.Count < count)
+                {
+                    if (nextTimingPos != -1)
+                    {
+                        if (currentBeat + beatTime >= nextTimingPos)
+                        {
+                            currentBeat += beatTime;
+                            break;
+                        }
+                    }
+                    currentBeat += beatTime;
+                    beatList.Add(currentBeat);
+                }
+            } while (beatList.Count < count);
+        }
+        return beatList;
+    }
+
 
     /*
      * Exports the given songmap as independent difficulty file with SONG_MIME_TYPE file ending. The class is serialized as XML type.

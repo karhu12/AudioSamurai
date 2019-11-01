@@ -12,10 +12,11 @@ public class SongmapController : MonoBehaviour
     void Start()
     {
         EnsureApplicationFolders();
-        Songmap m = new Songmap("S:\\Music\\ROY KNOX - Earthquake [NCS Release].ogg", "[Normal]");
-        m.AddTiming(0, 120);
-        m.Save();
-        Songmap m2 = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
+        Songmap m = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
+        m.AddTiming(200, 240);
+        m.AddTiming(680, 80);
+        List<float> l = m.getBeatList(0, 20);
+        print(l);
     }
 
     // Update is called once per frame
