@@ -13,8 +13,8 @@ public class SongmapController : MonoBehaviour
     {
         EnsureApplicationFolders();
         Songmap m = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
-        m.AddTiming(200, 240);
         m.AddTiming(680, 80);
+        m.AddTiming(200, 240);
         List<float> l = m.getBeatList(0, 20);
         print(l);
     }

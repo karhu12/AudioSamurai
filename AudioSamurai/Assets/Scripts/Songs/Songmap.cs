@@ -147,7 +147,7 @@ public class Songmap : IXmlSerializable
              TODO: if (objectType is valid) { add } 
              */
             mapObjects.Add((pos, objectType));
-            mapObjects.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+            mapObjects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
             return true;
         }
         return false;
@@ -160,7 +160,7 @@ public class Songmap : IXmlSerializable
         if ((dupePos = GetPositionDuplicate(ref mapObjects, pos)) != DUPLICATE_NOT_FOUND)
         {
             mapObjects[dupePos] = newMapObj;
-            mapObjects.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+            mapObjects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
             return true;
         }
         return false;
@@ -199,7 +199,7 @@ public class Songmap : IXmlSerializable
             if (bpm > 0 && measureDivisor <= 8 && measureDivisor >= 1)
             {
                 timingList.Add((pos, bpm, measureDivisor));
-                timingList.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+                timingList.Sort((x, y) => x.Item1.CompareTo(y.Item1));
                 return true;
             }
         }
@@ -217,7 +217,7 @@ public class Songmap : IXmlSerializable
         if ((dupePos = GetPositionDuplicate(ref timingList, pos)) != DUPLICATE_NOT_FOUND)
         {
             timingList[dupePos] = newTiming;
-            timingList.Sort((x, y) => y.Item1.CompareTo(x.Item1));
+            timingList.Sort((x, y) => x.Item1.CompareTo(y.Item1));
             return true;
         }
         return false;
@@ -346,6 +346,24 @@ public class Songmap : IXmlSerializable
     }
 
 
+    /* Returns filepath to currently selected audio files folder */
+    private string GetSongmapFolderPath()
+    {
+        return $"{SONGS_FOLDER}\\{Path.GetFileNameWithoutExtension(audioFilename)}";
+    }
+
+    /* Returns filepath to this songmaps difficulty file */
+    private string GetSongmapPath()
+    {
+        return $"{GetSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
+    }
+
+    /* Returns filepath to this songmaps audio file */
+    private string GetSongmapAudioFilePath()
+    {
+        return $"{GetSongmapFolderPath()}\\{audioFilename}";
+    }
+
     /* XML Serialization interface */
     public XmlSchema GetSchema()
     {
@@ -434,7 +452,10 @@ public class Songmap : IXmlSerializable
 
     /* Private methods */
 
-    /* Validates the songmap attributes if it's an functional songmap */
+    /* 
+     * Validates the songmap attributes if it's an functional songmap.
+     * Return boolean whether the validation succeeded or not.
+     */
     private bool Validate()
     {
         List<bool> checks = new List<bool>();
@@ -507,23 +528,5 @@ public class Songmap : IXmlSerializable
                 return mapObjList.IndexOf(mapObj);
         }
         return DUPLICATE_NOT_FOUND;
-    }
-
-    /* Returns filepath to currently selected audio files folder */
-    private string GetSongmapFolderPath()
-    {
-        return $"{SONGS_FOLDER}\\{Path.GetFileNameWithoutExtension(audioFilename)}";
-    }
-
-    /* Returns filepath to this songmaps difficulty file */
-    private string GetSongmapPath()
-    {
-        return $"{GetSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
-    }
-
-    /* Returns filepath to this songmaps audio file */
-    private string GetSongmapAudioFilePath()
-    {
-        return $"{GetSongmapFolderPath()}\\{audioFilename}";
     }
 }
