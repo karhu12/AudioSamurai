@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO;
+using UnityEngine.Networking;
 
 /*
  * SongmapController is a class thats mission is to ensure that the Songs can be loaded into the game and displayed for the user so they can choose which ever one to play.
@@ -12,7 +13,7 @@ public class SongmapController : MonoBehaviour
     public static readonly string APPLICATION_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AudioSamurai";
 
     private Dictionary<string, List<Songmap>> songmaps = new Dictionary<string, List<Songmap>>();
-
+    public AudioSource AudioSource;
 
     // Start is called before the first frame update
     void Start()
@@ -21,10 +22,26 @@ public class SongmapController : MonoBehaviour
         LoadSongmaps();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void PlaySongmapAudio(Songmap songmap)
     {
-        
+        StartCoroutine(PlaySongmapAudioCoroutine(songmap));
+    }
+
+    public IEnumerator PlaySongmapAudioCoroutine(Songmap songmap)
+    {
+        using (var www = UnityWebRequestMultimedia.GetAudioClip(songmap.GetSongmapAudioFilePath(), songmap.GetAudioType()))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError)
+            {
+                Debug.Log(www.error);
+            } else
+            {
+                AudioSource.clip = DownloadHandlerAudioClip.GetContent(www);
+                AudioSource.Play();
+            }
+        }
     }
 
     /* Returns an readonly songmaps dictionary that contains different songmaps under their parent song. */

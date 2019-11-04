@@ -345,21 +345,44 @@ public class Songmap : IXmlSerializable
         return HAL_DEFAULT_DURATION - hitAccuracyLevel * HAL_DIFF;
     }
 
+    /* Returns the average difficulty of given map */
+    public float GetDifficulty()
+    {
+        return (HitAccuracyLevel + ApproachRate) / 2;
+    }
+
+    /* Returns AudioType object based on the currently selected audioFile */
+    public AudioType GetAudioType()
+    {
+        string ext = Path.GetExtension(GetSongmapAudioFilePath());
+
+        switch (ext.ToLower())
+        {
+            case ".mp3":
+                return AudioType.MPEG;
+            case ".ogg":
+                return AudioType.OGGVORBIS;
+            case ".wav":
+                return AudioType.WAV;
+            default:
+                return AudioType.UNKNOWN;
+        }
+    }
 
     /* Returns filepath to currently selected audio files folder */
-    private string GetSongmapFolderPath()
+    public string GetSongmapFolderPath()
     {
         return $"{SONGS_FOLDER}\\{Path.GetFileNameWithoutExtension(audioFilename)}";
     }
 
     /* Returns filepath to this songmaps difficulty file */
-    private string GetSongmapPath()
+    public string GetSongmapPath()
     {
         return $"{GetSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
     }
 
     /* Returns filepath to this songmaps audio file */
-    private string GetSongmapAudioFilePath()
+    public string GetSongmapAudioFilePath()
     {
         return $"{GetSongmapFolderPath()}\\{audioFilename}";
     }
