@@ -8,15 +8,14 @@ public class SongmapController : MonoBehaviour
 {
     public static readonly string APPLICATION_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AudioSamurai";
 
+    private Dictionary<string, List<Songmap>> songmaps = new Dictionary<string, List<Songmap>>();
+
+
     // Start is called before the first frame update
     void Start()
     {
         EnsureApplicationFolders();
-        Songmap m = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
-        m.AddTiming(680, 80);
-        m.AddTiming(200, 240);
-        List<float> l = m.getBeatList(0, 20);
-        print(l);
+        LoadSongmaps();
     }
 
     // Update is called once per frame
@@ -24,6 +23,8 @@ public class SongmapController : MonoBehaviour
     {
         
     }
+
+    /* Private methods */
 
     /*
      * Ensures that the required application folders exists in the local application data and creates them if they dont.
@@ -45,6 +46,33 @@ public class SongmapController : MonoBehaviour
         catch (Exception e)
         {
             print("Exception occurred during application folder creation: " + e.ToString());
+        }
+    }
+
+    private void LoadSongmaps()
+    {
+        songmaps.Clear();
+        
+        foreach (var dir in Directory.EnumerateDirectories(Songmap.SONGS_FOLDER))
+        {
+            string key = dir.Substring(dir.LastIndexOf("\\") + 1);
+            songmaps.Add(key, new List<Songmap>());
+            foreach (var file in Directory.EnumerateFiles(dir))
+            {
+                if (file.Contains(Songmap.SONG_MIME_TYPE))
+                {
+                    try
+                    {
+                        Songmap songmap = Songmap.Load(file);
+                        songmaps[key].Add(songmap);
+                    } catch (Exception e)
+                    {
+                        print($"Exception occurred while loading file {file} as songmap. {e.ToString()}");
+                    }
+                }
+            }
+            if (songmaps[key].Count == 0)
+                songmaps.Remove(key);
         }
     }
 }
