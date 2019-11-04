@@ -491,7 +491,7 @@ public class Songmap : IXmlSerializable
                         mapObjMin = mapObj.Item1;
                 }
 
-                if (mapObjMin > timingMin)
+                if (mapObjMin >= timingMin)
                     return true;
             }
             else
