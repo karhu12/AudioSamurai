@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SongSelectionScrollAdapter : MonoBehaviour
+public class SongSelection : MonoBehaviour
 {
     /* Constants */
     readonly Color32 SELECTED_COLOR = new Color32(0xB9, 0x34, 0x88, 0xff);
@@ -63,6 +63,19 @@ public class SongSelectionScrollAdapter : MonoBehaviour
         }
     }
 
+    public void OnBackPress()
+    {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+        foreach (var view in views)
+        {
+            view.ToggleChildren(false);
+        }
+        if (SongmapController.Instance.AudioSource.isPlaying)
+        {
+            SongmapController.Instance.AudioSource.Stop();
+        }
+    }
+
     /*
      * Fired when one of the songmap titles has been clicked. Expands its actual songmaps if not open, else hides them.
      * Also plays the maps audio while children are expanded
@@ -95,6 +108,9 @@ public class SongSelectionScrollAdapter : MonoBehaviour
         }
     }
 
+    /*
+     * Fired when songmap title has been expanded and its child has been pressed. Will selected the given children, set play button active and high light the selection.
+     */
     public void OnSongmapClick(Text title)
     {
         foreach (var child in selectedView.songmapChildViews)
@@ -113,7 +129,8 @@ public class SongSelectionScrollAdapter : MonoBehaviour
 
     public void OnPlayClick()
     {
-        /* TODO: Move camera to game scene and pass songmap from selectedChild to game */
+        /* TODO: Change game state to start and load / instantiate map */
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Game);
     }
 }
 
@@ -165,6 +182,16 @@ public class SongmapView
         foreach (var view in songmapChildViews)
         {
             view.gameObject.SetActive(childrenExpanded);
+        }
+        return childrenExpanded;
+    }
+
+    public bool ToggleChildren(bool setOn)
+    {
+        childrenExpanded = setOn;
+        foreach (var view in songmapChildViews)
+        {
+            view.gameObject.SetActive(setOn);
         }
         return childrenExpanded;
     }
