@@ -6,42 +6,46 @@ using System.IO;
 using UnityEngine.Networking;
 
 /*
- * SongmapController is a class thats mission is to ensure that the Songs can be loaded into the game and displayed for the user so they can choose which ever one to play.
+ * SongmapController is a singleton class thats mission is to ensure that the Songs can be loaded into the game, displayed for the user and played so they can choose which ever one to play.
  */
 public class SongmapController : MonoBehaviour
 {
+    private static SongmapController instance;
+    public static SongmapController Instance { get => instance; }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+        } else
+        {
+            instance = this;
+        }
+    }
+
     public static readonly string APPLICATION_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AudioSamurai";
 
     private Dictionary<string, List<Songmap>> songmaps = new Dictionary<string, List<Songmap>>();
+
     public AudioSource AudioSource;
 
-    // Start is called before the first frame update
     void Start()
     {
         EnsureApplicationFolders();
         LoadSongmaps();
     }
 
+    /* Starts an couroutine that loads the songmaps audio clip and starts playing it. */
     public void PlaySongmapAudio(Songmap songmap)
     {
         StartCoroutine(PlaySongmapAudioCoroutine(songmap));
     }
 
-    public IEnumerator PlaySongmapAudioCoroutine(Songmap songmap)
+    /* Starts an coroutine that loads the songmaps audio clip into the audio source. */
+    public void LoadSongmapAudio(Songmap songmap)
     {
-        using (var www = UnityWebRequestMultimedia.GetAudioClip(songmap.GetSongmapAudioFilePath(), songmap.GetAudioType()))
-        {
-            yield return www.SendWebRequest();
-
-            if (www.isNetworkError)
-            {
-                Debug.Log(www.error);
-            } else
-            {
-                AudioSource.clip = DownloadHandlerAudioClip.GetContent(www);
-                AudioSource.Play();
-            }
-        }
+        StartCoroutine(LoadSongmapAudioCoroutine(songmap));
     }
 
     /* Returns an readonly songmaps dictionary that contains different songmaps under their parent song. */
@@ -104,6 +108,35 @@ public class SongmapController : MonoBehaviour
         catch (Exception e)
         {
             print("Exception occurred during application folder creation: " + e.ToString());
+        }
+    }
+
+    /*
+     * Couroutine that loads the audio clip from given songmap and starts playing it.
+     */
+    private IEnumerator PlaySongmapAudioCoroutine(Songmap songmap)
+    {
+        yield return LoadSongmapAudioCoroutine(songmap);
+        AudioSource.Play();
+    }
+
+    /*
+     * Couroutine that loads the audio clip from given songmap.
+     */
+    private IEnumerator LoadSongmapAudioCoroutine(Songmap songmap)
+    {
+        using (var www = UnityWebRequestMultimedia.GetAudioClip(songmap.GetSongmapAudioFilePath(), songmap.GetAudioType()))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                AudioSource.clip = DownloadHandlerAudioClip.GetContent(www);
+            }
         }
     }
 }

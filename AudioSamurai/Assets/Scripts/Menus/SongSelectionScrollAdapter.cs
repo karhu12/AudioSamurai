@@ -9,7 +9,6 @@ public class SongSelectionScrollAdapter : MonoBehaviour
     readonly Color32 SELECTED_COLOR = new Color32(0xB9, 0x34, 0x88, 0xff);
     readonly Color32 UNSELECTED_COLOR = new Color32(0xB0, 0x15, 0xCF, 0xff);
 
-    public SongmapController songmapController;
     public GameObject songmapParentPrefab;
     public GameObject songmapChildPrefab;
     public GameObject songmapPrefab;
@@ -37,7 +36,7 @@ public class SongSelectionScrollAdapter : MonoBehaviour
     {
         views.Clear();
         playSongButton.gameObject.SetActive(false);
-        maps = songmapController.GetSongmaps();
+        maps = SongmapController.Instance.GetSongmaps();
 
         foreach (Transform child in content)
         {
@@ -80,11 +79,11 @@ public class SongSelectionScrollAdapter : MonoBehaviour
                 if (view.ToggleChildren())
                 {
                     selectedView = view;
-                    songmapController.PlaySongmapAudio(maps[title.text][0]);
+                    SongmapController.Instance.PlaySongmapAudio(maps[title.text][0]);
                 }
                 else
                 {
-                    songmapController.AudioSource.Stop();
+                    SongmapController.Instance.AudioSource.Stop();
                     playSongButton.gameObject.SetActive(false);
                     selectedView = null;
                     selectedChildView = null;
