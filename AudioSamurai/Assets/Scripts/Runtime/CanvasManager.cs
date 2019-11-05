@@ -27,6 +27,11 @@ public class CanvasManager : MonoBehaviour
         }
     }
 
+    public void OnStart()
+    {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
+    }
+
     public void CheckMenuStatus()
     {
         if (onMainMenu)
@@ -75,13 +80,11 @@ public class CanvasManager : MonoBehaviour
 
     public void LoadSettings()
     {
-        Debug.Log("Loading settings...");
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
     }
 
     public void QuitGame()
     {
         Debug.Log("Quitting game...");
-    }
-
-
+    }   
 }

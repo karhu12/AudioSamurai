@@ -17,13 +17,6 @@ public class CameraController : Singleton<CameraController>
         Pause
     }
 
-    private void Start()
-    {
-        print(SetCameraToState(CameraState.Menu));
-        print(SetCameraToState(CameraState.OptionsMenu));
-        print(SetCameraToState(CameraState.SongSelection));
-    }
-
     public CameraState cameraState = CameraState.Default;
 
     private Animator animator;
@@ -56,5 +49,21 @@ public class CameraController : Singleton<CameraController>
             return true;
         }
         return false;
+    }
+
+    private void FixedUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            SetCameraToState(CameraState.Menu);
+        }
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            SetCameraToState(CameraState.Default);
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            SetCameraToState(CameraState.SongSelection);
+        }
     }
 }
