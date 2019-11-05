@@ -81,6 +81,7 @@ public class MainMenu : MonoBehaviour
     public void LoadSettings()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
+        Debug.Log("loading...");
     }
 
     public void QuitGame()
