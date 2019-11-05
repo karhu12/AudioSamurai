@@ -47,6 +47,7 @@ public class SongmapController : MonoBehaviour
     /* Returns an readonly songmaps dictionary that contains different songmaps under their parent song. */
     public IReadOnlyDictionary<string, List<Songmap>> GetSongmaps()
     {
+        LoadSongmaps();
         return (IReadOnlyDictionary<string, List<Songmap>>) songmaps;
     }
 

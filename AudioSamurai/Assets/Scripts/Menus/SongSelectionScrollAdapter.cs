@@ -25,6 +25,9 @@ public class SongSelectionScrollAdapter : MonoBehaviour
         Refresh();
     }
 
+    /*
+     * Updates the song list using songmapControllers songmaps.
+     */
     public void Refresh()
     {
         views.Clear();
@@ -44,7 +47,7 @@ public class SongSelectionScrollAdapter : MonoBehaviour
 
             foreach (var map in maps[key])
             {
-                view.AddSongmapChildView(songmapChildPrefab);
+                view.AddSongmapChildView(songmapChildPrefab, map);
                 SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
                 child.title.text = map.DifficultyTitle;
                 child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
@@ -56,6 +59,10 @@ public class SongSelectionScrollAdapter : MonoBehaviour
         }
     }
 
+    /*
+     * Fired when one of the songmap titles has been clicked. Expands its actual songmaps if not open, else hides them.
+     * Also plays the maps audio while children are expanded
+     */
     public void OnSongmapParentClick(Text title)
     {
         foreach (var view in views)
@@ -74,7 +81,9 @@ public class SongSelectionScrollAdapter : MonoBehaviour
                     selectedView = null;
                     selectedChildView = null;
                 }
-                break;
+            } else if (view.HasExpandedChildren())
+            {
+                view.ToggleChildren();
             }
         }
     }
@@ -89,6 +98,11 @@ public class SongSelectionScrollAdapter : MonoBehaviour
                 playSongButton.gameObject.SetActive(true);
             }
         }
+    }
+
+    public void OnPlayClick()
+    {
+        /* TODO: Move camera to game scene and pass songmap from selectedChild to game */
     }
 }
 
@@ -120,13 +134,18 @@ public class SongmapView
         parentSongmapView.gameObject.SetActive(true);
     }
 
-    public void AddSongmapChildView(GameObject childPrefab)
+    public void AddSongmapChildView(GameObject childPrefab, Songmap map)
     {
         GameObject obj = MonoBehaviour.Instantiate(childPrefab);
-        SongmapChildView childView = new SongmapChildView(obj);
+        SongmapChildView childView = new SongmapChildView(obj, map);
         childView.gameObject.transform.SetParent(gameObject.transform, false);
         childView.gameObject.SetActive(true);
         songmapChildViews.Add(childView);
+    }
+
+    public bool HasExpandedChildren()
+    {
+        return songmapChildViews[0].gameObject.activeSelf;
     }
 
     public bool ToggleChildren()
@@ -166,9 +185,11 @@ public class SongmapChildView : View
     public Text difficulty;
     public Text approachRate;
     public Text hitAccuracyLevel;
+    public Songmap songmap;
 
-    public SongmapChildView(GameObject gameObject) : base(gameObject)
+    public SongmapChildView(GameObject gameObject, Songmap map) : base(gameObject)
     {
+        songmap = map;
         title = this.gameObject.transform.Find("ItemTitle").GetComponent<Text>();
         difficulty = this.gameObject.transform.Find("ItemDifficulty").GetComponent<Text>();
         approachRate = this.gameObject.transform.Find("ItemAR").GetComponent<Text>();
