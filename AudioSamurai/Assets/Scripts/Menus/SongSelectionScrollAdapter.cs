@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 public class SongSelectionScrollAdapter : MonoBehaviour
 {
+    /* Constants */
+    readonly Color32 SELECTED_COLOR = new Color32(0xB9, 0x34, 0x88, 0xff);
+    readonly Color32 UNSELECTED_COLOR = new Color32(0xB0, 0x15, 0xCF, 0xff);
+
     public SongmapController songmapController;
     public GameObject songmapParentPrefab;
     public GameObject songmapChildPrefab;
@@ -19,6 +23,7 @@ public class SongSelectionScrollAdapter : MonoBehaviour
     IReadOnlyDictionary<string, List<Songmap>> maps;
     SongmapView selectedView;
     SongmapChildView selectedChildView;
+
 
     private void Start()
     {
@@ -65,6 +70,9 @@ public class SongSelectionScrollAdapter : MonoBehaviour
      */
     public void OnSongmapParentClick(Text title)
     {
+        if (selectedChildView != null && selectedChildView.gameObject != null)
+            selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
+
         foreach (var view in views)
         {
             if (view.parentSongmapView.title.text == title.text)
@@ -94,7 +102,11 @@ public class SongSelectionScrollAdapter : MonoBehaviour
         {
             if (child.title.text == title.text)
             {
+                if (selectedChildView != null && selectedChildView.gameObject != null)
+                    selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
+
                 selectedChildView = child;
+                child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
                 playSongButton.gameObject.SetActive(true);
             }
         }
