@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CanvasManager : MonoBehaviour
+public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
     public static bool onPause = false;
@@ -25,6 +25,11 @@ public class CanvasManager : MonoBehaviour
                 Pause();
             }
         }
+    }
+
+    public void OnStart()
+    {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
     }
 
     public void CheckMenuStatus()
@@ -75,13 +80,11 @@ public class CanvasManager : MonoBehaviour
 
     public void LoadSettings()
     {
-        Debug.Log("Loading settings...");
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
     }
 
     public void QuitGame()
     {
         Debug.Log("Quitting game...");
-    }
-
-
+    }   
 }
