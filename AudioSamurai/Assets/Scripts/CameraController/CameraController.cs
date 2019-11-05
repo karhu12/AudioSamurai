@@ -7,7 +7,6 @@ public class CameraController : Singleton<CameraController>
 {
     public enum CameraState
     {
-        Default,
         Menu,
         SongSelection,
         Quit,
@@ -17,7 +16,7 @@ public class CameraController : Singleton<CameraController>
         Pause
     }
 
-    public CameraState cameraState = CameraState.Default;
+    public CameraState cameraState = CameraState.Menu;
 
     private Animator animator;
     public Animator Animator
@@ -49,21 +48,5 @@ public class CameraController : Singleton<CameraController>
             return true;
         }
         return false;
-    }
-
-    private void FixedUpdate()
-    {
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            SetCameraToState(CameraState.Menu);
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            SetCameraToState(CameraState.Default);
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            SetCameraToState(CameraState.SongSelection);
-        }
     }
 }

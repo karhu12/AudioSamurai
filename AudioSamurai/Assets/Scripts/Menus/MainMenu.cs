@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CanvasManager : MonoBehaviour
+public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
     public static bool onPause = false;
