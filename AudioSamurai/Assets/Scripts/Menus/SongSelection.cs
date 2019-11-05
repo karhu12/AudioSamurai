@@ -63,6 +63,9 @@ public class SongSelection : MonoBehaviour
         }
     }
 
+    /*
+     * Fired when the back button is pressed. Takes the used back to the main menu.
+     */
     public void OnBackPress()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
@@ -70,6 +73,12 @@ public class SongSelection : MonoBehaviour
         {
             view.ToggleChildren(false);
         }
+        selectedView = null;
+        if (selectedChildView != null)
+            selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
+        selectedChildView = null;
+        playSongButton.gameObject.SetActive(false);
+
         if (SongmapController.Instance.AudioSource.isPlaying)
         {
             SongmapController.Instance.AudioSource.Stop();
