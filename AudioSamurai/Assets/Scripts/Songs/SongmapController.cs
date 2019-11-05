@@ -8,22 +8,8 @@ using UnityEngine.Networking;
 /*
  * SongmapController is a singleton class thats mission is to ensure that the Songs can be loaded into the game, displayed for the user and played so they can choose which ever one to play.
  */
-public class SongmapController : MonoBehaviour
+public class SongmapController : Singleton<SongmapController>
 {
-    private static SongmapController instance;
-    public static SongmapController Instance { get => instance; }
-
-    private void Awake()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(this.gameObject);
-        } else
-        {
-            instance = this;
-        }
-    }
-
     public static readonly string APPLICATION_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AudioSamurai";
 
     private Dictionary<string, List<Songmap>> songmaps = new Dictionary<string, List<Songmap>>();
