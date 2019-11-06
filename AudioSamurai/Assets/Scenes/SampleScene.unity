@@ -2270,8 +2270,9 @@ GameObject:
   - component: {fileID: 418938921}
   - component: {fileID: 418938920}
   - component: {fileID: 418938919}
+  - component: {fileID: 418938922}
   m_Layer: 5
-  m_Name: Button
+  m_Name: JumpAttackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2376,6 +2377,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 418938917}
   m_CullTransparentMesh: 0
+--- !u!114 &418938922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 418938917}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33ed214f2b29eb4c9bcb9c37bd7debd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
+  text: {fileID: 0}
+  actionReference: {fileID: 9108723991647095275, guid: 84b4043e07227a34480a9b6a07594967,
+    type: 3}
+  defaultBindingIndex: 0
+  compositeButtons: {fileID: 0}
+  compositeTexts: []
 --- !u!1 &434544045
 GameObject:
   m_ObjectHideFlags: 0
@@ -3995,7 +4015,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910635394}
-  m_LocalRotation: {x: -2.2364747e-11, y: 0.99999917, z: 0.0013000078, w: 0.000000017206894}
+  m_LocalRotation: {x: 2.2373237e-11, y: 0.99999917, z: 0.0012999879, w: -0.00000001720689}
   m_LocalPosition: {x: 0, y: 1.387, z: -8.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5651,7 +5671,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1278558170}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
@@ -5675,7 +5695,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: 
 --- !u!222 &1278558173
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7861,7 +7881,7 @@ GameObject:
   - component: {fileID: 1604554658}
   - component: {fileID: 1604554661}
   m_Layer: 5
-  m_Name: Button
+  m_Name: AttackButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8955,7 +8975,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1756108937}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
@@ -8979,7 +8999,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: 
 --- !u!222 &1756108940
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9868,8 +9888,9 @@ GameObject:
   - component: {fileID: 2091450718}
   - component: {fileID: 2091450717}
   - component: {fileID: 2091450716}
+  - component: {fileID: 2091450719}
   m_Layer: 5
-  m_Name: Button
+  m_Name: ParryButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9974,6 +9995,25 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2091450714}
   m_CullTransparentMesh: 0
+--- !u!114 &2091450719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091450714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a33ed214f2b29eb4c9bcb9c37bd7debd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  button: {fileID: 0}
+  text: {fileID: 0}
+  actionReference: {fileID: 8612818852247518081, guid: 84b4043e07227a34480a9b6a07594967,
+    type: 3}
+  defaultBindingIndex: 0
+  compositeButtons: {fileID: 0}
+  compositeTexts: []
 --- !u!1 &2108829106
 GameObject:
   m_ObjectHideFlags: 0
