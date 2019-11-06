@@ -69,20 +69,7 @@ public class SongSelection : MonoBehaviour
     public void OnBackPress()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
-        foreach (var view in views)
-        {
-            view.ToggleChildren(false);
-        }
-        selectedView = null;
-        if (selectedChildView != null)
-            selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
-        selectedChildView = null;
-        playSongButton.gameObject.SetActive(false);
-
-        if (SongmapController.Instance.AudioSource.isPlaying)
-        {
-            SongmapController.Instance.AudioSource.Stop();
-        }
+        ResetSongSelectionView();
     }
 
     /*
@@ -138,8 +125,29 @@ public class SongSelection : MonoBehaviour
 
     public void OnPlayClick()
     {
-        /* TODO: Change game state to start and load / instantiate map */
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.Game);
+        if (GameController.Instance.LoadGame(selectedChildView.songmap))
+        {
+            ResetSongSelectionView();
+            GameController.Instance.StartGame();
+        }
+    }
+
+    private void ResetSongSelectionView()
+    {
+        foreach (var view in views)
+        {
+            view.ToggleChildren(false);
+        }
+        selectedView = null;
+        if (selectedChildView != null)
+            selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
+        selectedChildView = null;
+        playSongButton.gameObject.SetActive(false);
+
+        if (SongmapController.Instance.AudioSource.isPlaying)
+        {
+            SongmapController.Instance.AudioSource.Stop();
+        }
     }
 }
 

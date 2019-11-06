@@ -50,7 +50,6 @@ public class Songmap : IXmlSerializable
     /* general */
     private string audioFilename;
 
-
     /* Difficulty */
     private string difficultyTitle;
     public string DifficultyTitle { 
@@ -182,6 +181,15 @@ public class Songmap : IXmlSerializable
     public IList<(float, float, int)> GetTimingList()
     {
         return timingList.AsReadOnly();
+    }
+
+    /* 
+     * Returns the closest timing item at millisecond position.
+     * pos : position in milliseconds.
+     */
+    public (float, float, int) GetClosestTimingAt(float pos)
+    {
+        return timingList.Aggregate((x, y) => Math.Abs(x.Item1 - pos) < Math.Abs(y.Item1 - pos) ? x : y);
     }
 
     /*
