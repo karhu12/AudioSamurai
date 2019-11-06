@@ -469,6 +469,12 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 5780119446202580547}
   m_PrefabAsset: {fileID: 0}
+--- !u!65 &317817068 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 6049067350840387481, guid: 05cbcf986cee7534bb0577495e44d5be,
+    type: 3}
+  m_PrefabInstance: {fileID: 6049067349587128966}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &447913550
 GameObject:
   m_ObjectHideFlags: 0
@@ -2573,6 +2579,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4712068133173416347, guid: 05cbcf986cee7534bb0577495e44d5be,
+        type: 3}
+      propertyPath: hitCollider
+      value: 
+      objectReference: {fileID: 317817068}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05cbcf986cee7534bb0577495e44d5be, type: 3}
 --- !u!1001 &8935928379476783973
