@@ -12,11 +12,11 @@ public class SongmapController : MonoBehaviour
     void Start()
     {
         EnsureApplicationFolders();
-        Songmap m = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
+        /*Songmap m = Songmap.Load($"{Songmap.SONGS_FOLDER}\\ROY KNOX - Earthquake [NCS Release]\\ROY KNOX - Earthquake [NCS Release] [Normal].as");
         m.AddTiming(680, 80);
         m.AddTiming(200, 240);
         List<float> l = m.getBeatList(0, 20);
-        print(l);
+        print(l);*/
     }
 
     // Update is called once per frame
