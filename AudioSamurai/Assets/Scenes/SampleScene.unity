@@ -2584,6 +2584,11 @@ PrefabInstance:
       propertyPath: hitCollider
       value: 
       objectReference: {fileID: 317817068}
+    - target: {fileID: 6049067350840387483, guid: 05cbcf986cee7534bb0577495e44d5be,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 05cbcf986cee7534bb0577495e44d5be, type: 3}
 --- !u!1001 &8935928379476783973
