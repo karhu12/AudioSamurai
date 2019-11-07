@@ -54,6 +54,9 @@ public class MapObject : Poolable<MapObject>
             case Player.HIT_COLLIDER_NAME:
                 OnPlayerHit(FindObjectOfType<Player>());
                 break;
+            case KillPlane.COLLIDER_NAME:
+                ReturnToPool();
+                break;
         }
     }
 
