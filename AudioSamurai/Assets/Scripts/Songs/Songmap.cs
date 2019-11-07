@@ -142,12 +142,13 @@ public class Songmap : IXmlSerializable
     {
         if (GetPositionDuplicate(ref mapObjects, pos) == DUPLICATE_NOT_FOUND)
         {
-            /*
-             TODO: if (objectType is valid) { add } 
-             */
-            mapObjects.Add((pos, objectType));
-            mapObjects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
-            return true;
+            List<string> availableTypes = MapObjectManager.Instance.GetMapObjectTypes();
+            if (availableTypes.Contains(objectType))
+            {
+                mapObjects.Add((pos, objectType));
+                mapObjects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                return true;
+            }
         }
         return false;
     }
