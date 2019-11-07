@@ -16,9 +16,6 @@ public class MapObjectManager : Singleton<MapObjectManager>
         {
             mapObjectPools.Add(prefab.GetMapObjectType(), new ObjectPool<MapObject>(prefab, spawnParent));
         }
-        GetMapObject(MapObject.Type).transform.position = new Vector3(0, 2, 3);
-        GetMapObject(GroundEnemy.Type).transform.position = new Vector3(0, 2, 6);
-        GetMapObject(AirEnemy.Type).transform.position = new Vector3(0, 2, 9);
     }
 
     public MapObject GetMapObject(string type)
