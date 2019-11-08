@@ -15,10 +15,16 @@ public class ControlRebind : MonoBehaviour
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
     private bool isUsingComposite;
 
+    InputAction action;
+    public InputActionAsset inputActionAsset;
+
 
     void Start()
     {
-        inputAction = actionReference.action;
+        var inputActions = inputActionAsset.FindActionMap("Player");
+        action = inputActions.FindAction("Attack");
+        inputActionAsset.Enable();
+        //inputAction = actionReference.action;
         if (button == null)
         {
             button = GetComponentInChildren<Button>();
@@ -40,7 +46,10 @@ public class ControlRebind : MonoBehaviour
 
     void RemapButtonClicked(string name, int bindingIndex = 0)
     {
-        button.enabled = false;
+        //InputAction actionToUse = inputAction.actionMap[0].actions[0];
+        //inputAction.Disable();
+        //actionToUse.Disable();
+        /*button.enabled = false;
         text.text = "Press button";
         rebindingOperation?.Dispose();
         rebindingOperation = inputAction.PerformInteractiveRebinding()
@@ -48,7 +57,20 @@ public class ControlRebind : MonoBehaviour
             .WithControlsExcluding("<Mouse>/delta")
             .OnMatchWaitForAnother(0.1f)
             .OnComplete(operation => ButtonRebindCompleted());
-        rebindingOperation.Start();
+        rebindingOperation.Start();*/
+
+        var inputActions = inputActionAsset.FindActionMap("Player");
+        action = inputActions.FindAction("Attack");
+        inputActionAsset.Disable();
+        action.Disable();
+        rebindingOperation = action.PerformInteractiveRebinding().WithRebindAddingNewBinding()
+            .OnComplete(operation =>
+            {
+                action.Enable();
+                inputActionAsset.Enable();
+                ButtonRebindCompleted(GetComponent<Button>());
+            })
+            .Start();
     }
 
     void ResetButtonMappingTextValue()
@@ -57,10 +79,10 @@ public class ControlRebind : MonoBehaviour
         button.gameObject.SetActive(!isUsingComposite);
     }
 
-    void ButtonRebindCompleted()
+    void ButtonRebindCompleted(Button button)
     {
         rebindingOperation.Dispose();
-        rebindingOperation = null;
+        //rebindingOperation = null;
         ResetButtonMappingTextValue();
         button.enabled = true;
     }
