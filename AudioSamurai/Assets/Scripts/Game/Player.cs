@@ -10,6 +10,8 @@ public class Player : MonoBehaviour
     public const float GROUND_PLACEMENT = .05f;
     public const float AIR_PLACEMENT = 2.05f;
     public const float ATTACK_TIME = 0.1f;
+    public const string COLLIDER_NAME = "Player";
+    public const string HIT_COLLIDER_NAME = "HitArea";
 
     public Collider hitCollider;
 
@@ -21,19 +23,19 @@ public class Player : MonoBehaviour
 
     private IEnumerator jumpAttack;
     private IEnumerator attack;
-
-    public const string COLLIDER_NAME = "Player";
-    public const string HIT_COLLIDER_NAME = "HitArea";
-       
+    private Animator animator;
 
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
+    public bool IsRunning { get; private set; }
 
     private void Awake()
     {
+        animator = GetComponent<Animator>();
         hitCollider.gameObject.SetActive(false);
         IsAttacking = false;
         IsJumpAttacking = false;
+        IsRunning = false;
 
         Equipment = new Equipment(gameObject);
         StartCoroutine(EquipCoroutine()); 
@@ -55,6 +57,9 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        animator.SetBool("IsRunning", IsRunning);
+        animator.SetBool("IsAttacking", IsAttacking);
+        animator.SetBool("IsJumpAttacking", IsJumpAttacking);
         if (Input.GetKeyDown(KeyCode.A))
         {
             Attack();
