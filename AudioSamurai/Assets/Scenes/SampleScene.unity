@@ -3381,7 +3381,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910635394}
-  m_LocalRotation: {x: 2.2369679e-11, y: 0.99999917, z: 0.0012999518, w: -0.000000017206894}
+  m_LocalRotation: {x: -2.2366494e-11, y: 0.99999917, z: 0.0012999717, w: 0.000000017206894}
   m_LocalPosition: {x: 0, y: 1.387, z: -8.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -4833,6 +4833,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainMenuUI: {fileID: 995196040}
   pauseUI: {fileID: 2018677147}
+--- !u!1 &1254873451 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3622385132926688460, guid: 05cbcf986cee7534bb0577495e44d5be,
+    type: 3}
+  m_PrefabInstance: {fileID: 6049067349587128966}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1261152867
 GameObject:
   m_ObjectHideFlags: 0
@@ -8734,6 +8740,23 @@ PrefabInstance:
       propertyPath: hitCollider
       value: 
       objectReference: {fileID: 317817068}
+    - target: {fileID: 4712068133173416347, guid: 05cbcf986cee7534bb0577495e44d5be,
+        type: 3}
+      propertyPath: swordModel
+      value: 
+      objectReference: {fileID: 4568607858219739295, guid: e552ebbeaf5f0f6429fa04b29b41d0bf,
+        type: 3}
+    - target: {fileID: 4712068133173416347, guid: 05cbcf986cee7534bb0577495e44d5be,
+        type: 3}
+      propertyPath: hatModel
+      value: 
+      objectReference: {fileID: 3486729438564404695, guid: b49c5b52c47fc8549b50a817620f890d,
+        type: 3}
+    - target: {fileID: 4712068133173416347, guid: 05cbcf986cee7534bb0577495e44d5be,
+        type: 3}
+      propertyPath: playerModel
+      value: 
+      objectReference: {fileID: 1254873451}
     - target: {fileID: 6049067350840387483, guid: 05cbcf986cee7534bb0577495e44d5be,
         type: 3}
       propertyPath: m_IsActive
