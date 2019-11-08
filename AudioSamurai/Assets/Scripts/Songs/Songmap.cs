@@ -510,6 +510,7 @@ public class Songmap : IXmlSerializable
             if (mapObjects.Count > 0)
             {
                 float timingMin = float.MaxValue;
+                List<string> validTypes = MapObjectManager.Instance.GetMapObjectTypes();
 
                 foreach (var timing in timingList)
                 {
@@ -519,6 +520,9 @@ public class Songmap : IXmlSerializable
                 float mapObjMin = float.MaxValue;
                 foreach (var mapObj in mapObjects)
                 {
+                    if (!validTypes.Contains(mapObj.Item2))
+                        return false;
+
                     if (mapObj.Item1 < mapObjMin)
                         mapObjMin = mapObj.Item1;
                 }

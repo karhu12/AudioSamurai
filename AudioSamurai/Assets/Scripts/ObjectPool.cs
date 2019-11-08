@@ -12,8 +12,8 @@ public class ObjectPool<T>
      
     public ObjectPool(Poolable<T> poolable, Transform parent, int initialSize = 5)
     {
+        Size = 0;
         poolParent = parent;
-        Size = initialSize;
         prefab = poolable;
         for (int sz = 0; sz < initialSize; sz++)
         {
@@ -25,9 +25,15 @@ public class ObjectPool<T>
     {
         if (objectPool.Count == 0)
             InstantiateNewPoolable();
+
         Poolable<T> obj = objectPool.Dequeue();
         obj.gameObject.SetActive(true);
         return obj;
+    }
+
+    public int GetAvailableCount()
+    {
+        return objectPool.Count;
     }
 
     /* */
@@ -50,6 +56,7 @@ public class ObjectPool<T>
         obj.gameObject.SetActive(false);
         obj.Pool = this;
         objectPool.Enqueue(obj);
+        Size += 1;
         return obj;
     }
 }

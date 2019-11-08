@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         hitCollider.gameObject.SetActive(false);
+        hitCollider.transform.position = new Vector3(0, 1, GameController.BEAT_DISTANCE);
         IsAttacking = false;
         IsJumpAttacking = false;
     }

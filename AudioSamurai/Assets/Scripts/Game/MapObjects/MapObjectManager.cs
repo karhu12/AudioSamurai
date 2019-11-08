@@ -18,6 +18,19 @@ public class MapObjectManager : Singleton<MapObjectManager>
         }
     }
 
+    public bool HasActiveObjects()
+    {
+        foreach (var key in mapObjectPools.Keys)
+        {
+            if (mapObjectPools[key].GetAvailableCount() != mapObjectPools[key].Size)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public MapObject GetMapObject(string type)
     {
         if (mapObjectPools.ContainsKey(type))
