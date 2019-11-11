@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
+    public const float HIT_AREA_OFFSET = 1f;
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
@@ -21,6 +22,7 @@ public class Player : MonoBehaviour
     public const string PARRY_ACTION  = "Parry";
 
     public Collider hitCollider;
+    public GameObject hitIndicator;
     public InputActionAsset inputActionAsset;
 
     /* Cosmetic */
@@ -31,7 +33,7 @@ public class Player : MonoBehaviour
 
     private IEnumerator jumpAttack;
     private IEnumerator attack;
-    private float beatDuration = 0;
+    private float currentBpm = 0;
     private Animator animator;
     private InputAction playerAttack;
     private InputAction playerJumpAttack;
@@ -51,7 +53,8 @@ public class Player : MonoBehaviour
         inputActionAsset.Enable();
         animator = GetComponent<Animator>();
         hitCollider.gameObject.SetActive(false);
-        hitCollider.transform.position = new Vector3(0, 1, GameController.BEAT_DISTANCE);
+        hitCollider.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET);
+        hitIndicator.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET);
         IsAttacking = false;
         IsJumpAttacking = false;
         IsRunning = false;
@@ -100,7 +103,7 @@ public class Player : MonoBehaviour
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning)
         {
-            transform.position += new Vector3(0f, 0f, beatDuration * Time.deltaTime * DEFAULT_SPEED);
+            transform.position += new Vector3(0f, 0f, ((currentBpm / GameController.BPM_MULTIPLIER) * GameController.BEAT_DISTANCE_PER_BPM_MULT) * (currentBpm / GameController.BPM_MULTIPLIER) * Time.fixedDeltaTime);
         }
     }
 
@@ -108,7 +111,7 @@ public class Player : MonoBehaviour
     {
         if (bpm > 0)
         {
-            beatDuration = 60 / bpm;
+            currentBpm = bpm;
         }
     }
 
@@ -118,8 +121,11 @@ public class Player : MonoBehaviour
      */
     public void Attack(InputAction.CallbackContext obj)
     {
-        attack = AttackCoroutine();
-        StartCoroutine(attack);
+        if (IsRunning)
+        {
+            attack = AttackCoroutine();
+            StartCoroutine(attack);
+        }
     }
 
      /*
@@ -128,8 +134,11 @@ public class Player : MonoBehaviour
      */
     public void JumpAttack(InputAction.CallbackContext obj)
     {
-        jumpAttack = JumpAttackCoroutine();
-        StartCoroutine(jumpAttack);
+        if (IsRunning)
+        {
+            jumpAttack = JumpAttackCoroutine();
+            StartCoroutine(jumpAttack);
+        }
     }
     
     IEnumerator AttackCoroutine()

@@ -251,9 +251,9 @@ public class Songmap : IXmlSerializable
     /*
      * Returns an list of floats which indicate that when beats happen based on the start position and timingList. An empty list is returned if position is not valid compared to timingList (eg. before first timing).
      * pos : position in milliseconds from where on to fetch the beat list.
-     * count : how many beats to fetch.
+     * duration : from how long period should the beat list be fetched from in milliseconds.
      */
-    public List<float> getBeatList(float pos, int count = 10)
+    public List<float> getBeatList(float pos, float duration)
     {
         List<float> beatList = new List<float>();
         if (timingList.Count > 0)
@@ -280,7 +280,7 @@ public class Songmap : IXmlSerializable
                 float nextTimingPos = timingList.FirstOrDefault(x => x.Item1 > currentBeat).Item1;
                 nextTimingPos = nextTimingPos > currentBeat ? nextTimingPos : -1;
 
-                while (beatList.Count < count)
+                while (currentBeat < duration)
                 {
                     if (nextTimingPos != -1)
                     {
@@ -293,7 +293,7 @@ public class Songmap : IXmlSerializable
                     currentBeat += beatTime;
                     beatList.Add(currentBeat);
                 }
-            } while (beatList.Count < count);
+            } while (currentBeat < duration);
         }
         return beatList;
     }

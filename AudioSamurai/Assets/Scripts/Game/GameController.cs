@@ -7,7 +7,8 @@ using UnityEngine;
 public class GameController : Singleton<GameController>
 {
     /* Constants */
-    public const float BEAT_DISTANCE = 2f;
+    public const float BEAT_DISTANCE_PER_BPM_MULT = 1f;
+    public const float BPM_MULTIPLIER = 60f;
 
     private const float SPAWN_AHEAD_IN_MS = 1000;
     private const float TIME_AFTER_LAST_OBJECT = 4000;
@@ -29,8 +30,8 @@ public class GameController : Singleton<GameController>
 
     private Songmap selectedSongmap;
 
-    private List<(float, string)> spawnQueue = new List<(float, string)>();
-    private (float, float, int) currentTiming;
+    private List<(float, float, string)> spawnQueue = new List<(float, float, string)>();
+    private List<(float, float)> timingQueue = new List<(float, float)>();
 
     public GameState State
     {
@@ -58,11 +59,8 @@ public class GameController : Singleton<GameController>
     {
         if (State == GameState.Idle)
         {
-            foreach (var mapObj in songmap.GetMapObjects())
-            {
-                spawnQueue.Add(mapObj);
-            }
             selectedSongmap = songmap;
+            Calculate();
             State = GameState.Ready;
             return true;
         }
@@ -112,7 +110,7 @@ public class GameController : Singleton<GameController>
     /* Checks if the items in the queue are within SPAWN_AHEAD_IN_MS from the current time in song and instantiates them in correct place if they are. */
     private void HandleSpawnQueue()
     {
-        List<(float, string)> removeList = new List<(float, string)>();
+        List<(float, float, string)> removeList = new List<(float, float, string)>();
         /* Note. mapObject ms position can not be less than first beat becaues of map validation. */
         foreach (var obj in spawnQueue)
         {
@@ -120,12 +118,9 @@ public class GameController : Singleton<GameController>
             if (obj.Item1 <= (songPosMs + SPAWN_AHEAD_IN_MS))
             {
                 removeList.Add(obj);
-                MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item2);
-                float beatTime = (60 / currentTiming.Item2 / currentTiming.Item3) * 1000;
+                MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item3);
 
-                float spawnPosOffset = ((obj.Item1 - songPosMs) / beatTime) * GameController.BEAT_DISTANCE;
-
-                mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), hitArea.transform.position.z + spawnPosOffset);
+                mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), obj.Item2);
             }
         }
         foreach (var removeItem in removeList)
@@ -137,15 +132,24 @@ public class GameController : Singleton<GameController>
     /* Sets the speed of entities affected by the game based on the BPM of current section. */
     private void HandleGameSpeed()
     {
-        (float, float, int) timingItem = selectedSongmap.GetClosestTimingAt(SongmapController.Instance.AudioSource.time);
-        if (timingItem.Item1 <= SongmapController.Instance.AudioSource.time)
-        {
-            currentTiming = timingItem;
-        }
-
         if (!player.IsRunning)
             player.IsRunning = true;
-        player.ChangeSpeed(currentTiming.Item2);
+
+        List<(float, float)> removeList = new List<(float, float)>();
+
+        foreach (var timing in timingQueue)
+        {
+            if (timing.Item1 <= SongmapController.Instance.AudioSource.time)
+            {
+                player.ChangeSpeed(timing.Item2);
+                removeList.Add(timing);
+            }
+        }
+
+        foreach (var remove in removeList)
+        {
+            timingQueue.Remove(remove);
+        }
     }
 
     /* Handles moving the user from game scene to result screen and display the result ui. */
@@ -199,5 +203,29 @@ public class GameController : Singleton<GameController>
             yield return new WaitForSeconds(1);
         }
         Debug.Log("Go!");
+    }
+
+    private void Calculate()
+    {
+        List<float> beats = selectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
+        List<(float, float)> beatSpawnPositions = new List<(float, float)>();
+        foreach (var beat in beats)
+        {
+            (float, float, int) closest = selectedSongmap.GetClosestTimingAt(beat);
+            beatSpawnPositions.Add((beat, (Player.HIT_AREA_OFFSET + (beats.IndexOf(beat) * ((closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT)) / closest.Item3)));
+        }
+
+        foreach (var mapObj in selectedSongmap.GetMapObjects())
+        {
+            (float,float) closestBeat = beatSpawnPositions.Aggregate((x, y) => Math.Abs(x.Item1 - mapObj.Item1) < Math.Abs(y.Item1 - mapObj.Item1) ? x : y);
+            spawnQueue.Add((mapObj.Item1, closestBeat.Item2, mapObj.Item2));
+        }
+
+        foreach (var timing in selectedSongmap.GetTimingList())
+        {
+            timingQueue.Add((timing.Item1, timing.Item2));
+        }
+
+        HandleSpawnQueue();
     }
 }

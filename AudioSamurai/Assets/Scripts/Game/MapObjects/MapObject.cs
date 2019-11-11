@@ -76,6 +76,7 @@ public class MapObject : Poolable<MapObject>
      */
     protected virtual void OnPlayerHit(Player player)
     {
-
+        Debug.Log($"Collision at: {SongmapController.Instance.AudioSource.time}");
+        ReturnToPool();
     }
 }

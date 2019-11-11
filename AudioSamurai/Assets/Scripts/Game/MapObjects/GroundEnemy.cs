@@ -20,5 +20,6 @@ public class GroundEnemy : MapObject
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
+        base.OnPlayerHit(player);
     }
 }
