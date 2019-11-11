@@ -10,6 +10,8 @@ public class Player : MonoBehaviour
     public const float GROUND_PLACEMENT = .05f;
     public const float AIR_PLACEMENT = 2.05f;
     public const float ATTACK_TIME = 0.1f;
+    public const float DEFAULT_SPEED = 10f;
+
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
 
@@ -23,11 +25,13 @@ public class Player : MonoBehaviour
 
     private IEnumerator jumpAttack;
     private IEnumerator attack;
+    private float beatDuration = 0;
     private Animator animator;
+
 
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
-    public bool IsRunning { get; private set; }
+    public bool IsRunning { get; set; }
 
     private void Awake()
     {
@@ -36,7 +40,6 @@ public class Player : MonoBehaviour
         IsAttacking = false;
         IsJumpAttacking = false;
         IsRunning = false;
-
         Equipment = new Equipment(gameObject);
         StartCoroutine(EquipCoroutine()); 
     }
@@ -60,13 +63,23 @@ public class Player : MonoBehaviour
         animator.SetBool("IsRunning", IsRunning);
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
-        if (Input.GetKeyDown(KeyCode.A))
+        CheckPlayerInput();
+    }
+
+    private void FixedUpdate()
+    {
+        //Add direction and velocity to player character depending on a song bpm
+        if (IsRunning)
         {
-            Attack();
+            transform.position += new Vector3(0f, 0f, beatDuration * Time.deltaTime * DEFAULT_SPEED);
         }
-        else if (Input.GetKeyDown(KeyCode.S))
+    }
+
+    public void ChangeSpeed(float bpm)
+    {
+        if (bpm > 0)
         {
-            JumpAttack();
+            beatDuration = 60 / bpm;
         }
     }
 
@@ -80,42 +93,82 @@ public class Player : MonoBehaviour
         StartCoroutine(attack);
     }
 
-    IEnumerator AttackCoroutine()
-    {
-        if (jumpAttack != null)
-            StopCoroutine(jumpAttack);
-
-        IsAttacking = true;
-        hitCollider.gameObject.SetActive(true);
-        /* TODO : Implement real player movement using rigidbody forces */
-        transform.position = new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z);
-        yield return new WaitForSeconds(ATTACK_TIME);
-        IsAttacking = false;
-        hitCollider.gameObject.SetActive(false);
-    }
-
-    /* 
-     * Performs an jump attack which is ran in an coroutine because it has time variables. 
+     /*
      * Works the same as normal attack but IsAttacking and IsJumpAttacking should be checked respectively.
+     * Performs an jump attack which is ran in an coroutine because it has time variables. 
      */
     public void JumpAttack()
     {
         jumpAttack = JumpAttackCoroutine();
         StartCoroutine(jumpAttack);
     }
+    
+    IEnumerator AttackCoroutine()
+    {
+        if (jumpAttack != null)
+        {
+            StopCoroutine(jumpAttack);
+            IsJumpAttacking = false;
+        }
 
+        IsAttacking = true;
+        hitCollider.gameObject.SetActive(true);
+        float addAmount = -.3f;
+        while (transform.position.y > GROUND_PLACEMENT)
+        {
+            yield return new WaitForSeconds(0.001f);
+            if (transform.position.y + addAmount <= GROUND_PLACEMENT)
+            {
+                transform.position = new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z);
+            }
+            else
+            {
+                transform.position += new Vector3(0, addAmount, 0);
+            }
+        }
+        yield return new WaitForSeconds(ATTACK_TIME);
+        IsAttacking = false;
+        hitCollider.gameObject.SetActive(false);
+    }
+    
     IEnumerator JumpAttackCoroutine()
     {
         if (attack != null)
+        {
             StopCoroutine(attack);
+            IsAttacking = false;
+        }
 
         IsJumpAttacking = true;
         hitCollider.gameObject.SetActive(true);
-        /* TODO : Implement real player movement using rigidbody forces */
-        transform.position = new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z);
+        float addAmount = .3f;
+        while (transform.position.y < AIR_PLACEMENT)
+        {
+            yield return new WaitForSeconds(0.001f);
+            if (transform.position.y + addAmount >= AIR_PLACEMENT)
+            {
+                transform.position = new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z);
+            }
+            else
+            {
+                transform.position += new Vector3(0, addAmount, 0);
+            }
+        }
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
         hitCollider.gameObject.SetActive(false);
+    }
+
+    private void CheckPlayerInput()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            Attack();
+        }
+        else if (Input.GetKeyDown(KeyCode.S))
+        {
+            JumpAttack();
+        }
     }
 }
 
