@@ -13,30 +13,24 @@ public class Player : MonoBehaviour
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
-    public const string GROUND_TAG = "Ground";
 
     public Collider hitCollider;
 
     private IEnumerator jumpAttack;
     private IEnumerator attack;
-    private Rigidbody rb;
-    private float beatDuration;
+    private float beatDuration = 0;
 
 
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
-    public bool OnGround { get; private set; }
     public bool IsRunning { get; set; }
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
         hitCollider.gameObject.SetActive(false);
         IsAttacking = false;
         IsJumpAttacking = false;
-        IsRunning = true;
-        OnGround = true;
-        ChangeSpeed(120);
+        IsRunning = false;
     }
 
     private void Update()
@@ -46,11 +40,10 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning)
         {
-            rb.AddForce(new Vector3(0f, 0f, beatDuration * Time.deltaTime * 2), ForceMode.Impulse);
+            transform.position += new Vector3(0f, 0f, beatDuration * Time.deltaTime * DEFAULT_SPEED);
         }
     }
 
@@ -68,42 +61,62 @@ public class Player : MonoBehaviour
         StartCoroutine(attack);
     }
 
-    IEnumerator AttackCoroutine()
-    {
-        if (jumpAttack != null)
-            StopCoroutine(jumpAttack);
-
-        IsAttacking = true;
-        hitCollider.gameObject.SetActive(true);
-        float horizontal = Input.GetAxis("Horizontal") * Time.deltaTime * DEFAULT_SPEED;
-        float vertical = Input.GetAxis("Vertical") * Time.deltaTime * DEFAULT_SPEED;
-
-        transform.Translate(horizontal, 0, vertical);
-        rb.AddForce(new Vector3(0, -5, 0), ForceMode.Impulse);
-        yield return new WaitForSeconds(ATTACK_TIME);
-        IsAttacking = false;
-        hitCollider.gameObject.SetActive(false);
-    }
-
     public void JumpAttack()
     {
         jumpAttack = JumpAttackCoroutine();
         StartCoroutine(jumpAttack);
     }
+    IEnumerator AttackCoroutine()
+    {
+        if (jumpAttack != null)
+        {
+            StopCoroutine(jumpAttack);
+            IsJumpAttacking = false;
+        }
+
+        IsAttacking = true;
+        hitCollider.gameObject.SetActive(true);
+        float addAmount = -.3f;
+        while (transform.position.y > GROUND_PLACEMENT)
+        {
+            yield return new WaitForSeconds(0.001f);
+            if (transform.position.y + addAmount <= GROUND_PLACEMENT)
+            {
+                transform.position = new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z);
+            }
+            else
+            {
+                transform.position += new Vector3(0, addAmount, 0);
+            }
+        }
+        yield return new WaitForSeconds(ATTACK_TIME);
+        IsAttacking = false;
+        hitCollider.gameObject.SetActive(false);
+    }
 
     IEnumerator JumpAttackCoroutine()
     {
         if (attack != null)
+        {
             StopCoroutine(attack);
+            IsAttacking = false;
+        }
 
         IsJumpAttacking = true;
         hitCollider.gameObject.SetActive(true);
-        float horizontal = Input.GetAxis("Horizontal") * Time.deltaTime * DEFAULT_SPEED;
-        float vertical = Input.GetAxis("Vertical") * Time.deltaTime * DEFAULT_SPEED;
-
-        transform.Translate(horizontal, 0, vertical);
-        rb.AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
-        OnGround = false;
+        float addAmount = .3f;
+        while (transform.position.y < AIR_PLACEMENT)
+        {
+            yield return new WaitForSeconds(0.001f);
+            if (transform.position.y + addAmount >= AIR_PLACEMENT)
+            {
+                transform.position = new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z);
+            }
+            else
+            {
+                transform.position += new Vector3(0, addAmount, 0);
+            }
+        }
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
         hitCollider.gameObject.SetActive(false);
@@ -118,14 +131,6 @@ public class Player : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.S))
         {
             JumpAttack();
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == GROUND_TAG)
-        {
-            OnGround = true;
         }
     }
 }
