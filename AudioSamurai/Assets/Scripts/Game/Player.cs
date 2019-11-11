@@ -7,8 +7,8 @@ using System;
 public class Player : MonoBehaviour
 {
     /* Constants */
-    public const float GROUND_PLACEMENT = .05f;
-    public const float AIR_PLACEMENT = 2.05f;
+    public const float GROUND_PLACEMENT = 0f;
+    public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
 
@@ -63,6 +63,7 @@ public class Player : MonoBehaviour
         animator.SetBool("IsRunning", IsRunning);
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
+        animator.SetFloat("Y", transform.position.y);
         CheckPlayerInput();
     }
 
@@ -113,7 +114,7 @@ public class Player : MonoBehaviour
 
         IsAttacking = true;
         hitCollider.gameObject.SetActive(true);
-        float addAmount = -.3f;
+        float addAmount = -.15f;
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return new WaitForSeconds(0.001f);
@@ -141,7 +142,7 @@ public class Player : MonoBehaviour
 
         IsJumpAttacking = true;
         hitCollider.gameObject.SetActive(true);
-        float addAmount = .3f;
+        float addAmount = .15f;
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return new WaitForSeconds(0.001f);
