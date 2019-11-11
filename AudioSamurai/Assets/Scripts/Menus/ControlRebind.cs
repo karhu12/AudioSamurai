@@ -3,15 +3,13 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 public class ControlRebind : MonoBehaviour
 {
-    public Button button;
-    public Text text;
     public InputActionReference actionReference;
     public int defaultBindingIndex;
-    public InputActionAsset inputActionAsset;
 
     private InputAction inputAction;
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
-    private bool isActive;
+    private Button button;
+    private Text text;
 
     void Start()
     {
@@ -54,7 +52,7 @@ public class ControlRebind : MonoBehaviour
     void ResetButtonMappingTextValue()
     {
         text.text = InputControlPath.ToHumanReadableString(inputAction.bindings[0].effectivePath);
-        button.gameObject.SetActive(!isActive);
+        button.gameObject.SetActive(true);
     }
 
     void ButtonRebindCompleted()
