@@ -8,13 +8,19 @@ public class OptionsMenu : MonoBehaviour
 {
 
     public AudioMixer audioMixer;
-
     public Dropdown resolutionDropdown;
-
+    int dropdownValue;
+    string dropdownText;
+    
     Resolution[] resolutions;
 
     void Start()
     {
+
+        string savedResolution = "";
+
+        savedResolution = PlayerPrefs.GetString("Resolution width");
+
         resolutions = Screen.resolutions;
         
         resolutionDropdown.ClearOptions();
@@ -32,17 +38,27 @@ public class OptionsMenu : MonoBehaviour
             {
                 currentResolutionIndex = i;
             }
+
+            
         }
 
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
+
     }
 
     public void SetResolution(int resolutionIndex)
     {
         Resolution resolution = resolutions[resolutionIndex];
         Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+
+        dropdownValue = resolutionDropdown.value;
+        dropdownText = resolutionDropdown.options[dropdownValue].text;
+
+        Debug.Log(dropdownText);
+        PlayerPrefs.SetString("Resolution width", dropdownText);
+
     }
 
     public void SetVolume(float volume)
