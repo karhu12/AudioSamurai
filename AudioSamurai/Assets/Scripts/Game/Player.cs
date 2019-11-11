@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -14,8 +15,13 @@ public class Player : MonoBehaviour
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
+    public const string INPUT_MAP = "Player";
+    public const string ATTACK_ACTION = "Attack";
+    public const string JUMP_ATTACK_ACTION = "Jump Attack";
+    public const string PARRY_ACTION  = "Parry";
 
     public Collider hitCollider;
+    public InputActionAsset inputActionAsset;
 
     /* Cosmetic */
     public GameObject hatModel;
@@ -27,6 +33,9 @@ public class Player : MonoBehaviour
     private IEnumerator attack;
     private float beatDuration = 0;
     private Animator animator;
+    private InputAction playerAttack;
+    private InputAction playerJumpAttack;
+    private InputAction playerParry;
 
 
     public bool IsAttacking { get; private set; }
@@ -35,6 +44,11 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        var inputActions = inputActionAsset.FindActionMap(Player.INPUT_MAP);
+        playerAttack = inputActions.FindAction(Player.ATTACK_ACTION);
+        playerJumpAttack = inputActions.FindAction(Player.JUMP_ATTACK_ACTION);
+        playerParry = inputActions.FindAction(Player.PARRY_ACTION);
+        inputActionAsset.Enable();
         animator = GetComponent<Animator>();
         hitCollider.gameObject.SetActive(false);
         IsAttacking = false;
@@ -42,6 +56,20 @@ public class Player : MonoBehaviour
         IsRunning = false;
         Equipment = new Equipment(gameObject);
         StartCoroutine(EquipCoroutine()); 
+    }
+
+    private void OnEnable()
+    {
+        playerAttack.performed += Attack;
+        playerJumpAttack.performed += JumpAttack;
+        /* TODO? : playerParry.performed += Parry; */
+    }
+
+    private void OnDisable()
+    {
+        playerAttack.performed -= Attack;
+        playerJumpAttack.performed -= JumpAttack;
+        /* TODO? : playerParry.performed -= Parry; */
     }
 
     /* Performs item equipping. NOTE : For some reason equipment is invisible after equipping if coroutine is not used to yield result after equip.*/
@@ -64,7 +92,6 @@ public class Player : MonoBehaviour
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
         animator.SetFloat("Y", transform.position.y);
-        CheckPlayerInput();
     }
 
     private void FixedUpdate()
@@ -88,7 +115,7 @@ public class Player : MonoBehaviour
      * Performs an normal attack which is ran in an coroutine because it has time variables.
      * Attack enables HitArea collider which is triggered on MapObjects if they collide.
      */
-    public void Attack()
+    public void Attack(InputAction.CallbackContext obj)
     {
         attack = AttackCoroutine();
         StartCoroutine(attack);
@@ -98,7 +125,7 @@ public class Player : MonoBehaviour
      * Works the same as normal attack but IsAttacking and IsJumpAttacking should be checked respectively.
      * Performs an jump attack which is ran in an coroutine because it has time variables. 
      */
-    public void JumpAttack()
+    public void JumpAttack(InputAction.CallbackContext obj)
     {
         jumpAttack = JumpAttackCoroutine();
         StartCoroutine(jumpAttack);
@@ -158,18 +185,6 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
         hitCollider.gameObject.SetActive(false);
-    }
-
-    private void CheckPlayerInput()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Attack();
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            JumpAttack();
-        }
     }
 }
 
