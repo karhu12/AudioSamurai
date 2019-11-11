@@ -5,7 +5,7 @@ using UnityEngine;
 public class AirEnemy : MapObject
 {
     /* Constants */
-    public const string Type = "AirEnemy";
+    public new const string Type = "AirEnemy";
 
     public override string GetMapObjectType()
     {

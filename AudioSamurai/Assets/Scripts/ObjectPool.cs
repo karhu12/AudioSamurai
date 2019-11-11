@@ -69,6 +69,7 @@ public class Poolable<T> : MonoBehaviour
     {
         if (Pool != null)
             Pool.ReturnToPool(this);
-        Destroy(this);
+        else
+            Destroy(this);
     }
 }

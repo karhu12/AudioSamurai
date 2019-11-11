@@ -12,8 +12,10 @@ public class GameController : Singleton<GameController>
     private const float SPAWN_AHEAD_IN_MS = 1000;
     private const float TIME_AFTER_LAST_OBJECT = 4000;
     private const float FADEOUT_STEP_DURATION = 100;
+    public static readonly Vector3 START_POSITION = new Vector3(0, 0, 0);
 
     public Collider hitArea;
+    public Player player;
 
     public enum GameState
     {
@@ -33,6 +35,19 @@ public class GameController : Singleton<GameController>
     public GameState State
     {
         get; private set;
+    }
+
+    private void Start()
+    {
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+        }
+
+        if (hitArea == null)
+        {
+            hitArea = GameObject.FindGameObjectWithTag("HitArea").GetComponent<Collider>();
+        }
     }
 
     /*
@@ -102,17 +117,13 @@ public class GameController : Singleton<GameController>
         foreach (var obj in spawnQueue)
         {
             float songPosMs = SongmapController.Instance.AudioSource.time * 1000;
-            if (obj.Item1 + SPAWN_AHEAD_IN_MS > songPosMs)
+            if (obj.Item1 <= (songPosMs + SPAWN_AHEAD_IN_MS))
             {
                 removeList.Add(obj);
                 MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item2);
                 float beatTime = (60 / currentTiming.Item2 / currentTiming.Item3) * 1000;
 
                 float spawnPosOffset = ((obj.Item1 - songPosMs) / beatTime) * GameController.BEAT_DISTANCE;
-                if (hitArea == null)
-                {
-                    hitArea = GameObject.FindGameObjectWithTag("HitArea").GetComponent<Collider>();
-                }
 
                 mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), hitArea.transform.position.z + spawnPosOffset);
             }
@@ -130,13 +141,18 @@ public class GameController : Singleton<GameController>
         if (timingItem.Item1 <= SongmapController.Instance.AudioSource.time)
         {
             currentTiming = timingItem;
-            /* Set player speed to X */
         }
+
+        if (!player.IsRunning)
+            player.IsRunning = true;
+        player.ChangeSpeed(currentTiming.Item2);
     }
 
     /* Handles moving the user from game scene to result screen and display the result ui. */
     private void OnGameEnd()
     {
+        player.IsRunning = false;
+        player.transform.position = START_POSITION;
         State = GameState.EndScreen;
         SongmapController.Instance.AudioSource.Stop();
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
