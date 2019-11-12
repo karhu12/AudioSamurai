@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapObject : Poolable<MapObject>
+public class MapObject : Poolable
 {
     /* Constants */
     public const float AIR_PLACEMENT = 3.05f;
