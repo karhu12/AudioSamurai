@@ -41,7 +41,7 @@ public class PauseMenu : MonoBehaviour
     //MenuButton OnClick
     public void LoadMainMenu()
     {
-        pauseUI.SetActive(false);
+        Resume();
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         Debug.Log("Loading main menu...");
     }
