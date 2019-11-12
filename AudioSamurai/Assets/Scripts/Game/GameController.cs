@@ -10,6 +10,8 @@ public class GameController : Singleton<GameController>
     public const float BEAT_DISTANCE_PER_BPM_MULT = 1f;
     public const float BPM_MULTIPLIER = 60f;
 
+    // 180 bpm = 3 beat distance 
+
     private const float SPAWN_AHEAD_IN_MS = 1000;
     private const float TIME_AFTER_LAST_OBJECT = 4000;
     private const float FADEOUT_STEP_DURATION = 100;
@@ -139,7 +141,7 @@ public class GameController : Singleton<GameController>
 
         foreach (var timing in timingQueue)
         {
-            if (timing.Item1 <= SongmapController.Instance.AudioSource.time)
+            if (timing.Item1 <= SongmapController.Instance.AudioSource.time * 1000)
             {
                 player.ChangeSpeed(timing.Item2);
                 removeList.Add(timing);
@@ -212,12 +214,22 @@ public class GameController : Singleton<GameController>
         foreach (var beat in beats)
         {
             (float, float, int) closest = selectedSongmap.GetClosestTimingAt(beat);
-            beatSpawnPositions.Add((beat, (Player.HIT_AREA_OFFSET + (beats.IndexOf(beat) * ((closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT)) / closest.Item3)));
+            float spawnPosition = (closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT / closest.Item3;
+            if (beats.IndexOf(beat) != 0)
+            {
+                spawnPosition += beatSpawnPositions.Last().Item2;
+            } else
+            {
+                spawnPosition -= (closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT / closest.Item3;
+                spawnPosition += Player.HIT_AREA_OFFSET;
+                spawnPosition += Player.HIT_AREA_DEPTH;
+            }
+            beatSpawnPositions.Add((beat, spawnPosition));
         }
 
         foreach (var mapObj in selectedSongmap.GetMapObjects())
         {
-            (float,float) closestBeat = beatSpawnPositions.Aggregate((x, y) => Math.Abs(x.Item1 - mapObj.Item1) < Math.Abs(y.Item1 - mapObj.Item1) ? x : y);
+            (float,float) closestBeat = beatSpawnPositions.FindLast(item => Math.Round((double)item.Item1, 0) <= Math.Round((double)mapObj.Item1, 0));
             spawnQueue.Add((mapObj.Item1, closestBeat.Item2, mapObj.Item2));
         }
 

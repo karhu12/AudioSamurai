@@ -20,6 +20,7 @@ public class AirEnemy : MapObject
     override protected void OnPlayerCollision(Player player)
     {
         /* TODO : Player take damage + lose combo */
+        base.OnPlayerCollision(player);
     }
 
     protected override void OnPlayerHit(Player player)

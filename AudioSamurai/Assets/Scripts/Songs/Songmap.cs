@@ -21,6 +21,7 @@ public class Songmap : IXmlSerializable
 {
     /* Constants */
     public static readonly string SONGS_FOLDER = SongmapController.APPLICATION_FOLDER + "\\Songs";
+    public static readonly (float, float, int) INVALID_TIMING = (-1, -1, -1);
     public const string SONG_MIME_TYPE = ".as";
 
     public const float MIN_AR = 1;
@@ -185,12 +186,25 @@ public class Songmap : IXmlSerializable
     }
 
     /* 
-     * Returns the closest timing item at millisecond position.
+     * Returns the closest timing item at millisecond position. INVALID_TIMING if no valid timing found.
      * pos : position in milliseconds.
      */
     public (float, float, int) GetClosestTimingAt(float pos)
     {
-        return timingList.Aggregate((x, y) => Math.Abs(x.Item1 - pos) < Math.Abs(y.Item1 - pos) ? x : y);
+        foreach (var timing in timingList)
+        {
+            int index = timingList.IndexOf(timing);
+            if (timing.Item1 <= pos)
+            {
+                if (timingList.Count - 1 >= index + 1)
+                {
+                    if (timingList[index + 1].Item1 < pos)
+                        continue;
+                }
+                return timing;
+            }
+        }
+        return INVALID_TIMING;
     }
 
     /*

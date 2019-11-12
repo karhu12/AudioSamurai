@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
     public const float HIT_AREA_OFFSET = 1f;
+    public const float HIT_AREA_DEPTH = 0.5f;
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
@@ -103,7 +104,7 @@ public class Player : MonoBehaviour
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning)
         {
-            transform.position += new Vector3(0f, 0f, ((currentBpm / GameController.BPM_MULTIPLIER) * GameController.BEAT_DISTANCE_PER_BPM_MULT) * (currentBpm / GameController.BPM_MULTIPLIER) * Time.fixedDeltaTime);
+            transform.position += new Vector3(0f, 0f, ((currentBpm / GameController.BPM_MULTIPLIER) * GameController.BEAT_DISTANCE_PER_BPM_MULT) * (Time.fixedDeltaTime / (60 / currentBpm)));
         }
     }
 
