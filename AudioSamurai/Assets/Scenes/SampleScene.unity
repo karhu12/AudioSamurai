@@ -1359,7 +1359,7 @@ GameObject:
   - component: {fileID: 193305101}
   - component: {fileID: 193305100}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: ScoringSystemCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2892,7 +2892,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &710334605
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2909,8 +2909,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 84, y: -20}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 154, y: -20}
+  m_SizeDelta: {x: 300, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &710334606
 MonoBehaviour:
@@ -3577,7 +3577,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910635394}
-  m_LocalRotation: {x: -2.2366437e-11, y: 0.99999917, z: 0.0012999717, w: 0.000000017206894}
+  m_LocalRotation: {x: -2.236627e-11, y: 0.99999917, z: 0.0012999717, w: 0.000000017206894}
   m_LocalPosition: {x: 0, y: 1.387, z: -8.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5082,7 +5082,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1283788517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5139,8 +5139,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 83, y: -52}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 154, y: -52}
+  m_SizeDelta: {x: 300, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &1294343474 stripped
 RectTransform:
@@ -7590,6 +7590,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scoreText: {fileID: 710334604}
   comboText: {fileID: 1283788516}
+  hasGameStarted: 0
+  isLevelFinished: 0
 --- !u!4 &1706235876
 Transform:
   m_ObjectHideFlags: 0

@@ -84,16 +84,22 @@ public class GroundEnemy : MapObject
     override protected void OnPlayerCollision(Player player)
     {
         /* TODO : Player take damage + lose combo */
+        //Reset the combo back to default/minimum.
         ScoreSystem.combo = ScoreSystem.MIN_COMBO;
     }
 
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
-        if(ScoreSystem.combo < ScoreSystem.MAX_COMBO)
+        //Check whether the combo is or isn't in its maximum value and then make different score operations based on that. 
+        if (ScoreSystem.combo < ScoreSystem.MAX_COMBO)
         {
             ScoreSystem.combo *= 2;
             ScoreSystem.score += 10 * ScoreSystem.combo;
+        }
+        else if (ScoreSystem.combo == ScoreSystem.MAX_COMBO)
+        {
+            ScoreSystem.score += 15 * ScoreSystem.combo;
         }
     }
 }
@@ -113,15 +119,21 @@ public class AirEnemy : MapObject
     override protected void OnPlayerCollision(Player player)
     {
         /* TODO : Player take damage + lose combo */
+        //Reset the combo back to default/minimum.
         ScoreSystem.combo = ScoreSystem.MIN_COMBO;
     }
 
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
+        //Check whether the combo is or isn't in its maximum value and then make different score operations based on that.   
         if (ScoreSystem.combo < ScoreSystem.MAX_COMBO)
         {
             ScoreSystem.combo *= 2;
+            ScoreSystem.score += 15 * ScoreSystem.combo;
+        }
+        else if(ScoreSystem.combo == ScoreSystem.MAX_COMBO)
+        {
             ScoreSystem.score += 15 * ScoreSystem.combo;
         }
     }
