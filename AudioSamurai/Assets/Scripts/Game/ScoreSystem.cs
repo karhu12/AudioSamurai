@@ -6,22 +6,25 @@ using UnityEngine.UI;
 public class ScoreSystem : MonoBehaviour
 {
     public GameObject scoreText;
+    public GameObject multiplierText;
     public GameObject comboText;
-
+    
     //Minimum and maximum values for combo.
-    public const int MIN_COMBO = 1;
-    public const int MAX_COMBO = 16;
+    public const int MIN_MULTIPLIER = 1;
+    public const int MAX_MULTIPLIER = 16;
 
+    public static int multiplier;
     public static int combo;
     public static int score;
     //Call this from other class when you want the game to start.
     public bool hasGameStarted = false;
     public bool isLevelFinished = false;
-    //public int testcombo; Just for testing purposes.
+    public int testmultiplier = 1; //Just for testing purposes.
 
     private void Start()
     {
-        combo = MIN_COMBO;
+        multiplier = MIN_MULTIPLIER;
+        combo = 0;
         score = 0;
         //Add score every 0.1 seconds. 
         InvokeRepeating("AddScore", 1, 0.1f);  
@@ -30,7 +33,8 @@ public class ScoreSystem : MonoBehaviour
     void Update()
     {
         scoreText.GetComponent<Text>().text = "SCORE: " + score;
-        comboText.GetComponent<Text>().text = "COMBO: " + combo + "x"; 
+        multiplierText.GetComponent<Text>().text = "MULTIPLIER: " + multiplier + "x";
+        comboText.GetComponent<Text>().text = "COMBO: " + combo;
     }
 
     //Add basic score from proggressing. Combo, hits and misses are handled in MapObject script.
@@ -38,10 +42,11 @@ public class ScoreSystem : MonoBehaviour
     {
         if (hasGameStarted && !isLevelFinished)
         {
-            //combo = testcombo; Just for testing purposes.
             scoreText.SetActive(true);
             comboText.SetActive(true);
-            score += 1 * combo;
+            multiplierText.SetActive(true);
+            multiplier = testmultiplier; //Just for testing purposes.
+            score += 1 * multiplier;
         }
         else if(isLevelFinished)
         {

@@ -85,21 +85,23 @@ public class GroundEnemy : MapObject
     {
         /* TODO : Player take damage + lose combo */
         //Reset the combo back to default/minimum.
-        ScoreSystem.combo = ScoreSystem.MIN_COMBO;
+        ScoreSystem.combo = 0;
+        ScoreSystem.multiplier = ScoreSystem.MIN_MULTIPLIER;
     }
 
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
         //Check whether the combo is or isn't in its maximum value and then make different score operations based on that. 
-        if (ScoreSystem.combo < ScoreSystem.MAX_COMBO)
+        ScoreSystem.combo++;
+        if (ScoreSystem.combo < ScoreSystem.MAX_MULTIPLIER)
         {
             ScoreSystem.combo *= 2;
-            ScoreSystem.score += 10 * ScoreSystem.combo;
+            ScoreSystem.score += 10 * ScoreSystem.multiplier;
         }
-        else if (ScoreSystem.combo == ScoreSystem.MAX_COMBO)
+        else if (ScoreSystem.combo == ScoreSystem.MAX_MULTIPLIER)
         {
-            ScoreSystem.score += 15 * ScoreSystem.combo;
+            ScoreSystem.score += 15 * ScoreSystem.multiplier;
         }
     }
 }
@@ -120,21 +122,23 @@ public class AirEnemy : MapObject
     {
         /* TODO : Player take damage + lose combo */
         //Reset the combo back to default/minimum.
-        ScoreSystem.combo = ScoreSystem.MIN_COMBO;
+        ScoreSystem.combo = 0;
+        ScoreSystem.multiplier = ScoreSystem.MIN_MULTIPLIER;
     }
 
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
-        //Check whether the combo is or isn't in its maximum value and then make different score operations based on that.   
-        if (ScoreSystem.combo < ScoreSystem.MAX_COMBO)
+        //Check whether the combo is or isn't in its maximum value and then make different score operations based on that.
+        ScoreSystem.combo++;
+        if (ScoreSystem.multiplier < ScoreSystem.MAX_MULTIPLIER)
         {
-            ScoreSystem.combo *= 2;
-            ScoreSystem.score += 15 * ScoreSystem.combo;
+            ScoreSystem.multiplier *= 2;
+            ScoreSystem.score += 15 * ScoreSystem.multiplier;
         }
-        else if(ScoreSystem.combo == ScoreSystem.MAX_COMBO)
+        else if(ScoreSystem.multiplier == ScoreSystem.MAX_MULTIPLIER)
         {
-            ScoreSystem.score += 15 * ScoreSystem.combo;
+            ScoreSystem.score += 15 * ScoreSystem.multiplier;
         }
     }
 }
