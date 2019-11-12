@@ -122,6 +122,7 @@ public class SongmapController : Singleton<SongmapController>
             else
             {
                 AudioSource.clip = DownloadHandlerAudioClip.GetContent(www);
+                AudioSource.volume = .5f;
             }
         }
     }

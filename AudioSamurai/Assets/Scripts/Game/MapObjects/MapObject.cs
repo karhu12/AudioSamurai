@@ -2,12 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapObject : MonoBehaviour
+public class MapObject : Poolable<MapObject>
 {
     /* Constants */
     public const float AIR_PLACEMENT = 3.05f;
     public const float GROUND_PLACEMENT = .55f;
     public const float INVALID_PLACEMENT = -1f;
+
+    // Constant used for determining the type of object. Mainly used for helping on instantiation. Sub classes should declare similiar one.
+    public const string Type = "MapObject";
+
+    /* returns the map objects own object type. Should be overridden in derived classes to represent type. */
+    public virtual string GetMapObjectType()
+    {
+        return MapObject.Type;
+    }
 
     public enum VerticalPlacement
     {
@@ -34,12 +43,6 @@ public class MapObject : MonoBehaviour
         return INVALID_PLACEMENT;
     }
 
-    /* returns the map objects own object type. Should be overridden in derived classes to represent type. */
-    protected virtual string GetMapObjectType()
-    {
-        return "GenericMapObject";
-    }
-
     /* Handle collisions with player and his attacks */
     private void OnTriggerEnter(Collider other)
     {
@@ -51,6 +54,9 @@ public class MapObject : MonoBehaviour
             case Player.HIT_COLLIDER_NAME:
                 OnPlayerHit(FindObjectOfType<Player>());
                 break;
+            case KillPlane.COLLIDER_NAME:
+                ReturnToPool();
+                break;
         }
     }
 
@@ -60,7 +66,7 @@ public class MapObject : MonoBehaviour
      */
     protected virtual void OnPlayerCollision(Player player)
     {
-
+        Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
     }
 
 
@@ -70,47 +76,7 @@ public class MapObject : MonoBehaviour
      */
     protected virtual void OnPlayerHit(Player player)
     {
-
-    }
-}
-
-public class GroundEnemy : MapObject
-{
-    override protected string GetMapObjectType()
-    {
-        return "GroundEnemy";
-    }
-
-    override protected void OnPlayerCollision(Player player)
-    {
-        /* TODO : Player take damage + lose combo */
-    }
-
-    protected override void OnPlayerHit(Player player)
-    {
-        /* TODO : Add combo to player and destroy self */
-    }
-}
-
-public class AirEnemy : MapObject
-{
-    public override VerticalPlacement Placement
-    {
-        get => VerticalPlacement.Air;
-    }
-
-    override protected string GetMapObjectType()
-    {
-        return "AirEnemy";
-    }
-
-    override protected void OnPlayerCollision(Player player)
-    {
-        /* TODO : Player take damage + lose combo */
-    }
-
-    protected override void OnPlayerHit(Player player)
-    {
-        /* TODO : Add combo to player and destroy self */
+        Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
+        ReturnToPool();
     }
 }
