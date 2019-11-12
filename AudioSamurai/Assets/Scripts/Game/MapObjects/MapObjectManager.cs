@@ -31,6 +31,18 @@ public class MapObjectManager : Singleton<MapObjectManager>
         return false;
     }
 
+    public void Cleanup()
+    {
+        MapObject[] mapObjects = FindObjectsOfType<MapObject>();
+        foreach (var mapObj in mapObjects)
+        {
+            if (mapObj.gameObject.activeSelf)
+            {
+                mapObj.gameObject.SetActive(false);
+            }
+        }
+    }
+
     public MapObject GetMapObject(string type)
     {
         if (mapObjectPools.ContainsKey(type))

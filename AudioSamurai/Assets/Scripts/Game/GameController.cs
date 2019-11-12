@@ -19,7 +19,7 @@ public class GameController : Singleton<GameController>
 
     public Collider hitArea;
     public Player player;
-
+    
     public enum GameState
     {
         Idle,
@@ -51,6 +51,44 @@ public class GameController : Singleton<GameController>
         {
             hitArea = GameObject.FindGameObjectWithTag("HitArea").GetComponent<Collider>();
         }
+    }
+
+    public bool Pause()
+    {
+        if (State == GameState.Playing)
+        {
+            SongmapController.Instance.AudioSource.Pause();
+            State = GameState.Paused;
+            return true;
+        }
+        return false;
+    }
+
+    public bool Unpause()
+    {
+
+        if (State == GameState.Paused)
+        {
+            SongmapController.Instance.AudioSource.UnPause();
+            State = GameState.Playing;
+            return true;
+        }
+        return false;
+    }
+
+    public bool QuitGame()
+    {
+        if (State == GameState.Paused || State == GameState.Playing)
+        {
+            MapObjectManager.Instance.Cleanup();
+            SongmapController.Instance.AudioSource.Stop();
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
+            player.IsRunning = false;
+            player.transform.position = START_POSITION;
+            State = GameState.Idle;
+            return true;
+        }
+        return false;
     }
 
     /*
@@ -157,11 +195,12 @@ public class GameController : Singleton<GameController>
     /* Handles moving the user from game scene to result screen and display the result ui. */
     private void OnGameEnd()
     {
-        player.IsRunning = false;
-        player.transform.position = START_POSITION;
         State = GameState.EndScreen;
+        MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
+        player.IsRunning = false;
+        player.transform.position = START_POSITION;
     }
 
     private IEnumerator GameEndCoroutine()
