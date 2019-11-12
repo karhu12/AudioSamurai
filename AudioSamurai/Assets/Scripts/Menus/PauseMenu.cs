@@ -26,23 +26,29 @@ public class PauseMenu : MonoBehaviour
     //ResumeButton OnClick
     public void Resume()
     {
-        pauseUI.SetActive(false);
-        Time.timeScale = 1f;
-        onPause = false;
+        if (GameController.Instance.Unpause())
+        {
+            pauseUI.SetActive(false);
+            Time.timeScale = 1f;
+            onPause = false;
+        }
     }
 
     public void Pause()
     {
-        pauseUI.SetActive(true);
-        Time.timeScale = 0f;
-        onPause = true;
+        if (GameController.Instance.Pause())
+        {
+            pauseUI.SetActive(true);
+            Time.timeScale = 0f;
+            onPause = true;
+        }
     }
 
     //MenuButton OnClick
     public void LoadMainMenu()
     {
         Resume();
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+        GameController.Instance.QuitGame();
         Debug.Log("Loading main menu...");
     }
 }
