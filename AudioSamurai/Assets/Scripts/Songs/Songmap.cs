@@ -71,6 +71,8 @@ public class Songmap : IXmlSerializable
         set { if (value >= MIN_HAL && value <= MAX_HAL) hitAccuracyLevel = value; }
     }
 
+    /* TODO : Health drain multiplier. 5 damage multiplied by multiplier when damage taken*/
+
     /* map specific points */
     private List<(float, float, int)> timingList = new List<(float, float, int)>();
 

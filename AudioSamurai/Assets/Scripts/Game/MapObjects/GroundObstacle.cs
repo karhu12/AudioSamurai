@@ -13,7 +13,8 @@ public class GroundObstacle : MapObject
     }
 
     override protected void OnPlayerCollision(Player player) {
-        /* TODO : Player take damage + lose combo */
+        /* TODO : lose combo */
+        player.TakeDamage();
         base.OnPlayerCollision(player);
     }
 

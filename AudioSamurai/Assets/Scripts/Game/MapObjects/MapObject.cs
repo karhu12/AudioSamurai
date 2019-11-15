@@ -77,6 +77,7 @@ public class MapObject : Poolable
     protected virtual void OnPlayerHit(Player player)
     {
         Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
+        player.RestoreHealth();
         ReturnToPool();
     }
 }

@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     public const float DEFAULT_SPEED = 10f;
     public const float HIT_AREA_OFFSET = 1f;
     public const float HIT_AREA_DEPTH = 0.5f;
+    public const float STARTING_HEALTH = 100;
+    public const float DAMAGE_AMOUNT = 3;
+    public const float HEALTH_RESTORE_AMOUNT = 1;
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
@@ -39,11 +42,11 @@ public class Player : MonoBehaviour
     private InputAction playerAttack;
     private InputAction playerJumpAttack;
     private InputAction playerParry;
-
-
+       
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
     public bool IsRunning { get; set; }
+    public float Health { get; private set; }
 
     private void Awake()
     {
@@ -60,54 +63,26 @@ public class Player : MonoBehaviour
         IsJumpAttacking = false;
         IsRunning = false;
         Equipment = new Equipment(gameObject);
-        StartCoroutine(EquipCoroutine()); 
+        StartCoroutine(EquipCoroutine());
+        Health = STARTING_HEALTH;
     }
 
-    private void OnEnable()
-    {
-        playerAttack.performed += Attack;
-        playerJumpAttack.performed += JumpAttack;
-        /* TODO? : playerParry.performed += Parry; */
+    /* Makes the player take constant amount of damage multiplied by the given multiplier */
+    public void TakeDamage(float damageMultiplier = 1) {
+        Health -= DAMAGE_AMOUNT * damageMultiplier;
+        /* TODO : Play damage taken sound + animation? */
     }
 
-    private void OnDisable()
-    {
-        playerAttack.performed -= Attack;
-        playerJumpAttack.performed -= JumpAttack;
-        /* TODO? : playerParry.performed -= Parry; */
-    }
-
-    /* Performs item equipping. NOTE : For some reason equipment is invisible after equipping if coroutine is not used to yield result after equip.*/
-    private IEnumerator EquipCoroutine()
-    {
-        if (hatModel != null)
-            Equipment.Equip(hatModel, "Hat");
-
-        yield return null;
-
-        if (swordModel != null)
-            Equipment.Equip(swordModel, "Katana");
-
-        yield return null;
-    }
-
-    private void Update()
-    {
-        animator.SetBool("IsRunning", IsRunning);
-        animator.SetBool("IsAttacking", IsAttacking);
-        animator.SetBool("IsJumpAttacking", IsJumpAttacking);
-        animator.SetFloat("Y", transform.position.y);
-    }
-
-    private void FixedUpdate()
-    {
-        //Add direction and velocity to player character depending on a song bpm
-        if (IsRunning)
-        {
-            transform.position += new Vector3(0f, 0f, ((currentBpm / GameController.BPM_MULTIPLIER) * GameController.BEAT_DISTANCE_PER_BPM_MULT) * (Time.fixedDeltaTime / (60 / currentBpm)));
+    /* Restores players health by constant amount. Should be called when striking enemies. */
+    public void RestoreHealth() {
+        if (Health + HEALTH_RESTORE_AMOUNT > STARTING_HEALTH) {
+            Health = STARTING_HEALTH;
+        } else {
+            Health += HEALTH_RESTORE_AMOUNT;
         }
     }
-
+    
+    /* Changes player speed to match given BPM */
     public void ChangeSpeed(float bpm)
     {
         if (bpm > 0)
@@ -141,7 +116,47 @@ public class Player : MonoBehaviour
             StartCoroutine(jumpAttack);
         }
     }
-    
+
+    /* Private methods */
+
+    private void Update() {
+        animator.SetBool("IsRunning", IsRunning);
+        animator.SetBool("IsAttacking", IsAttacking);
+        animator.SetBool("IsJumpAttacking", IsJumpAttacking);
+        animator.SetFloat("Y", transform.position.y);
+    }
+
+    private void FixedUpdate() {
+        //Add direction and velocity to player character depending on a song bpm
+        if (IsRunning) {
+            transform.position += new Vector3(0f, 0f, ((currentBpm / GameController.BPM_MULTIPLIER) * GameController.BEAT_DISTANCE_PER_BPM_MULT) * (Time.fixedDeltaTime / (60 / currentBpm)));
+        }
+    }
+    private void OnEnable() {
+        playerAttack.performed += Attack;
+        playerJumpAttack.performed += JumpAttack;
+        /* TODO? : playerParry.performed += Parry; */
+    }
+
+    private void OnDisable() {
+        playerAttack.performed -= Attack;
+        playerJumpAttack.performed -= JumpAttack;
+        /* TODO? : playerParry.performed -= Parry; */
+    }
+
+    /* Performs item equipping. NOTE : For some reason equipment is invisible after equipping if coroutine is not used to yield result after equip.*/
+    private IEnumerator EquipCoroutine() {
+        if (hatModel != null)
+            Equipment.Equip(hatModel, "Hat");
+
+        yield return null;
+
+        if (swordModel != null)
+            Equipment.Equip(swordModel, "Katana");
+
+        yield return null;
+    }
+
     IEnumerator AttackCoroutine()
     {
         if (jumpAttack != null)
