@@ -9,6 +9,7 @@ public class MapObject : MonoBehaviour
     public const float GROUND_PLACEMENT = .55f;
     public const float INVALID_PLACEMENT = -1f;
 
+
     public enum VerticalPlacement
     {
         Air,

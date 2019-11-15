@@ -8,6 +8,7 @@ public class ScoreSystem : MonoBehaviour
     public GameObject scoreText;
     public GameObject multiplierText;
     public GameObject comboText;
+    public GameObject hudCanvas;
     
     //Minimum and maximum values for combo.
     public const int MIN_MULTIPLIER = 1;
@@ -16,18 +17,23 @@ public class ScoreSystem : MonoBehaviour
     public static int multiplier;
     public static int combo;
     public static int score;
-    //Call this from other class when you want the game to start.
+    //Call this from other class where the game starts so that the counting starts at the same time.
     public bool hasGameStarted = false;
     public bool isLevelFinished = false;
     public int testmultiplier = 1; //Just for testing purposes.
 
+
+    public GameObject health;
+    private HealthBarController hbc;
+
     private void Start()
     {
+        hbc = health.GetComponent<HealthBarController>();
         multiplier = MIN_MULTIPLIER;
         combo = 0;
         score = 0;
         //Add score every 0.1 seconds. 
-        InvokeRepeating("AddScore", 1, 0.1f);  
+        InvokeRepeating("AddScore", 1, 0.1f);
     }
 
     void Update()
@@ -42,11 +48,17 @@ public class ScoreSystem : MonoBehaviour
     {
         if (hasGameStarted && !isLevelFinished)
         {
-            scoreText.SetActive(true);
-            comboText.SetActive(true);
-            multiplierText.SetActive(true);
-            multiplier = testmultiplier; //Just for testing purposes.
-            score += 1 * multiplier;
+            if (!hbc.isGameOver)
+            {
+                hudCanvas.SetActive(true);
+                multiplier = testmultiplier; //Just for testing purposes.
+                score += 1 * multiplier;
+            }
+            else
+            {
+                CancelInvoke();
+                Debug.Log("GAME OVER");
+            }
         }
         else if(isLevelFinished)
         {
