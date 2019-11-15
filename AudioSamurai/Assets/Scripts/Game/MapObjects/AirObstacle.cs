@@ -2,13 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GroundObstacle : MapObject
+public class AirObstacle : MapObject
 {
     /* Constants */
-    public new const string Type = "GroundObstacle";
+    public new const string Type = "AirObstacle";
 
+    public override VerticalPlacement Placement
+    {
+        get => VerticalPlacement.Air;
+    }
     public override string GetMapObjectType() {
-        return GroundObstacle.Type;
+        return AirObstacle.Type;
     }
 
     override protected void OnPlayerCollision(Player player) {
@@ -18,6 +22,6 @@ public class GroundObstacle : MapObject
     }
 
     protected override void OnPlayerHit(Player player) {
-        /* Do nothing since it's an obstacle. */ 
+        /* Do nothing since it's an obstacle. */
     }
 }
