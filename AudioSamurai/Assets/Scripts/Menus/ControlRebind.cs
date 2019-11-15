@@ -10,9 +10,12 @@ public class ControlRebind : MonoBehaviour
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
     private Button button;
     private Text text;
+    private InputBinding inputBinding;
 
     void Start()
     {
+        string bind = PlayerPrefs.GetString("binding");
+        Debug.Log(bind);
         inputAction = actionReference.action;
         if (button == null)
         {
@@ -47,11 +50,17 @@ public class ControlRebind : MonoBehaviour
             .OnMatchWaitForAnother(0.1f)
             .OnComplete(operation => ButtonRebindCompleted());
         rebindingOperation.Start();
+
+        
+        //Debug.Log(inputBinding.overridePath);
+        
     }
 
     void ResetButtonMappingTextValue()
     {
         text.text = InputControlPath.ToHumanReadableString(inputAction.bindings[0].effectivePath);
+        Debug.Log(text.text);
+        PlayerPrefs.SetString("binding", text.text);
         button.gameObject.SetActive(true);
     }
 
@@ -62,6 +71,8 @@ public class ControlRebind : MonoBehaviour
         rebindingOperation = null;
         ResetButtonMappingTextValue();
         button.enabled = true;
+        //Debug.Log(inputAction.id);
+        //Debug.Log(inputBinding.path);
     }
 
 
