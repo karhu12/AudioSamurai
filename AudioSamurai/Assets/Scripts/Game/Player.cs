@@ -163,23 +163,16 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(jumpAttack);
             IsJumpAttacking = false;
+            hitCollider.gameObject.SetActive(false);
         }
 
         IsAttacking = true;
-        hitCollider.gameObject.SetActive(true);
-        float addAmount = -.5f;
         while (transform.position.y > GROUND_PLACEMENT)
         {
-            yield return new WaitForSeconds(0.001f);
-            if (transform.position.y + addAmount <= GROUND_PLACEMENT)
-            {
-                transform.position = new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z);
-            }
-            else
-            {
-                transform.position += new Vector3(0, addAmount, 0);
-            }
+            yield return new WaitForSecondsRealtime(0.00001f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 4);
         }
+        hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsAttacking = false;
         hitCollider.gameObject.SetActive(false);
@@ -191,23 +184,16 @@ public class Player : MonoBehaviour
         {
             StopCoroutine(attack);
             IsAttacking = false;
+            hitCollider.gameObject.SetActive(false);
         }
 
         IsJumpAttacking = true;
-        hitCollider.gameObject.SetActive(true);
-        float addAmount = .5f;
         while (transform.position.y < AIR_PLACEMENT)
         {
-            yield return new WaitForSeconds(0.001f);
-            if (transform.position.y + addAmount >= AIR_PLACEMENT)
-            {
-                transform.position = new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z);
-            }
-            else
-            {
-                transform.position += new Vector3(0, addAmount, 0);
-            }
+            yield return new WaitForSecondsRealtime(0.00001f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 4);
         }
+        hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
         hitCollider.gameObject.SetActive(false);
