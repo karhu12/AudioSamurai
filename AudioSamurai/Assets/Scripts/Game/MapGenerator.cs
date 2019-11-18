@@ -8,7 +8,7 @@ public class MapGenerator : MonoBehaviour
     /* Constants */
     public const float SCALED_SIZE = 800;
     public const float PLACEMENT_OFFSET = 16;
-    public const int SPAWN_AFTER_TARGET = 3;
+    public const int SPAWN_AFTER_TARGET = 4;
     public const int SPAWN_BEFORE_TARGET = 1;
 
     public GameObject generationTarget;

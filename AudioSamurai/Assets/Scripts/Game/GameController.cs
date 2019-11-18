@@ -7,12 +7,13 @@ using UnityEngine;
 public class GameController : Singleton<GameController>
 {
     /* Constants */
+    public const float BEAT_DISTANCE = 4f;
     public const float BEAT_DISTANCE_PER_BPM_MULT = 1f;
     public const float BPM_MULTIPLIER = 60f;
 
     // 180 bpm = 3 beat distance 
 
-    private const float SPAWN_AHEAD_IN_MS = 1000;
+    private const float SPAWN_AHEAD_IN_MS = 5000;
     private const float TIME_AFTER_LAST_OBJECT = 4000;
     private const float FADEOUT_STEP_DURATION = 100;
     public static readonly Vector3 START_POSITION = new Vector3(0, 0, 0);
@@ -250,18 +251,16 @@ public class GameController : Singleton<GameController>
     {
         List<float> beats = selectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
         List<(float, float)> beatSpawnPositions = new List<(float, float)>();
-        foreach (var beat in beats)
-        {
-            (float, float, int) closest = selectedSongmap.GetClosestTimingAt(beat);
-            float spawnPosition = (closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT / closest.Item3;
-            if (beats.IndexOf(beat) != 0)
+        foreach (var beat in beats) {
+            var idx = beats.IndexOf(beat);
+            var closest = selectedSongmap.GetClosestTimingAt(beat);
+            float spawnPosition = 0;
+            if (idx == 0)
             {
-                spawnPosition += beatSpawnPositions.Last().Item2;
-            } else
-            {
-                spawnPosition -= (closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT / closest.Item3;
                 spawnPosition += Player.HIT_AREA_OFFSET;
                 spawnPosition += Player.HIT_AREA_DEPTH;
+            } else {
+                spawnPosition = beatSpawnPositions.Last().Item2 + BEAT_DISTANCE / closest.Item3;
             }
             beatSpawnPositions.Add((beat, spawnPosition));
         }
