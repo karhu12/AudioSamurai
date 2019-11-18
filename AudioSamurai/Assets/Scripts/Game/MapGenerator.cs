@@ -74,7 +74,7 @@ public class MapGenerator : MonoBehaviour
                 float center = generationTarget.transform.position.z + (tilePos * PLACEMENT_OFFSET);
                 float backPosition = center - PLACEMENT_OFFSET;
                 float forwardPosition = center + PLACEMENT_OFFSET;
-                if (!spawnedTiles.Exists(item => item.transform.position.z > backPosition && item.transform.position.z <= forwardPosition)) 
+                if (!spawnedTiles.Exists(item => item.transform.position.z > backPosition && item.transform.position.z < forwardPosition)) 
                 {
                     Generatable g = (Generatable)tileObjectPools[currentGenerationType].Get();
                     g.transform.position = new Vector3(0, 0, (int)center);
