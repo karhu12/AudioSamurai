@@ -129,7 +129,7 @@ public class Player : MonoBehaviour
     private void FixedUpdate() {
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning) {
-            transform.position += new Vector3(0f, 0f, ((currentBpm / GameController.BPM_MULTIPLIER) * GameController.BEAT_DISTANCE_PER_BPM_MULT) * (Time.fixedDeltaTime / (60 / currentBpm)));
+            transform.position += new Vector3(0f, 0f, GameController.BEAT_DISTANCE * (Time.fixedDeltaTime / (60 / currentBpm)));
         }
     }
     private void OnEnable() {
@@ -167,7 +167,7 @@ public class Player : MonoBehaviour
 
         IsAttacking = true;
         hitCollider.gameObject.SetActive(true);
-        float addAmount = -.15f;
+        float addAmount = -.5f;
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return new WaitForSeconds(0.001f);
@@ -195,7 +195,7 @@ public class Player : MonoBehaviour
 
         IsJumpAttacking = true;
         hitCollider.gameObject.SetActive(true);
-        float addAmount = .15f;
+        float addAmount = .5f;
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return new WaitForSeconds(0.001f);
