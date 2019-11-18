@@ -5,28 +5,12 @@ using UnityEngine;
 public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
-    public static bool onPause = false;
 
     public GameObject mainMenuUI;
-    public GameObject pauseUI;
 
     
 
     // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P) && !onMainMenu)
-        {
-            if (onPause)
-            {
-                Resume();
-            } else
-            {
-                Pause();
-            }
-        }
-    }
-
     public void OnStart()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
@@ -56,28 +40,12 @@ public class MainMenu : MonoBehaviour
         onMainMenu = false;
     }
 
-    public void Resume()
-    {
-        pauseUI.SetActive(false);
-        Time.timeScale = 1f;
-        onPause = false;
-    }
-
-    public void Pause()
-    {
-        pauseUI.SetActive(true);
-        Time.timeScale = 0f;
-        onPause = true;
-    }
-
     public void LoadMenu()
     {
-        pauseUI.SetActive(false);
         mainMenuUI.SetActive(true);
         onMainMenu = true;
-        onPause = false;
     }
-
+     
     public void LoadSettings()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);

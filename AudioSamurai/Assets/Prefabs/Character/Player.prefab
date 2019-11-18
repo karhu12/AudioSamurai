@@ -825,7 +825,7 @@ Animator:
   m_Controller: {fileID: 0}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
@@ -873,7 +873,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitCollider: {fileID: 0}
-  playerModel: {fileID: 0}
+  hitIndicator: {fileID: 0}
+  inputActionAsset: {fileID: 0}
   hatModel: {fileID: 0}
   swordModel: {fileID: 0}
 --- !u!1 &4362123503829417088

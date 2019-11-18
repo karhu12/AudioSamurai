@@ -21,6 +21,7 @@ public class Songmap : IXmlSerializable
 {
     /* Constants */
     public static readonly string SONGS_FOLDER = SongmapController.APPLICATION_FOLDER + "\\Songs";
+    public static readonly (float, float, int) INVALID_TIMING = (-1, -1, -1);
     public const string SONG_MIME_TYPE = ".as";
 
     public const float MIN_AR = 1;
@@ -50,7 +51,6 @@ public class Songmap : IXmlSerializable
     /* general */
     private string audioFilename;
 
-
     /* Difficulty */
     private string difficultyTitle;
     public string DifficultyTitle { 
@@ -70,6 +70,8 @@ public class Songmap : IXmlSerializable
         get => hitAccuracyLevel;
         set { if (value >= MIN_HAL && value <= MAX_HAL) hitAccuracyLevel = value; }
     }
+
+    /* TODO : Health drain multiplier. 5 damage multiplied by multiplier when damage taken*/
 
     /* map specific points */
     private List<(float, float, int)> timingList = new List<(float, float, int)>();
@@ -143,12 +145,13 @@ public class Songmap : IXmlSerializable
     {
         if (GetPositionDuplicate(ref mapObjects, pos) == DUPLICATE_NOT_FOUND)
         {
-            /*
-             TODO: if (objectType is valid) { add } 
-             */
-            mapObjects.Add((pos, objectType));
-            mapObjects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
-            return true;
+            List<string> availableTypes = MapObjectManager.Instance.GetMapObjectTypes();
+            if (availableTypes.Contains(objectType))
+            {
+                mapObjects.Add((pos, objectType));
+                mapObjects.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+                return true;
+            }
         }
         return false;
     }
@@ -182,6 +185,28 @@ public class Songmap : IXmlSerializable
     public IList<(float, float, int)> GetTimingList()
     {
         return timingList.AsReadOnly();
+    }
+
+    /* 
+     * Returns the closest timing item at millisecond position. INVALID_TIMING if no valid timing found.
+     * pos : position in milliseconds.
+     */
+    public (float, float, int) GetClosestTimingAt(float pos)
+    {
+        foreach (var timing in timingList)
+        {
+            int index = timingList.IndexOf(timing);
+            if (timing.Item1 <= pos)
+            {
+                if (timingList.Count - 1 >= index + 1)
+                {
+                    if (timingList[index + 1].Item1 < pos)
+                        continue;
+                }
+                return timing;
+            }
+        }
+        return INVALID_TIMING;
     }
 
     /*
@@ -242,9 +267,9 @@ public class Songmap : IXmlSerializable
     /*
      * Returns an list of floats which indicate that when beats happen based on the start position and timingList. An empty list is returned if position is not valid compared to timingList (eg. before first timing).
      * pos : position in milliseconds from where on to fetch the beat list.
-     * count : how many beats to fetch.
+     * duration : from how long period should the beat list be fetched from in milliseconds.
      */
-    public List<float> getBeatList(float pos, int count = 10)
+    public List<float> getBeatList(float pos, float duration)
     {
         List<float> beatList = new List<float>();
         if (timingList.Count > 0)
@@ -271,7 +296,7 @@ public class Songmap : IXmlSerializable
                 float nextTimingPos = timingList.FirstOrDefault(x => x.Item1 > currentBeat).Item1;
                 nextTimingPos = nextTimingPos > currentBeat ? nextTimingPos : -1;
 
-                while (beatList.Count < count)
+                while (currentBeat < duration)
                 {
                     if (nextTimingPos != -1)
                     {
@@ -284,7 +309,7 @@ public class Songmap : IXmlSerializable
                     currentBeat += beatTime;
                     beatList.Add(currentBeat);
                 }
-            } while (beatList.Count < count);
+            } while (currentBeat < duration);
         }
         return beatList;
     }
@@ -501,6 +526,7 @@ public class Songmap : IXmlSerializable
             if (mapObjects.Count > 0)
             {
                 float timingMin = float.MaxValue;
+                List<string> validTypes = MapObjectManager.Instance.GetMapObjectTypes();
 
                 foreach (var timing in timingList)
                 {
@@ -510,6 +536,9 @@ public class Songmap : IXmlSerializable
                 float mapObjMin = float.MaxValue;
                 foreach (var mapObj in mapObjects)
                 {
+                    if (!validTypes.Contains(mapObj.Item2))
+                        return false;
+
                     if (mapObj.Item1 < mapObjMin)
                         mapObjMin = mapObj.Item1;
                 }
