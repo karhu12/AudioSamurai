@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Linq;
 public class ControlRebind : MonoBehaviour
 {
     public InputActionReference actionReference;
@@ -10,13 +11,18 @@ public class ControlRebind : MonoBehaviour
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
     private Button button;
     private Text text;
-    private InputBinding inputBinding;
 
     void Start()
     {
-        string bind = PlayerPrefs.GetString("binding");
-        Debug.Log(bind);
+
         inputAction = actionReference.action;
+
+        string action = PlayerPrefs.GetString(inputAction.name, null);
+        if (action != null)
+        {
+            inputAction.ApplyBindingOverride(action);
+        }
+        
         if (button == null)
         {
             button = GetComponentInChildren<Button>();
@@ -29,7 +35,6 @@ public class ControlRebind : MonoBehaviour
 
         button.onClick.AddListener(delegate { RemapButtonClicked(name, defaultBindingIndex); });
         ResetButtonMappingTextValue();
-        
     }
 
     private void OnDestroy()
@@ -50,17 +55,16 @@ public class ControlRebind : MonoBehaviour
             .OnMatchWaitForAnother(0.1f)
             .OnComplete(operation => ButtonRebindCompleted());
         rebindingOperation.Start();
-
-        
-        //Debug.Log(inputBinding.overridePath);
-        
     }
 
     void ResetButtonMappingTextValue()
     {
         text.text = InputControlPath.ToHumanReadableString(inputAction.bindings[0].effectivePath);
-        Debug.Log(text.text);
-        PlayerPrefs.SetString("binding", text.text);
+
+        var ac = inputAction.bindings.FirstOrDefault((item) => item.action == inputAction.name);
+        string path = ac.effectivePath;
+
+        PlayerPrefs.SetString(inputAction.name, path);
         button.gameObject.SetActive(true);
     }
 
@@ -71,8 +75,6 @@ public class ControlRebind : MonoBehaviour
         rebindingOperation = null;
         ResetButtonMappingTextValue();
         button.enabled = true;
-        //Debug.Log(inputAction.id);
-        //Debug.Log(inputBinding.path);
     }
 
 

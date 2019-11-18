@@ -22,7 +22,6 @@ public class OptionsMenu : MonoBehaviour
     int dropdownValue;
     string dropdownText;
     int currentResolutionIndex;
-    int savedQualityIndex;
 
     Resolution[] resolutions;
 
