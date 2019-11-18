@@ -199,9 +199,11 @@ public class GameController : Singleton<GameController>
         State = GameState.EndScreen;
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
+        ScoreSystem.isGameOnGoing = false;
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         player.IsRunning = false;
         player.transform.position = START_POSITION;
+        
     }
 
     private IEnumerator GameEndCoroutine()
@@ -223,6 +225,7 @@ public class GameController : Singleton<GameController>
         yield return InitialCoroutine();
         yield return CountdownCoroutine();
         SongmapController.Instance.AudioSource.Play();
+        ScoreSystem.isGameOnGoing = true;
         State = GameState.Playing;
         yield return null;
     }

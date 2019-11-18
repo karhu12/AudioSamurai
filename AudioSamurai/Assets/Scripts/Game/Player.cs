@@ -32,6 +32,8 @@ public class Player : MonoBehaviour
     /* Cosmetic */
     public GameObject hatModel;
     public GameObject swordModel;
+    public GameObject healthBarControl;
+   
 
     public Equipment Equipment { get; private set; }
 
@@ -39,10 +41,12 @@ public class Player : MonoBehaviour
     private IEnumerator attack;
     private float currentBpm = 0;
     private Animator animator;
+    private HealthBarController hbc;
     private InputAction playerAttack;
     private InputAction playerJumpAttack;
     private InputAction playerParry;
-       
+    
+
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
     public bool IsRunning { get; set; }
@@ -56,6 +60,7 @@ public class Player : MonoBehaviour
         playerParry = inputActions.FindAction(Player.PARRY_ACTION);
         inputActionAsset.Enable();
         animator = GetComponent<Animator>();
+        hbc = healthBarControl.GetComponent<HealthBarController>();
         hitCollider.gameObject.SetActive(false);
         hitCollider.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET);
         hitIndicator.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET);
@@ -70,6 +75,8 @@ public class Player : MonoBehaviour
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
     public void TakeDamage(float damageMultiplier = 1) {
         Health -= DAMAGE_AMOUNT * damageMultiplier;
+        hbc.TakeDamageEffect(STARTING_HEALTH, Health);
+        Debug.Log(Health.ToString());
         /* TODO : Play damage taken sound + animation? */
     }
 
@@ -79,6 +86,7 @@ public class Player : MonoBehaviour
             Health = STARTING_HEALTH;
         } else {
             Health += HEALTH_RESTORE_AMOUNT;
+            hbc.HealEffect(STARTING_HEALTH, Health);
         }
     }
     

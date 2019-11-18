@@ -20,12 +20,15 @@ public class AirEnemy : MapObject
     override protected void OnPlayerCollision(Player player)
     {
         /* TODO : Player take damage + lose combo */
+        player.TakeDamage();
+        ScoreSystem.ResetCombo();
         base.OnPlayerCollision(player);
     }
 
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
+        ScoreSystem.AddCombo();
         base.OnPlayerHit(player);
     }
 }
