@@ -1356,7 +1356,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 115091020}
-  m_LocalRotation: {x: 5.0915433e-10, y: 0.9998577, z: 0.016870383, w: -0.0000000301769}
+  m_LocalRotation: {x: 1.6357843e-10, y: 0.9998577, z: 0.016870402, w: -0.000000009695631}
   m_LocalPosition: {x: 0, y: 9.860001, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -3541,7 +3541,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: -10.6}
+  m_AnchoredPosition: {x: 50, y: -10.6}
   m_SizeDelta: {x: 250, y: 30}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &549805684
@@ -4232,8 +4232,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -4.3150024, y: 120.50001}
-  m_SizeDelta: {x: 160, y: 25.54}
+  m_AnchoredPosition: {x: 12, y: 110}
+  m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &762261803
 MonoBehaviour:
@@ -4254,11 +4254,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
-    m_FontStyle: 0
+    m_Font: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
+    m_FontSize: 20
+    m_FontStyle: 1
     m_BestFit: 1
-    m_MinSize: 10
+    m_MinSize: 1
     m_MaxSize: 40
     m_Alignment: 1
     m_AlignByGeometry: 0
@@ -4837,7 +4837,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910635394}
-  m_LocalRotation: {x: -2.234206e-11, y: 0.99999917, z: 0.0012999598, w: 0.000000017206894}
+  m_LocalRotation: {x: -2.2341929e-11, y: 0.99999917, z: 0.0012999598, w: 0.000000017206894}
   m_LocalPosition: {x: 0, y: 5.507001, z: -8.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -6203,7 +6203,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: 19.7}
+  m_AnchoredPosition: {x: 50, y: 19.7}
   m_SizeDelta: {x: 250, y: 30}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1198136041
@@ -6337,6 +6337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 336f6fc438be2584da5c915f969a7ebc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  titleText: {fileID: 762261801}
   scoreText: {fileID: 1788154872}
   comboText: {fileID: 1198136039}
   hitPercentageText: {fileID: 549805682}
@@ -9447,7 +9448,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626211858}
-  m_LocalRotation: {x: 0.057759766, y: -0.61240524, z: 0.044937566, w: 0.7871495}
+  m_LocalRotation: {x: 0.057766303, y: -0.6122906, z: 0.04492913, w: 0.78723866}
   m_LocalPosition: {x: 4.32, y: 2.178, z: -0.158}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -10053,7 +10054,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: 5.0915433e-10, y: 0.9998577, z: 0.016870383, w: -0.0000000301769}
+  m_LocalRotation: {x: 1.6357843e-10, y: 0.9998577, z: 0.016870402, w: -0.000000009695631}
   m_LocalPosition: {x: 0, y: 9.860001, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -10472,7 +10473,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0.5, y: 49.6}
+  m_AnchoredPosition: {x: 50, y: 49.6}
   m_SizeDelta: {x: 250, y: 30}
   m_Pivot: {x: 0, y: 0.5000007}
 --- !u!114 &1788154874
@@ -12282,6 +12283,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: OnSongmapClick
+      objectReference: {fileID: 0}
+    - target: {fileID: 5780119446991955323, guid: 011bde37de3f18047969fe384e4c2783,
+        type: 3}
+      propertyPath: m_Name
+      value: ItemHDL
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 011bde37de3f18047969fe384e4c2783, type: 3}

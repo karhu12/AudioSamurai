@@ -18,7 +18,7 @@ public class GameData : Singleton<GameData>
             }
         }
     }
-    public string MapName { get; set; } = "";
+    public string MapName { get; set; }
     public double RoundedHitPercentage { get; private set; } = 0;
     
     private float hitPercentage = 0;

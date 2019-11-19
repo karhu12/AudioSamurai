@@ -7,6 +7,7 @@ public class Obstacle : MapObject
     override protected void OnPlayerCollision(Player player) {
         ScoreSystem.Instance.ResetCombo();
         player.TakeDamage();
+        GameData.Instance.OnHitMissed();
         base.OnPlayerCollision(player);
     }
 
