@@ -12,7 +12,7 @@ public class Player : MonoBehaviour
     public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
-    public const float HIT_AREA_OFFSET = 1f;
+    public const float HIT_AREA_OFFSET = 1.5f;
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
     public const float DAMAGE_AMOUNT = 3;
