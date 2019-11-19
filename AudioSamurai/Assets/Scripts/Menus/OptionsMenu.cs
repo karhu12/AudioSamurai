@@ -16,6 +16,7 @@ public class OptionsMenu : MonoBehaviour
 
     private int screenInt;
     private bool isFullScreen = false;
+    private float logarithmicVolume;
 
     const string qualityValue = "qualityvalue";
 
@@ -52,8 +53,7 @@ public class OptionsMenu : MonoBehaviour
     void Start()
     {
         volumeSlider.value = PlayerPrefs.GetFloat("MVolume", 1f);
-        audioMixer.SetFloat("volume", PlayerPrefs.GetFloat("MVolume"));
-
+        audioMixer.SetFloat("volume", logarithmicVolume);
         qualityDropdown.value = PlayerPrefs.GetInt(qualityValue, 2);
 
         resolutions = Screen.resolutions;
@@ -97,7 +97,11 @@ public class OptionsMenu : MonoBehaviour
     public void SetVolume(float volume)
     {
         PlayerPrefs.SetFloat("MVolume", volume);
-        audioMixer.SetFloat("volume", PlayerPrefs.GetFloat("MVolume"));
+        logarithmicVolume = Mathf.Log10(PlayerPrefs.GetFloat("MVolume")) * 20;
+        Debug.Log(volume);
+        audioMixer.SetFloat("volume", logarithmicVolume);
+        Debug.Log(logarithmicVolume);
+        
     }
 
     public void SetQuality(int qualityIndex)

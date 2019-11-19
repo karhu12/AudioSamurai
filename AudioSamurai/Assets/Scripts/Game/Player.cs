@@ -109,6 +109,7 @@ public class Player : MonoBehaviour
         {
             attack = AttackCoroutine();
             StartCoroutine(attack);
+            FindObjectOfType<AudioManager>().Play("PlayerAttack");
         }
     }
 
