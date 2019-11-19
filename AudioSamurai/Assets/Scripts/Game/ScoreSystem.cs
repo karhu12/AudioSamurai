@@ -4,16 +4,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ScoreSystem : MonoBehaviour
+public class ScoreSystem : Singleton<ScoreSystem>
 {
+    public enum HitType
+    {
+        Perfect = 300,
+        Normal = 100,
+        Poor = 50
+    }
+
     public GameObject scoreText;
     public TextMeshProUGUI comboText;
-    public static Animator comboAnim;
+    public Animator comboAnim;
 
-    private static int combo;
-    private static int score;
-    //Call this from other class where the game starts so that the counting starts at the same time.
-    public static bool isGameOnGoing = false;
+    private int combo;
+    private int score;
+
 
     private void Start()
     {
@@ -29,9 +35,9 @@ public class ScoreSystem : MonoBehaviour
         comboText.GetComponent<TextMeshProUGUI>().text = combo.ToString() + "x";
     }
 
-    public static void AddScore(int scoreToAdd)
+    public void AddScore(int scoreToAdd)
     {
-        if (isGameOnGoing)
+        if (GameController.Instance.State == GameController.GameState.Playing)
         {
             if (combo > 0)
             {
@@ -45,14 +51,26 @@ public class ScoreSystem : MonoBehaviour
         }
     }
 
-    public static void AddCombo()
+    public void AddScore(HitType hit)
     {
-        combo += 1;
-        comboAnim.Play("comboAnimation");
+        AddScore((int)hit);
     }
 
-    public static void ResetCombo()
+    public void AddCombo()
+    {
+        if (GameController.Instance.State == GameController.GameState.Playing)
+        {
+            combo += 1;
+            comboAnim.Play("comboAnimation");
+        }
+    }
+
+    public void ResetCombo()
     {
         combo = 0;
+    }
+
+    public void ResetScore() {
+        score = 0;
     }
 }

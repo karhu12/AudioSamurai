@@ -16,14 +16,14 @@ public class GroundEnemy : MapObject
     {
         /* TODO : Player take damage + lose combo */
         player.TakeDamage();
-        ScoreSystem.ResetCombo();
+        ScoreSystem.Instance.ResetCombo();
         base.OnPlayerCollision(player);
     }
 
     protected override void OnPlayerHit(Player player)
     {
         /* TODO : Add combo to player and destroy self */
-        ScoreSystem.AddCombo();
+        ScoreSystem.Instance.AddCombo();
         base.OnPlayerHit(player);
     }
 }
