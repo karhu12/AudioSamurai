@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ground
   - HitArea
+  - HUD
+  - FailMenu
   layers:
   - Default
   - TransparentFX

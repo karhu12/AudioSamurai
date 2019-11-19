@@ -7,18 +7,19 @@ using UnityEngine;
 public class GameController : Singleton<GameController>
 {
     /* Constants */
+    public const float BEAT_DISTANCE = 4f;
     public const float BEAT_DISTANCE_PER_BPM_MULT = 1f;
     public const float BPM_MULTIPLIER = 60f;
 
-    // 180 bpm = 3 beat distance 
-
-    private const float SPAWN_AHEAD_IN_MS = 1000;
+    private const float SPAWN_AHEAD_IN_MS = 5000;
     private const float TIME_AFTER_LAST_OBJECT = 4000;
     private const float FADEOUT_STEP_DURATION = 100;
     public static readonly Vector3 START_POSITION = new Vector3(0, 0, 0);
 
     public Collider hitArea;
     public Player player;
+    public Canvas hud;
+    public FailMenu failMenu;
     
     public enum GameState
     {
@@ -27,13 +28,14 @@ public class GameController : Singleton<GameController>
         Playing,
         WaitingForEnd,
         Paused,
-        EndScreen
+        EndScreen,
+        FailScreen
     }
 
-    private Songmap selectedSongmap;
-
+    public Songmap SelectedSongmap { get; private set; }
+    public (float, float, int) CurrentTiming { get; private set; }
     private List<(float, float, string)> spawnQueue = new List<(float, float, string)>();
-    private List<(float, float)> timingQueue = new List<(float, float)>();
+    private List<(float, float, int)> timingQueue = new List<(float, float, int)>();
 
     public GameState State
     {
@@ -43,14 +45,17 @@ public class GameController : Singleton<GameController>
     private void Start()
     {
         if (player == null)
-        {
-            player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-        }
+            player = GameObject.FindGameObjectWithTag(Player.COLLIDER_NAME).GetComponent<Player>();
 
         if (hitArea == null)
-        {
-            hitArea = GameObject.FindGameObjectWithTag("HitArea").GetComponent<Collider>();
-        }
+            hitArea = GameObject.FindGameObjectWithTag(Player.HIT_COLLIDER_NAME).GetComponent<Collider>();
+
+        if (hud == null)
+            hud = GameObject.FindGameObjectWithTag("HUD").GetComponent<Canvas>();
+        hud.gameObject.SetActive(false);
+
+        if (failMenu == null)
+            failMenu = GameObject.FindGameObjectWithTag(FailMenu.TAG).GetComponent<FailMenu>();
     }
 
     public bool Pause()
@@ -76,19 +81,23 @@ public class GameController : Singleton<GameController>
         return false;
     }
 
-    public bool QuitGame()
-    {
-        if (State == GameState.Paused || State == GameState.Playing)
+    public void Retry() {
+        if (State == GameState.Paused || State == GameState.FailScreen)
         {
-            MapObjectManager.Instance.Cleanup();
-            SongmapController.Instance.AudioSource.Stop();
-            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
-            player.IsRunning = false;
-            player.transform.position = START_POSITION;
-            State = GameState.Idle;
-            return true;
+            if (LoadGame(SelectedSongmap)) {
+                StartGame();
+            }
         }
-        return false;
+    }
+
+    public void QuitGame()
+    {
+        if (State == GameState.Paused || State == GameState.Playing || State == GameState.FailScreen)
+        {
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
+            State = GameState.Idle;
+            ResetGameState();
+        }
     }
 
     /*
@@ -97,9 +106,9 @@ public class GameController : Singleton<GameController>
      */
     public bool LoadGame(Songmap songmap)
     {
-        if (State == GameState.Idle)
+        if (State == GameState.Idle || State == GameState.FailScreen)
         {
-            selectedSongmap = songmap;
+            SelectedSongmap = songmap;
             Calculate();
             State = GameState.Ready;
             return true;
@@ -107,12 +116,14 @@ public class GameController : Singleton<GameController>
         return false;
     }
 
+    /* Performs the game start coroutine if it is ready. */
     public void StartGame()
     {
         if (State == GameState.Ready)
             StartCoroutine(GameStartCoroutine());
     }
 
+    /* If the game is currently on the result screen, it will move the game back to song selection and set the state back to idling. */
     public void MoveFromEndScreen()
     {
         if (State == GameState.EndScreen)
@@ -120,6 +131,26 @@ public class GameController : Singleton<GameController>
             CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
             State = GameState.Idle;
         }
+    }
+
+    /* Calculates what score it should reward player with based on the hitTiming */
+    public int CalculateHitScore(float hitTiming) {
+        float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
+        float hitTime = Math.Abs(SongmapController.Instance.AudioSource.time * 1000 - hitTiming);
+        if (hitTime < accHitTime) {
+            Debug.Log($"hit offset = {hitTime}, PERFECT");
+            return (int)ScoreSystem.HitType.Perfect;
+        }
+        else if (hitTime >= accHitTime && hitTime <= accHitTime * 2) {
+            Debug.Log($"hit offset = {hitTime}, NORMAL");
+            return (int)ScoreSystem.HitType.Normal;
+        }
+        else if (hitTime >= accHitTime * 2 && hitTime <= accHitTime * 3) {
+            Debug.Log($"hit offset = {hitTime}, POOR");
+            return (int)ScoreSystem.HitType.Poor;
+        }
+        Debug.Log($"hit offset = {hitTime}, MISS");
+        return 0;
     }
 
     /* Private methods */
@@ -136,17 +167,19 @@ public class GameController : Singleton<GameController>
     }
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
-    private void OnPlayingUpdate()
-    {
-        HandleGameSpeed();
-        HandleSpawnQueue();
-        if (spawnQueue.Count == 0 && !MapObjectManager.Instance.HasActiveObjects())
-        {
-            StartCoroutine(GameEndCoroutine());
-            State = GameState.WaitingForEnd;
+    private void OnPlayingUpdate() {
+        if (player.Health <= 0) {
+            GameFail();
+        } else {
+            HandleGameSpeed();
+            HandleSpawnQueue();
+            if (spawnQueue.Count == 0 && !MapObjectManager.Instance.HasActiveObjects()) {
+                StartCoroutine(GameEndCoroutine());
+                State = GameState.WaitingForEnd;
+            }
         }
     }
-
+    
     /* Checks if the items in the queue are within SPAWN_AHEAD_IN_MS from the current time in song and instantiates them in correct place if they are. */
     private void HandleSpawnQueue()
     {
@@ -159,7 +192,7 @@ public class GameController : Singleton<GameController>
             {
                 removeList.Add(obj);
                 MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item3);
-
+                mapObject.Timing = obj.Item1;
                 mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), obj.Item2);
             }
         }
@@ -175,13 +208,14 @@ public class GameController : Singleton<GameController>
         if (!player.IsRunning)
             player.IsRunning = true;
 
-        List<(float, float)> removeList = new List<(float, float)>();
+        List<(float, float, int)> removeList = new List<(float, float, int)>();
 
         foreach (var timing in timingQueue)
         {
             if (timing.Item1 <= SongmapController.Instance.AudioSource.time * 1000)
             {
                 player.ChangeSpeed(timing.Item2);
+                CurrentTiming = timing;
                 removeList.Add(timing);
             }
         }
@@ -193,14 +227,24 @@ public class GameController : Singleton<GameController>
     }
 
     /* Handles moving the user from game scene to result screen and display the result ui. */
-    private void OnGameEnd()
+    private void OnGameEnd() 
     {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         State = GameState.EndScreen;
+        ResetGameState();
+        /* Get result from score manager */
+    }
+
+    private void ResetGameState() {
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         player.IsRunning = false;
         player.transform.position = START_POSITION;
+        if (hud.gameObject.activeSelf)
+            hud.gameObject.SetActive(false);
+        player.RestoreHealth(true);
+        ScoreSystem.Instance.ResetCombo();
+        ScoreSystem.Instance.ResetScore();
     }
 
     private IEnumerator GameEndCoroutine()
@@ -217,9 +261,10 @@ public class GameController : Singleton<GameController>
     }
 
     /* Coroutine that ensures everything is setup for playing. */
-    private IEnumerator GameStartCoroutine()
-    {
+    private IEnumerator GameStartCoroutine() {
         yield return InitialCoroutine();
+        if (!hud.gameObject.activeSelf)
+            hud.gameObject.SetActive(true);
         yield return CountdownCoroutine();
         SongmapController.Instance.AudioSource.Play();
         State = GameState.Playing;
@@ -246,35 +291,42 @@ public class GameController : Singleton<GameController>
         Debug.Log("Go!");
     }
 
+    private void GameFail() {
+        if (State == GameState.Playing) {
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.FailMenu);
+            State = GameState.FailScreen;
+            failMenu.ToggleFailMusic(true);
+            ResetGameState();
+        }
+    }
+    
     private void Calculate()
     {
-        List<float> beats = selectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
+        List<float> beats = SelectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
         List<(float, float)> beatSpawnPositions = new List<(float, float)>();
-        foreach (var beat in beats)
-        {
-            (float, float, int) closest = selectedSongmap.GetClosestTimingAt(beat);
-            float spawnPosition = (closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT / closest.Item3;
-            if (beats.IndexOf(beat) != 0)
+        foreach (var beat in beats) {
+            var idx = beats.IndexOf(beat);
+            var closest = SelectedSongmap.GetClosestTimingAt(beat);
+            float spawnPosition = 0;
+            if (idx == 0)
             {
-                spawnPosition += beatSpawnPositions.Last().Item2;
-            } else
-            {
-                spawnPosition -= (closest.Item2 / BPM_MULTIPLIER) * BEAT_DISTANCE_PER_BPM_MULT / closest.Item3;
                 spawnPosition += Player.HIT_AREA_OFFSET;
                 spawnPosition += Player.HIT_AREA_DEPTH;
+            } else {
+                spawnPosition = beatSpawnPositions.Last().Item2 + BEAT_DISTANCE / closest.Item3;
             }
             beatSpawnPositions.Add((beat, spawnPosition));
         }
 
-        foreach (var mapObj in selectedSongmap.GetMapObjects())
+        foreach (var mapObj in SelectedSongmap.GetMapObjects())
         {
             (float,float) closestBeat = beatSpawnPositions.FindLast(item => Math.Round((double)item.Item1, 0) <= Math.Round((double)mapObj.Item1, 0));
             spawnQueue.Add((mapObj.Item1, closestBeat.Item2, mapObj.Item2));
         }
 
-        foreach (var timing in selectedSongmap.GetTimingList())
+        foreach (var timing in SelectedSongmap.GetTimingList())
         {
-            timingQueue.Add((timing.Item1, timing.Item2));
+            timingQueue.Add((timing.Item1, timing.Item2, timing.Item3));
         }
 
         HandleSpawnQueue();

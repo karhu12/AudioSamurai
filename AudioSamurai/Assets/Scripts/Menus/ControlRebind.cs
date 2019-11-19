@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Linq;
 public class ControlRebind : MonoBehaviour
 {
     public InputActionReference actionReference;
@@ -13,7 +14,15 @@ public class ControlRebind : MonoBehaviour
 
     void Start()
     {
+
         inputAction = actionReference.action;
+
+        string action = PlayerPrefs.GetString(inputAction.name, null);
+        if (action != null)
+        {
+            inputAction.ApplyBindingOverride(action);
+        }
+        
         if (button == null)
         {
             button = GetComponentInChildren<Button>();
@@ -26,7 +35,6 @@ public class ControlRebind : MonoBehaviour
 
         button.onClick.AddListener(delegate { RemapButtonClicked(name, defaultBindingIndex); });
         ResetButtonMappingTextValue();
-        
     }
 
     private void OnDestroy()
@@ -52,6 +60,11 @@ public class ControlRebind : MonoBehaviour
     void ResetButtonMappingTextValue()
     {
         text.text = InputControlPath.ToHumanReadableString(inputAction.bindings[0].effectivePath);
+
+        var ac = inputAction.bindings.FirstOrDefault((item) => item.action == inputAction.name);
+        string path = ac.effectivePath;
+
+        PlayerPrefs.SetString(inputAction.name, path);
         button.gameObject.SetActive(true);
     }
 

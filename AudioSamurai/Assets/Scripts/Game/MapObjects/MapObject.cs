@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapObject : Poolable<MapObject>
+public class MapObject : Poolable
 {
     /* Constants */
     public const float AIR_PLACEMENT = 3.05f;
@@ -23,6 +23,8 @@ public class MapObject : Poolable<MapObject>
         Air,
         Ground
     }
+
+    public float Timing { get; set; }
 
     /* Placement constant of class. Must be overridden in derived class to change verticla placement! */
     public virtual VerticalPlacement Placement 
@@ -66,7 +68,7 @@ public class MapObject : Poolable<MapObject>
      */
     protected virtual void OnPlayerCollision(Player player)
     {
-        Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
+        // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
     }
 
 
@@ -76,7 +78,8 @@ public class MapObject : Poolable<MapObject>
      */
     protected virtual void OnPlayerHit(Player player)
     {
-        Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
+        // Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
+        player.RestoreHealth();
         ReturnToPool();
     }
 }
