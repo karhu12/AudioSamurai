@@ -55,7 +55,7 @@ public class SongSelection : MonoBehaviour
                 SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
                 child.title.text = map.DifficultyTitle;
                 child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
-                child.approachRate.text = $"AR: {map.ApproachRate}";
+                child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
                 child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
             }
             views.Add(view);
@@ -238,7 +238,7 @@ public class SongmapChildView : View
 {
     public Text title;
     public Text difficulty;
-    public Text approachRate;
+    public Text healthDrain;
     public Text hitAccuracyLevel;
     public Songmap songmap;
 
@@ -247,7 +247,7 @@ public class SongmapChildView : View
         songmap = map;
         title = this.gameObject.transform.Find("ItemTitle").GetComponent<Text>();
         difficulty = this.gameObject.transform.Find("ItemDifficulty").GetComponent<Text>();
-        approachRate = this.gameObject.transform.Find("ItemAR").GetComponent<Text>();
+        healthDrain = this.gameObject.transform.Find("ItemHDL").GetComponent<Text>();
         hitAccuracyLevel = this.gameObject.transform.Find("ItemHAL").GetComponent<Text>();
     }
 }

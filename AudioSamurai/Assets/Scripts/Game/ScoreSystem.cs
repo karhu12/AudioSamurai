@@ -6,11 +6,15 @@ using TMPro;
 
 public class ScoreSystem : Singleton<ScoreSystem>
 {
+    /* Constants */
+    public const int HIT_TYPES = 3;
+
     public enum HitType
     {
         Perfect = 300,
         Normal = 100,
-        Poor = 50
+        Poor = 50,
+        Miss = 0
     }
 
     public GameObject scoreText;
@@ -30,7 +34,6 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     void Update()
     {
-        AddScore(1);
         scoreText.GetComponent<Text>().text = score.ToString();
         comboText.GetComponent<TextMeshProUGUI>().text = combo.ToString() + "x";
     }
@@ -39,30 +42,15 @@ public class ScoreSystem : Singleton<ScoreSystem>
     {
         if (GameController.Instance.State == GameController.GameState.Playing)
         {
-            if (combo > 0)
-            {
-                score += scoreToAdd * combo;
-            }
-            else
-            {
-                score += scoreToAdd;
-            }
-            
+            score += scoreToAdd * (combo == 0 ? 1 : combo);
+            combo += 1;
+            comboAnim.Play("comboAnimation");
         }
     }
 
     public void AddScore(HitType hit)
     {
         AddScore((int)hit);
-    }
-
-    public void AddCombo()
-    {
-        if (GameController.Instance.State == GameController.GameState.Playing)
-        {
-            combo += 1;
-            comboAnim.Play("comboAnimation");
-        }
     }
 
     public void ResetCombo()

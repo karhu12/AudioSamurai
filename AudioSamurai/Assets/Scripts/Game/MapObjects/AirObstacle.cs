@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AirObstacle : MapObject
+public class AirObstacle : Obstacle
 {
     /* Constants */
     public new const string Type = "AirObstacle";
@@ -13,16 +13,5 @@ public class AirObstacle : MapObject
     }
     public override string GetMapObjectType() {
         return AirObstacle.Type;
-    }
-
-    override protected void OnPlayerCollision(Player player) {
-        /* TODO : lose combo */
-        ScoreSystem.Instance.ResetCombo();
-        player.TakeDamage();
-        base.OnPlayerCollision(player);
-    }
-
-    protected override void OnPlayerHit(Player player) {
-        /* Do nothing since it's an obstacle. */
     }
 }
