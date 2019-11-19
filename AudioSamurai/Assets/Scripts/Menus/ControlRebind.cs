@@ -4,13 +4,15 @@ using UnityEngine.UI;
 using System.Linq;
 public class ControlRebind : MonoBehaviour
 {
+    public Button button;
+    public Text text;
     public InputActionReference actionReference;
     public int defaultBindingIndex;
+    public InputActionAsset inputActionAsset;
 
     private InputAction inputAction;
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
-    private Button button;
-    private Text text;
+    private bool isActive;
 
     void Start()
     {
@@ -60,12 +62,16 @@ public class ControlRebind : MonoBehaviour
     void ResetButtonMappingTextValue()
     {
         text.text = InputControlPath.ToHumanReadableString(inputAction.bindings[0].effectivePath);
+<<<<<<< HEAD
 
         var ac = inputAction.bindings.FirstOrDefault((item) => item.action == inputAction.name);
         string path = ac.effectivePath;
 
         PlayerPrefs.SetString(inputAction.name, path);
         button.gameObject.SetActive(true);
+=======
+        button.gameObject.SetActive(!isActive);
+>>>>>>> 4ac341ea6fa3cf97f780f12abbc5864a7b6301ec
     }
 
     void ButtonRebindCompleted()
