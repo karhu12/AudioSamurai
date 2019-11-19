@@ -60,7 +60,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
         {
             combo += 1;
             comboAnim.Play("comboAnimation");
-            GameData.Instance.CompareToHighestCombo(combo);
+            GameData.Instance.HighestCombo = combo;
         }
     }
 

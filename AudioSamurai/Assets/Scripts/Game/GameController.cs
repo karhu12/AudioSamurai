@@ -204,7 +204,7 @@ public class GameController : Singleton<GameController>
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
         /* Get result from score manager */
-        GameData.Instance.SetFinalScore(ScoreSystem.Instance.GetScore());
+        GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();
         GameData.Instance.CalculateHitPercentage();
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         player.IsRunning = false;
