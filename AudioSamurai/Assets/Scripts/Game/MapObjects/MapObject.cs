@@ -24,6 +24,8 @@ public class MapObject : Poolable
         Ground
     }
 
+    public float Timing { get; set; }
+
     /* Placement constant of class. Must be overridden in derived class to change verticla placement! */
     public virtual VerticalPlacement Placement 
     {
@@ -66,7 +68,7 @@ public class MapObject : Poolable
      */
     protected virtual void OnPlayerCollision(Player player)
     {
-        Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
+        // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
     }
 
 
@@ -76,7 +78,7 @@ public class MapObject : Poolable
      */
     protected virtual void OnPlayerHit(Player player)
     {
-        Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
+        // Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
         player.RestoreHealth();
         ReturnToPool();
     }
