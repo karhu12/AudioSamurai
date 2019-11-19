@@ -125,6 +125,12 @@ public class Songmap : IXmlSerializable
         this.difficultyTitle = difficultyTitle;
     }
 
+    /* Returns given songmaps name as a string */
+    public string GetSongmapName()
+    {
+        return $"{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}";
+    }
+
     /* Returns readonly list from mapObjects. mapObjects can be edited only by using addMapObject, editMapObject and removeMapObject methods */
     public IList<(float, string)> GetMapObjects()
     {
@@ -396,7 +402,7 @@ public class Songmap : IXmlSerializable
     /* Returns filepath to this songmaps difficulty file */
     public string GetSongmapPath()
     {
-        return $"{GetSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
+        return $"{GetSongmapFolderPath()}\\{GetSongmapName()}{SONG_MIME_TYPE}";
     }
 
     /* Returns filepath to this songmaps audio file */
