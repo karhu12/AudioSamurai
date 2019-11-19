@@ -38,7 +38,7 @@ public class MapObjectManager : Singleton<MapObjectManager>
         {
             if (mapObj.gameObject.activeSelf)
             {
-                mapObj.gameObject.SetActive(false);
+                mapObj.ReturnToPool();
             }
         }
     }

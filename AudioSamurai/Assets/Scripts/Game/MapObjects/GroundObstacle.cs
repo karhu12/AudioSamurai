@@ -2,23 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GroundObstacle : MapObject
+public class GroundObstacle : Obstacle
 {
     /* Constants */
     public new const string Type = "GroundObstacle";
 
     public override string GetMapObjectType() {
         return GroundObstacle.Type;
-    }
-
-    override protected void OnPlayerCollision(Player player) {
-        ScoreSystem.Instance.ResetCombo();
-        GameData.Instance.OnHitMissed();
-        player.TakeDamage();
-        base.OnPlayerCollision(player);
-    }
-
-    protected override void OnPlayerHit(Player player) {
-        /* Do nothing since it's an obstacle. */ 
     }
 }

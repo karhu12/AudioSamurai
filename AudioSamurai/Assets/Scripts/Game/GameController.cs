@@ -29,13 +29,14 @@ public class GameController : Singleton<GameController>
         Playing,
         WaitingForEnd,
         Paused,
-        EndScreen
+        EndScreen,
+        FailScreen
     }
 
-    private Songmap selectedSongmap;
-
+    public Songmap SelectedSongmap { get; private set; }
+    public (float, float, int) CurrentTiming { get; private set; }
     private List<(float, float, string)> spawnQueue = new List<(float, float, string)>();
-    private List<(float, float)> timingQueue = new List<(float, float)>();
+    private List<(float, float, int)> timingQueue = new List<(float, float, int)>();
 
     public GameState State
     {
@@ -105,7 +106,7 @@ public class GameController : Singleton<GameController>
     {
         if (State == GameState.Idle)
         {
-            selectedSongmap = songmap;
+            SelectedSongmap = songmap;
             Calculate();
             State = GameState.Ready;
             return true;
@@ -113,12 +114,14 @@ public class GameController : Singleton<GameController>
         return false;
     }
 
+    /* Performs the game start coroutine if it is ready. */
     public void StartGame()
     {
         if (State == GameState.Ready)
             StartCoroutine(GameStartCoroutine());
     }
 
+    /* If the game is currently on the result screen, it will move the game back to song selection and set the state back to idling. */
     public void MoveFromEndScreen()
     {
         if (State == GameState.EndScreen)
@@ -126,6 +129,26 @@ public class GameController : Singleton<GameController>
             CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
             State = GameState.Idle;
         }
+    }
+
+    /* Calculates what score it should reward player with based on the hitTiming */
+    public int CalculateHitScore(float hitTiming) {
+        float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
+        float hitTime = Math.Abs(SongmapController.Instance.AudioSource.time * 1000 - hitTiming);
+        if (hitTime < accHitTime) {
+            Debug.Log($"hit offset = {hitTime}, PERFECT");
+            return (int)ScoreSystem.HitType.Perfect;
+        }
+        else if (hitTime >= accHitTime && hitTime <= accHitTime * 2) {
+            Debug.Log($"hit offset = {hitTime}, NORMAL");
+            return (int)ScoreSystem.HitType.Normal;
+        }
+        else if (hitTime >= accHitTime * 2 && hitTime <= accHitTime * 3) {
+            Debug.Log($"hit offset = {hitTime}, POOR");
+            return (int)ScoreSystem.HitType.Poor;
+        }
+        Debug.Log($"hit offset = {hitTime}, MISS");
+        return 0;
     }
 
     /* Private methods */
@@ -143,12 +166,22 @@ public class GameController : Singleton<GameController>
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
     private void OnPlayingUpdate() {
-        HandleGameSpeed();
-        HandleSpawnQueue();
-        if (spawnQueue.Count == 0 && !MapObjectManager.Instance.HasActiveObjects())
-        {
-            StartCoroutine(GameEndCoroutine());
-            State = GameState.WaitingForEnd;
+        if (player.Health <= 0) {
+            GameFail();
+        } else {
+            HandleGameSpeed();
+            HandleSpawnQueue();
+            if (spawnQueue.Count == 0 && !MapObjectManager.Instance.HasActiveObjects()) {
+                StartCoroutine(GameEndCoroutine());
+                State = GameState.WaitingForEnd;
+            }
+        }
+    }
+
+    /* */
+    private void GameFail() {
+        if (State == GameState.Playing) {
+            State = GameState.FailScreen;
         }
     }
 
@@ -164,7 +197,7 @@ public class GameController : Singleton<GameController>
             {
                 removeList.Add(obj);
                 MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item3);
-
+                mapObject.Timing = obj.Item1;
                 mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), obj.Item2);
             }
         }
@@ -180,13 +213,14 @@ public class GameController : Singleton<GameController>
         if (!player.IsRunning)
             player.IsRunning = true;
 
-        List<(float, float)> removeList = new List<(float, float)>();
+        List<(float, float, int)> removeList = new List<(float, float, int)>();
 
         foreach (var timing in timingQueue)
         {
             if (timing.Item1 <= SongmapController.Instance.AudioSource.time * 1000)
             {
                 player.ChangeSpeed(timing.Item2);
+                CurrentTiming = timing;
                 removeList.Add(timing);
             }
         }
@@ -261,11 +295,11 @@ public class GameController : Singleton<GameController>
 
     private void Calculate()
     {
-        List<float> beats = selectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
+        List<float> beats = SelectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
         List<(float, float)> beatSpawnPositions = new List<(float, float)>();
         foreach (var beat in beats) {
             var idx = beats.IndexOf(beat);
-            var closest = selectedSongmap.GetClosestTimingAt(beat);
+            var closest = SelectedSongmap.GetClosestTimingAt(beat);
             float spawnPosition = 0;
             if (idx == 0)
             {
@@ -277,15 +311,15 @@ public class GameController : Singleton<GameController>
             beatSpawnPositions.Add((beat, spawnPosition));
         }
 
-        foreach (var mapObj in selectedSongmap.GetMapObjects())
+        foreach (var mapObj in SelectedSongmap.GetMapObjects())
         {
             (float,float) closestBeat = beatSpawnPositions.FindLast(item => Math.Round((double)item.Item1, 0) <= Math.Round((double)mapObj.Item1, 0));
             spawnQueue.Add((mapObj.Item1, closestBeat.Item2, mapObj.Item2));
         }
 
-        foreach (var timing in selectedSongmap.GetTimingList())
+        foreach (var timing in SelectedSongmap.GetTimingList())
         {
-            timingQueue.Add((timing.Item1, timing.Item2));
+            timingQueue.Add((timing.Item1, timing.Item2, timing.Item3));
         }
 
         HandleSpawnQueue();
