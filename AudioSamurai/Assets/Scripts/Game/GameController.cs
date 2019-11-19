@@ -20,6 +20,7 @@ public class GameController : Singleton<GameController>
 
     public Collider hitArea;
     public Player player;
+    public Canvas hud;
     
     public enum GameState
     {
@@ -44,14 +45,14 @@ public class GameController : Singleton<GameController>
     private void Start()
     {
         if (player == null)
-        {
             player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
-        }
 
         if (hitArea == null)
-        {
             hitArea = GameObject.FindGameObjectWithTag("HitArea").GetComponent<Collider>();
-        }
+
+        if (hud == null)
+            hud = GameObject.FindGameObjectWithTag("HUD").GetComponent<Canvas>();
+        hud.gameObject.SetActive(false);
     }
 
     public bool Pause()
@@ -87,6 +88,10 @@ public class GameController : Singleton<GameController>
             player.IsRunning = false;
             player.transform.position = START_POSITION;
             State = GameState.Idle;
+            if (hud.gameObject.activeSelf)
+                hud.gameObject.SetActive(false);
+            ScoreSystem.Instance.ResetCombo();
+            ScoreSystem.Instance.ResetScore();
             return true;
         }
         return false;
@@ -137,8 +142,7 @@ public class GameController : Singleton<GameController>
     }
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
-    private void OnPlayingUpdate()
-    {
+    private void OnPlayingUpdate() {
         HandleGameSpeed();
         HandleSpawnQueue();
         if (spawnQueue.Count == 0 && !MapObjectManager.Instance.HasActiveObjects())
@@ -199,9 +203,13 @@ public class GameController : Singleton<GameController>
         State = GameState.EndScreen;
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
+        /* Get result from score manager */
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         player.IsRunning = false;
         player.transform.position = START_POSITION;
+        ScoreSystem.Instance.ResetCombo();
+        ScoreSystem.Instance.ResetScore();
+        hud.gameObject.SetActive(false);
     }
 
     private IEnumerator GameEndCoroutine()
@@ -218,9 +226,10 @@ public class GameController : Singleton<GameController>
     }
 
     /* Coroutine that ensures everything is setup for playing. */
-    private IEnumerator GameStartCoroutine()
-    {
+    private IEnumerator GameStartCoroutine() {
         yield return InitialCoroutine();
+        if (!hud.gameObject.activeSelf)
+            hud.gameObject.SetActive(true);
         yield return CountdownCoroutine();
         SongmapController.Instance.AudioSource.Play();
         State = GameState.Playing;
