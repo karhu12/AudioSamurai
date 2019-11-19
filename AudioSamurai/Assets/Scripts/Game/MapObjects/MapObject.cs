@@ -65,6 +65,7 @@ public class MapObject : Poolable
     /*
      * Triggered when the MapObject has collision with the player.
      * Should be overridden in derived classes to implement logic.
+     * NOTE : It is currently possible for enemy to have collision with player multiple times. Could be fixed with collision times counter.
      */
     protected virtual void OnPlayerCollision(Player player)
     {

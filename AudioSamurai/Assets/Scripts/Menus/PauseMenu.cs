@@ -23,11 +23,16 @@ public class PauseMenu : MonoBehaviour
         }
     }
 
-    //ResumeButton OnClick
-    public void Resume()
+    public void OnRestart()
     {
-        if (GameController.Instance.Unpause())
-        {
+        Resume(false);
+        GameController.Instance.Retry();
+    }
+
+    //ResumeButton OnClick
+    public void Resume(bool withUnpause = true)
+    {
+        if (withUnpause ? GameController.Instance.Unpause() : true) {
             pauseUI.SetActive(false);
             Time.timeScale = 1f;
             onPause = false;
