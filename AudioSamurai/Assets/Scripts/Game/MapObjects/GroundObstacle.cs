@@ -13,6 +13,7 @@ public class GroundObstacle : MapObject
 
     override protected void OnPlayerCollision(Player player) {
         ScoreSystem.Instance.ResetCombo();
+        GameData.Instance.OnHitMissed();
         player.TakeDamage();
         base.OnPlayerCollision(player);
     }

@@ -18,6 +18,7 @@ public class AirObstacle : MapObject
     override protected void OnPlayerCollision(Player player) {
         /* TODO : lose combo */
         ScoreSystem.Instance.ResetCombo();
+        GameData.Instance.OnHitMissed();
         player.TakeDamage();
         base.OnPlayerCollision(player);
     }

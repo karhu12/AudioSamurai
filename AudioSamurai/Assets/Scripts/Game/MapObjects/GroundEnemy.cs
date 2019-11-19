@@ -17,6 +17,7 @@ public class GroundEnemy : MapObject
         /* TODO : Player take damage + lose combo */
         player.TakeDamage();
         ScoreSystem.Instance.ResetCombo();
+        GameData.Instance.OnHitMissed();
         base.OnPlayerCollision(player);
     }
 
@@ -24,6 +25,7 @@ public class GroundEnemy : MapObject
     {
         /* TODO : Add combo to player and destroy self */
         ScoreSystem.Instance.AddCombo();
+        GameData.Instance.OnSuccessfulHit();
         base.OnPlayerHit(player);
     }
 }
