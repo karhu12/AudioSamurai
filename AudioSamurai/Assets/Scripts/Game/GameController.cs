@@ -84,6 +84,7 @@ public class GameController : Singleton<GameController>
     public void Retry() {
         if (State == GameState.Paused || State == GameState.FailScreen)
         {
+            ResetGameState();
             if (LoadGame(SelectedSongmap)) {
                 StartGame();
             }
@@ -106,7 +107,7 @@ public class GameController : Singleton<GameController>
      */
     public bool LoadGame(Songmap songmap)
     {
-        if (State == GameState.Idle || State == GameState.FailScreen)
+        if (State == GameState.Idle || State == GameState.FailScreen || State == GameState.Paused)
         {
             SelectedSongmap = songmap;
             Calculate();
