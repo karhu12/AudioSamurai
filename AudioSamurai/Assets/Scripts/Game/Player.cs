@@ -81,12 +81,18 @@ public class Player : MonoBehaviour
     }
 
     /* Restores players health by constant amount. Should be called when striking enemies. */
-    public void RestoreHealth() {
-        if (Health + HEALTH_RESTORE_AMOUNT > STARTING_HEALTH) {
+    public void RestoreHealth(bool toFull = false) {
+        if (toFull) {
             Health = STARTING_HEALTH;
-        } else {
-            Health += HEALTH_RESTORE_AMOUNT;
             hbc.HealEffect(STARTING_HEALTH, Health);
+        } else {
+            if (Health + HEALTH_RESTORE_AMOUNT > STARTING_HEALTH) {
+                Health = STARTING_HEALTH;
+            }
+            else {
+                Health += HEALTH_RESTORE_AMOUNT;
+                hbc.HealEffect(STARTING_HEALTH, Health);
+            }
         }
     }
     

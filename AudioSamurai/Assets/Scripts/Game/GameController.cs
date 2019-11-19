@@ -11,8 +11,6 @@ public class GameController : Singleton<GameController>
     public const float BEAT_DISTANCE_PER_BPM_MULT = 1f;
     public const float BPM_MULTIPLIER = 60f;
 
-    // 180 bpm = 3 beat distance 
-
     private const float SPAWN_AHEAD_IN_MS = 5000;
     private const float TIME_AFTER_LAST_OBJECT = 4000;
     private const float FADEOUT_STEP_DURATION = 100;
@@ -21,6 +19,7 @@ public class GameController : Singleton<GameController>
     public Collider hitArea;
     public Player player;
     public Canvas hud;
+    public FailMenu failMenu;
     
     public enum GameState
     {
@@ -46,14 +45,17 @@ public class GameController : Singleton<GameController>
     private void Start()
     {
         if (player == null)
-            player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+            player = GameObject.FindGameObjectWithTag(Player.COLLIDER_NAME).GetComponent<Player>();
 
         if (hitArea == null)
-            hitArea = GameObject.FindGameObjectWithTag("HitArea").GetComponent<Collider>();
+            hitArea = GameObject.FindGameObjectWithTag(Player.HIT_COLLIDER_NAME).GetComponent<Collider>();
 
         if (hud == null)
             hud = GameObject.FindGameObjectWithTag("HUD").GetComponent<Canvas>();
         hud.gameObject.SetActive(false);
+
+        if (failMenu == null)
+            failMenu = GameObject.FindGameObjectWithTag(FailMenu.TAG).GetComponent<FailMenu>();
     }
 
     public bool Pause()
@@ -79,23 +81,23 @@ public class GameController : Singleton<GameController>
         return false;
     }
 
-    public bool QuitGame()
-    {
-        if (State == GameState.Paused || State == GameState.Playing)
+    public void Retry() {
+        if (State == GameState.Paused || State == GameState.FailScreen)
         {
-            MapObjectManager.Instance.Cleanup();
-            SongmapController.Instance.AudioSource.Stop();
-            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
-            player.IsRunning = false;
-            player.transform.position = START_POSITION;
-            State = GameState.Idle;
-            if (hud.gameObject.activeSelf)
-                hud.gameObject.SetActive(false);
-            ScoreSystem.Instance.ResetCombo();
-            ScoreSystem.Instance.ResetScore();
-            return true;
+            if (LoadGame(SelectedSongmap)) {
+                StartGame();
+            }
         }
-        return false;
+    }
+
+    public void QuitGame()
+    {
+        if (State == GameState.Paused || State == GameState.Playing || State == GameState.FailScreen)
+        {
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
+            State = GameState.Idle;
+            ResetGameState();
+        }
     }
 
     /*
@@ -104,7 +106,7 @@ public class GameController : Singleton<GameController>
      */
     public bool LoadGame(Songmap songmap)
     {
-        if (State == GameState.Idle)
+        if (State == GameState.Idle || State == GameState.FailScreen)
         {
             SelectedSongmap = songmap;
             Calculate();
@@ -177,14 +179,7 @@ public class GameController : Singleton<GameController>
             }
         }
     }
-
-    /* */
-    private void GameFail() {
-        if (State == GameState.Playing) {
-            State = GameState.FailScreen;
-        }
-    }
-
+    
     /* Checks if the items in the queue are within SPAWN_AHEAD_IN_MS from the current time in song and instantiates them in correct place if they are. */
     private void HandleSpawnQueue()
     {
@@ -232,18 +227,24 @@ public class GameController : Singleton<GameController>
     }
 
     /* Handles moving the user from game scene to result screen and display the result ui. */
-    private void OnGameEnd()
+    private void OnGameEnd() 
     {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         State = GameState.EndScreen;
+        ResetGameState();
+        /* Get result from score manager */
+    }
+
+    private void ResetGameState() {
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
-        /* Get result from score manager */
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         player.IsRunning = false;
         player.transform.position = START_POSITION;
+        if (hud.gameObject.activeSelf)
+            hud.gameObject.SetActive(false);
+        player.RestoreHealth(true);
         ScoreSystem.Instance.ResetCombo();
         ScoreSystem.Instance.ResetScore();
-        hud.gameObject.SetActive(false);
     }
 
     private IEnumerator GameEndCoroutine()
@@ -290,6 +291,15 @@ public class GameController : Singleton<GameController>
         Debug.Log("Go!");
     }
 
+    private void GameFail() {
+        if (State == GameState.Playing) {
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.FailMenu);
+            State = GameState.FailScreen;
+            failMenu.ToggleFailMusic(true);
+            ResetGameState();
+        }
+    }
+    
     private void Calculate()
     {
         List<float> beats = SelectedSongmap.getBeatList(0, SongmapController.Instance.AudioSource.clip.length * 1000);
