@@ -57,7 +57,7 @@ public class MapObject : Poolable
                 OnPlayerHit(FindObjectOfType<Player>());
                 break;
             case EnemyChecker.COLLIDER_NAME:
-                OnPlayerCollision(FindObjectOfType<Player>());
+                OnEnemyMiss(FindObjectOfType<Player>());
                 break;
             case KillPlane.COLLIDER_NAME:
                 ReturnToPool();
@@ -75,6 +75,13 @@ public class MapObject : Poolable
         // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
     }
 
+    /*
+     *Triggered when player passes enemy on wrong Y-axel level
+     */
+    protected virtual void OnEnemyMiss(Player player)
+    {
+
+    }
 
     /*
      * Triggered when the MapObject has collision with the players ground hit collider. (Enabled when attacking in air or ground)

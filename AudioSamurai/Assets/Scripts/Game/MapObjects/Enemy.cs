@@ -11,6 +11,13 @@ public class Enemy : MapObject
         base.OnPlayerCollision(player);
     }
 
+    protected override void OnEnemyMiss(Player player)
+    {
+        player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
+        ScoreSystem.Instance.ResetCombo();
+        base.OnEnemyMiss(player);
+    }
+
     protected override void OnPlayerHit(Player player) {
         int score = GameController.Instance.CalculateHitScore(Timing);
         ScoreSystem.Instance.AddScore(score);
