@@ -72,7 +72,7 @@ public class MapObject : Poolable
     {
         // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
         float damage = player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
-        FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 1.5f, .5f), $"-{damage}", Color.red);
+        FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
         ScoreSystem.Instance.ResetCombo();
     }
 
