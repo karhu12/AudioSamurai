@@ -6,7 +6,7 @@ public class MapObject : Poolable
 {
     /* Constants */
     public const float AIR_PLACEMENT = 3.05f;
-    public const float GROUND_PLACEMENT = .55f;
+    public const float GROUND_PLACEMENT = 0f;
     public const float INVALID_PLACEMENT = -1f;
 
     // Constant used for determining the type of object. Mainly used for helping on instantiation. Sub classes should declare similiar one.
