@@ -195,6 +195,7 @@ public class GameController : Singleton<GameController>
                 MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item3);
                 mapObject.Timing = obj.Item1;
                 mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), obj.Item2);
+
             }
         }
         foreach (var removeItem in removeList)

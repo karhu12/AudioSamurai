@@ -56,6 +56,9 @@ public class MapObject : Poolable
             case Player.HIT_COLLIDER_NAME:
                 OnPlayerHit(FindObjectOfType<Player>());
                 break;
+            case EnemyChecker.COLLIDER_NAME:
+                OnPlayerCollision(FindObjectOfType<Player>());
+                break;
             case KillPlane.COLLIDER_NAME:
                 ReturnToPool();
                 break;
@@ -83,4 +86,5 @@ public class MapObject : Poolable
         player.RestoreHealth();
         ReturnToPool();
     }
+
 }

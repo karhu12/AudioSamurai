@@ -16,4 +16,5 @@ public class Enemy : MapObject
         ScoreSystem.Instance.AddScore(score);
         base.OnPlayerHit(player);
     }
+
 }
