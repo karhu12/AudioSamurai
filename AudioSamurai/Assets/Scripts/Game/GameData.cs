@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameData : Singleton<GameData>
 {
-    public float FinalScore { get; set; } = 0;
+    public int FinalScore { get; set; } = 0;
     private int highestCombo = 0;
     public int HighestCombo
     {

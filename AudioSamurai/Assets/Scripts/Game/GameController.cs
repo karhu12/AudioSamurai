@@ -241,6 +241,7 @@ public class GameController : Singleton<GameController>
         GameData.Instance.MapName = Instance.SelectedSongmap.GetSongmapName();
         GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();
         GameData.Instance.CalculateHitPercentage();
+        HighScoreManager.Instance.CompareToHighScore(GameData.Instance.FinalScore, GameData.Instance.MapName);
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         player.IsRunning = false;
         player.transform.position = START_POSITION;
