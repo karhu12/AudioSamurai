@@ -34,6 +34,7 @@ public class SongSelection : MonoBehaviour
      */
     public void Refresh()
     {
+        SongmapController.Instance.AudioSource.Stop();
         views.Clear();
         playSongButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps();
@@ -70,6 +71,7 @@ public class SongSelection : MonoBehaviour
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         ResetSongSelectionView();
+        FindObjectOfType<AudioManager>().Play("MenuMusic");
     }
 
     /*
@@ -88,6 +90,7 @@ public class SongSelection : MonoBehaviour
                 if (view.ToggleChildren())
                 {
                     selectedView = view;
+                    FindObjectOfType<AudioManager>().Pause("MenuMusic");
                     SongmapController.Instance.PlaySongmapAudio(maps[title.text][0]);
                 }
                 else
@@ -102,6 +105,7 @@ public class SongSelection : MonoBehaviour
                 view.ToggleChildren();
             }
         }
+        
     }
 
     /*

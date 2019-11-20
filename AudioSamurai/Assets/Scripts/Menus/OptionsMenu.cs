@@ -13,7 +13,6 @@ public class OptionsMenu : MonoBehaviour
     public Dropdown qualityDropdown;
     public Toggle fullScreenToggle;
 
-
     private int screenInt;
     private bool isFullScreen = false;
     private float logarithmicVolume;
@@ -124,6 +123,13 @@ public class OptionsMenu : MonoBehaviour
             PlayerPrefs.SetInt("togglestate", 1);
         }
 
+    }
+
+    public void OnBackButtonPress()
+    {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+        //ResetSongSelectionView();
+        //FindObjectOfType<AudioManager>().Play("MenuMusic");
     }
 
 }

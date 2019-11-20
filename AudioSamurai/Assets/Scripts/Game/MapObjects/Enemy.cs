@@ -15,5 +15,6 @@ public class Enemy : MapObject
         int score = GameController.Instance.CalculateHitScore(Timing);
         ScoreSystem.Instance.AddScore(score);
         base.OnPlayerHit(player);
+        FindObjectOfType<AudioManager>().Play("PlayerAttack");
     }
 }
