@@ -13,8 +13,7 @@ using System.Linq;
  * Each songmap object usually defines how a single difficulty should be played out.
  * A songmaps audioFilename marks the songmaps folder name in %localappdata%\AudioSamurai\Songs and the audio file inside that given folder.
  * 
- * AR (Approach rate): How much time the player has before they see the approaching map object. Calculated with = AR_DURATION / approachRate
- * HAL (Hit accuracy level): How much time does the player have to hit/parry map object on beat. Calculated with = HAL_DEFAULT_DURATION - HAL_DIFF * hitAccuracyLevel)
+ * HAL (Hit accuracy level): How much time does the player have to hit/parry map object on beat. Calculated based on bpm and divisor. When maximum the time span of hitting the note halves and on 1 its full.
  */
 
 public class Songmap : IXmlSerializable
@@ -23,19 +22,18 @@ public class Songmap : IXmlSerializable
     public static readonly string SONGS_FOLDER = SongmapController.APPLICATION_FOLDER + "\\Songs";
     public static readonly (float, float, int) INVALID_TIMING = (-1, -1, -1);
     public const string SONG_MIME_TYPE = ".as";
-
-    public const float MIN_AR = 1;
-    public const float MAX_AR = 5;
-    public const float AR_DURATION = 1000;
-
+    
     public const float MIN_HAL = 1;
     public const float MAX_HAL = 10;
-    public const float HAL_DIFF = 5;
-    public const float HAL_DEFAULT_DURATION = 100 + HAL_DIFF;
+    public const float MIN_HAL_MULT = 1f;
+    public const float MAX_HAL_MULT = 0.5f;
+
+    public const float MIN_HDL = 1;
+    public const float MAX_HDL = 10;
 
     public const string XML_AUDIO_FILENAME = "AudioFilename";
     public const string XML_DIFF_TITLE = "DifficultyTitle";
-    public const string XML_AR = "ApproachRate";
+    public const string XML_HDL = "HealthDrainLevel";
     public const string XML_HAL = "HitAccuracyLevel";
     public const string XML_TIMING = "TimingList";
     public const string XML_TIMING_ITEM = "TimingListItem";
@@ -58,12 +56,6 @@ public class Songmap : IXmlSerializable
         set { if (value.Length <= 12) difficultyTitle = value; }
     }
 
-    private float approachRate;
-    public float ApproachRate { 
-        get => approachRate;
-        set { if (value >= MIN_AR && value <= MAX_AR) approachRate = value; }
-    }
-
     private float hitAccuracyLevel;
     public float HitAccuracyLevel
     {
@@ -71,7 +63,11 @@ public class Songmap : IXmlSerializable
         set { if (value >= MIN_HAL && value <= MAX_HAL) hitAccuracyLevel = value; }
     }
 
-    /* TODO : Health drain multiplier. 5 damage multiplied by multiplier when damage taken*/
+    private float healthDrainLevel;
+    public float HealthDrainlevel {
+        get => healthDrainLevel;
+        set { if (value >= MIN_HDL && value <= MAX_HDL) healthDrainLevel = value; }
+    }
 
     /* map specific points */
     private List<(float, float, int)> timingList = new List<(float, float, int)>();
@@ -81,8 +77,8 @@ public class Songmap : IXmlSerializable
     /* Default constructor. Not recommended to use because it does not initialize the map correctly. */
     public Songmap()
     {
-        approachRate = MIN_AR;
-        hitAccuracyLevel = MIN_HAL;
+        HealthDrainlevel = MIN_HDL;
+        HitAccuracyLevel = MIN_HAL;
         difficultyTitle = "";
     }
 
@@ -113,8 +109,8 @@ public class Songmap : IXmlSerializable
         {
             throw new Exception("Given audio file did not exist");
         }
-        approachRate = MIN_AR;
-        hitAccuracyLevel = MIN_HAL;
+        HealthDrainlevel = MIN_HDL;
+        HitAccuracyLevel = MIN_HAL;
         difficultyTitle = "";
     }
 
@@ -127,6 +123,12 @@ public class Songmap : IXmlSerializable
     public Songmap(string audioFilePath, string difficultyTitle) : this(audioFilePath)
     {
         this.difficultyTitle = difficultyTitle;
+    }
+
+    /* Returns given songmaps name as a string */
+    public string GetSongmapName()
+    {
+        return $"{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}";
     }
 
     /* Returns readonly list from mapObjects. mapObjects can be edited only by using addMapObject, editMapObject and removeMapObject methods */
@@ -358,22 +360,19 @@ public class Songmap : IXmlSerializable
         }
     }
 
-    /* Returns the calculated approach rate of map in milliseconds on how fast the objects should become visible at. */
-    public float GetApproachRate()
+    /* 
+     * returns the calculated HAL in milliseconds which tells what is the window of accurate hitting on mapObjects.
+     * currentTiming : used to calculate what is the accurate hitting level for given timing.
+     */
+    public float GetHitAccuracyLevel((float, float, int) currentTiming)
     {
-        return AR_DURATION / approachRate;
-    }
-
-    /* returns the calculated HAL which tells what is the windows of accurate hitting on mapObjects. */
-    public float GetHitAccuracyLevel()
-    {
-        return HAL_DEFAULT_DURATION - hitAccuracyLevel * HAL_DIFF;
+        return (((MAX_HAL_MULT - MIN_HAL_MULT) * (hitAccuracyLevel - MIN_HAL) / MAX_HAL - MIN_HAL) + MIN_HAL * 2) * (60 / currentTiming.Item2 / currentTiming.Item3) / ScoreSystem.HIT_TYPES * 1000; 
     }
 
     /* Returns the average difficulty of given map */
     public float GetDifficulty()
     {
-        return (HitAccuracyLevel + ApproachRate) / 2;
+        return (HitAccuracyLevel + HealthDrainlevel) / 2;
     }
 
     /* Returns AudioType object based on the currently selected audioFile */
@@ -403,7 +402,7 @@ public class Songmap : IXmlSerializable
     /* Returns filepath to this songmaps difficulty file */
     public string GetSongmapPath()
     {
-        return $"{GetSongmapFolderPath()}\\{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}{SONG_MIME_TYPE}";
+        return $"{GetSongmapFolderPath()}\\{GetSongmapName()}{SONG_MIME_TYPE}";
     }
 
     /* Returns filepath to this songmaps audio file */
@@ -434,11 +433,11 @@ public class Songmap : IXmlSerializable
                         case XML_DIFF_TITLE when reader.Read():
                             difficultyTitle = reader.Value;
                             break;
-                        case XML_AR when reader.Read():
-                            approachRate = float.Parse(reader.Value);
+                        case XML_HDL when reader.Read():
+                            HealthDrainlevel = float.Parse(reader.Value);
                             break;
                         case XML_HAL when reader.Read():
-                            hitAccuracyLevel = float.Parse(reader.Value);
+                            HitAccuracyLevel = float.Parse(reader.Value);
                             break;
                         case XML_TIMING:
                             if (reader.ReadToFollowing(XML_TIMING_ITEM))
@@ -475,8 +474,8 @@ public class Songmap : IXmlSerializable
     {
         writer.WriteElementString(XML_AUDIO_FILENAME, audioFilename);
         writer.WriteElementString(XML_DIFF_TITLE, difficultyTitle);
-        writer.WriteElementString(XML_AR, $"{approachRate}");
-        writer.WriteElementString(XML_HAL, $"{hitAccuracyLevel}");
+        writer.WriteElementString(XML_HDL, $"{HealthDrainlevel}");
+        writer.WriteElementString(XML_HAL, $"{HitAccuracyLevel}");
         writer.WriteStartElement(XML_TIMING);
         foreach ((float, float, int) timingItem in timingList)
         {

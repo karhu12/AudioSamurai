@@ -15,7 +15,7 @@ public class Player : MonoBehaviour
     public const float HIT_AREA_OFFSET = 1.5f;
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
-    public const float DAMAGE_AMOUNT = 3;
+    public const float DAMAGE_AMOUNT = 4;
     public const float HEALTH_RESTORE_AMOUNT = 1;
 
     public const string COLLIDER_NAME = "Player";
@@ -81,12 +81,18 @@ public class Player : MonoBehaviour
     }
 
     /* Restores players health by constant amount. Should be called when striking enemies. */
-    public void RestoreHealth() {
-        if (Health + HEALTH_RESTORE_AMOUNT > STARTING_HEALTH) {
+    public void RestoreHealth(bool toFull = false) {
+        if (toFull) {
             Health = STARTING_HEALTH;
-        } else {
-            Health += HEALTH_RESTORE_AMOUNT;
             hbc.HealEffect(STARTING_HEALTH, Health);
+        } else {
+            if (Health + HEALTH_RESTORE_AMOUNT > STARTING_HEALTH) {
+                Health = STARTING_HEALTH;
+            }
+            else {
+                Health += HEALTH_RESTORE_AMOUNT;
+                hbc.HealEffect(STARTING_HEALTH, Health);
+            }
         }
     }
     

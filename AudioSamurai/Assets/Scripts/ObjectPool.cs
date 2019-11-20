@@ -36,6 +36,16 @@ public class ObjectPool
         return objectPool.Count;
     }
 
+    public int GetActiveCount()
+    {
+        int count = 0;
+        foreach (var obj in objectPool) {
+            if (obj.gameObject.activeSelf)
+                count++;
+        }
+        return count;
+    }
+
     /* */
     public void ReturnToPool(Poolable poolable)
     {
