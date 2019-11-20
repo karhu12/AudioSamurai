@@ -4801,6 +4801,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56c612091d91801449fc9256413bbfae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatingText: {fileID: 0}
 --- !u!65 &1864341611486873085
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4842,6 +4843,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 56c612091d91801449fc9256413bbfae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floatingText: {fileID: 7942805436473874600, guid: aecf3f4f9e06c0744b5c35b5c8cd7dd5,
+    type: 3}
 --- !u!95 &5856546242144437434
 Animator:
   serializedVersion: 3

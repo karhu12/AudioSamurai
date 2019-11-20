@@ -5,15 +5,16 @@ using System;
 
 public class Enemy : MapObject
 {
-    override protected void OnPlayerCollision(Player player) {
-        player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
-        ScoreSystem.Instance.ResetCombo();
-        base.OnPlayerCollision(player);
+    protected void ShowScoreText(int score) {
+        ScoreSystem.HitType type = (ScoreSystem.HitType)score;
+        FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(.5f, 1.5f, .5f),ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type));
     }
 
     protected override void OnPlayerHit(Player player) {
         int score = GameController.Instance.CalculateHitScore(Timing);
+        ShowScoreText(score);
         ScoreSystem.Instance.AddScore(score);
-        base.OnPlayerHit(player);
+        player.RestoreHealth();
+        ReturnToPool();
     }
 }
