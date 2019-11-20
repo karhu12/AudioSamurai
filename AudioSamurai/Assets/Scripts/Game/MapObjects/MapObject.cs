@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MapObject : Poolable
 {
@@ -80,7 +81,10 @@ public class MapObject : Poolable
     protected virtual void OnPlayerHit(Player player)
     {
         // Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
-        player.RestoreHealth();
-        ReturnToPool();
+    }
+
+    protected virtual IEnumerator DeathCoroutine()
+    {
+        yield return new WaitForSeconds(1);
     }
 }

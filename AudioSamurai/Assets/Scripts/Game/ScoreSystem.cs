@@ -8,6 +8,10 @@ public class ScoreSystem : Singleton<ScoreSystem>
 {
     /* Constants */
     public const int HIT_TYPES = 3;
+    public const string PERFECT_TEXT = "Perfect";
+    public const string NORMAL_TEXt = "Normal";
+    public const string POOR_TEXT = "Poor";
+    public const string MISS_TEXT = "X";
 
     public enum HitType
     {
