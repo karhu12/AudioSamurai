@@ -71,7 +71,7 @@ public class SongSelection : MonoBehaviour
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         ResetSongSelectionView();
-        FindObjectOfType<AudioManager>().Play("MenuMusic");
+        //FindObjectOfType<AudioManager>().Play("MenuMusic");
     }
 
     /*
