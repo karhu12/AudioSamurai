@@ -5,36 +5,9 @@ using System;
 
 public class Enemy : MapObject
 {
-    public GameObject floatingTextPrefab;
-
     protected void ShowScoreText(int score) {
-        if (floatingTextPrefab != null) {
-            GameObject textObj = Instantiate(floatingTextPrefab, transform.position, Quaternion.identity);
-            var text = textObj.GetComponent<TMPro.TextMeshPro>();
-            switch ((ScoreSystem.HitType)score) {
-                case ScoreSystem.HitType.Perfect:
-                    text.color = Color.blue;
-                    text.SetText(ScoreSystem.PERFECT_TEXT);
-                    break;
-                case ScoreSystem.HitType.Normal:
-                    text.color = Color.green;
-                    text.SetText(ScoreSystem.NORMAL_TEXt);
-                    break;
-                case ScoreSystem.HitType.Poor:
-                    text.color = Color.yellow;
-                    text.SetText(ScoreSystem.POOR_TEXT);
-                    break;
-                case ScoreSystem.HitType.Miss:
-                    text.color = Color.red;
-                    text.SetText(ScoreSystem.MISS_TEXT);
-                    break;
-            }
-        }
-    }
-
-    override protected void OnPlayerCollision(Player player) {
-        player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
-        ScoreSystem.Instance.ResetCombo();
+        ScoreSystem.HitType type = (ScoreSystem.HitType)score;
+        FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(.5f, 1.5f, .5f),ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type));
     }
 
     protected override void OnPlayerHit(Player player) {

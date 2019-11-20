@@ -73,11 +73,13 @@ public class Player : MonoBehaviour
     }
 
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
-    public void TakeDamage(float damageMultiplier = 1) {
-        Health -= DAMAGE_AMOUNT * damageMultiplier;
+    public float TakeDamage(float damageMultiplier = 1) {
+        float damage = DAMAGE_AMOUNT * damageMultiplier;
+        Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
         Debug.Log(Health.ToString());
         /* TODO : Play damage taken sound + animation? */
+        return damage;
     }
 
     /* Restores players health by constant amount. Should be called when striking enemies. */

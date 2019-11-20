@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class FloatingText : Poolable
 {
-    public float DestroyTime = 3f;
-    public Vector3 Offset = new Vector3(0, 0, 0);
+    public float DestroyTime = 1f;
+    private Animator animator;
 
-    void Start()
+    private void Start() 
     {
-        transform.localPosition += Offset;
-        transform.LookAt(Camera.main.transform);
-        transform.Rotate(new Vector3(0, 180, 0));
-        Destroy(gameObject, DestroyTime);
+        animator = GetComponent<Animator>();
+        StartCoroutine(ReturnToPoolCoroutine());
+    }
+
+    private IEnumerator ReturnToPoolCoroutine()
+    {
+        do {
+            yield return null;
+        } while (AnimatorIsPlaying());
+        ReturnToPool();
+    }
+    private bool AnimatorIsPlaying() {
+        return animator.GetCurrentAnimatorStateInfo(0).length >
+               animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
     }
 }
