@@ -75,7 +75,7 @@ public class Poolable : MonoBehaviour
 {
     public ObjectPool Pool { get; set; }
 
-    public void ReturnToPool()
+    public virtual void ReturnToPool()
     {
         if (Pool != null)
             Pool.ReturnToPool(this);
