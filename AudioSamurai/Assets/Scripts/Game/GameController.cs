@@ -129,8 +129,8 @@ public class GameController : Singleton<GameController>
     {
         if (State == GameState.EndScreen)
         {
-            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
             State = GameState.Idle;
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
         }
     }
 
