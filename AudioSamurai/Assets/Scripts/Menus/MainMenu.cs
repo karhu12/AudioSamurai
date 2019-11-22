@@ -32,6 +32,7 @@ public class MainMenu : MonoBehaviour
     // Update is called once per frame
     public void OnStart()
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
     }
 
@@ -57,6 +58,7 @@ public class MainMenu : MonoBehaviour
     {
         mainMenuUI.SetActive(false);
         onMainMenu = false;
+        FindObjectOfType<AudioManager>().Pause("MenuMusic");
     }
 
     public void LoadMenu()
@@ -67,6 +69,7 @@ public class MainMenu : MonoBehaviour
      
     public void LoadSettings()
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
         Debug.Log("loading...");
     }
@@ -75,9 +78,11 @@ public class MainMenu : MonoBehaviour
     {
         if (Application.isEditor)
         {
+            FindObjectOfType<AudioManager>().Play("Click");
             UnityEditor.EditorApplication.isPlaying = false;
         } else
         {
+            FindObjectOfType<AudioManager>().Play("Click");
             Application.Quit();
         }
             

@@ -105,7 +105,12 @@ public class OptionsMenu : MonoBehaviour
 
     public void SetQuality(int qualityIndex)
     {
-            QualitySettings.SetQualityLevel(qualityIndex);
+        QualitySettings.SetQualityLevel(qualityIndex);
+    }
+
+    public void PlayClickSound()
+    {
+        FindObjectOfType<AudioManager>().Play("Click");
     }
 
     public void SetFullscreen(bool isFullScreen)
@@ -127,9 +132,8 @@ public class OptionsMenu : MonoBehaviour
 
     public void OnBackButtonPress()
     {
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
-        //ResetSongSelectionView();
-        //FindObjectOfType<AudioManager>().Play("MenuMusic");
     }
 
 }

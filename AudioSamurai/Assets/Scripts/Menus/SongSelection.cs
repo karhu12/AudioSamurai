@@ -35,6 +35,7 @@ public class SongSelection : MonoBehaviour
     public void Refresh()
     {
         SongmapController.Instance.AudioSource.Stop();
+        FindObjectOfType<AudioManager>().Play("Refresh");
         views.Clear();
         playSongButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps();
@@ -69,9 +70,11 @@ public class SongSelection : MonoBehaviour
      */
     public void OnBackPress()
     {
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
+        FindObjectOfType<AudioManager>().Pause("MenuMusic");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         ResetSongSelectionView();
-        //FindObjectOfType<AudioManager>().Play("MenuMusic");
+        FindObjectOfType<AudioManager>().Play("MenuMusic");
     }
 
     /*
