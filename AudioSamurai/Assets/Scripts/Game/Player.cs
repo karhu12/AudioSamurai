@@ -16,7 +16,7 @@ public class Player : MonoBehaviour
     public const float LOCAL_HIT_AREA_OFFSET = 0.5f;
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
-    public const float DAMAGE_AMOUNT = 4;
+    public const float DAMAGE_AMOUNT = 3;
     public const float HEALTH_RESTORE_AMOUNT = 1;
 
     public const string COLLIDER_NAME = "Player";
@@ -187,7 +187,7 @@ public class Player : MonoBehaviour
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return new WaitForSecondsRealtime(0.00001f);
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 4);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 10);
         }
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
