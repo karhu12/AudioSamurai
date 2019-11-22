@@ -8,6 +8,10 @@ public class ScoreSystem : Singleton<ScoreSystem>
 {
     /* Constants */
     public const int HIT_TYPES = 3;
+    public const string PERFECT_TEXT = "Perfect";
+    public const string NORMAL_TEXT = "Normal";
+    public const string POOR_TEXT = "Poor";
+    public const string MISS_TEXT = "X";
 
     public enum HitType
     {
@@ -15,6 +19,32 @@ public class ScoreSystem : Singleton<ScoreSystem>
         Normal = 100,
         Poor = 50,
         Miss = 0
+    }
+
+    public static string GetHitTypeString(HitType hitType)
+    {
+        switch (hitType) {
+            case HitType.Perfect:
+                return PERFECT_TEXT;
+            case HitType.Normal:
+                return NORMAL_TEXT;
+            case HitType.Poor:
+                return POOR_TEXT;
+        }
+        return MISS_TEXT;
+    }
+
+    public static Color GetHitTypeColor(HitType hitType)
+    {
+        switch (hitType) {
+            case HitType.Perfect:
+                return Color.cyan;
+            case HitType.Normal:
+                return Color.green;
+            case HitType.Poor:
+                return Color.yellow;
+        }
+        return Color.red;
     }
 
     public GameObject scoreText;
