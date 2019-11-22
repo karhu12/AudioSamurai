@@ -7,7 +7,7 @@ public class MapObject : Poolable
 {
     /* Constants */
     public const float AIR_PLACEMENT = 3.05f;
-    public const float GROUND_PLACEMENT = .55f;
+    public const float GROUND_PLACEMENT = 0f;
     public const float INVALID_PLACEMENT = -1f;
 
     // Constant used for determining the type of object. Mainly used for helping on instantiation. Sub classes should declare similiar one.
@@ -58,6 +58,9 @@ public class MapObject : Poolable
             case Player.HIT_COLLIDER_NAME:
                 OnPlayerHit(FindObjectOfType<Player>());
                 break;
+            case EnemyChecker.COLLIDER_NAME:
+                OnEnemyMiss(FindObjectOfType<Player>());
+                break;
             case KillPlane.COLLIDER_NAME:
                 ReturnToPool();
                 break;
@@ -80,6 +83,13 @@ public class MapObject : Poolable
         }
     }
 
+    /*
+     *Triggered when player passes enemy on wrong Y-axel level
+     */
+    protected virtual void OnEnemyMiss(Player player)
+    {
+
+    }
 
     /*
      * Triggered when the MapObject has collision with the players ground hit collider. (Enabled when attacking in air or ground)
@@ -99,4 +109,5 @@ public class MapObject : Poolable
         HasHadCollision = false;
         base.ReturnToPool();
     }
+
 }
