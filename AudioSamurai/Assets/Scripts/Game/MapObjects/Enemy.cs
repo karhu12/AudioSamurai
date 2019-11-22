@@ -12,6 +12,12 @@ public class Enemy : MapObject
         FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(.5f, 1.5f, .5f),ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type));
     }
 
+    protected override void OnEnemyMiss(Player player)
+    {
+        ScoreSystem.Instance.ResetCombo();
+        base.OnEnemyMiss(player);
+    }
+
     protected override void OnPlayerHit(Player player) {
         if (!HasBeenHit) {
             HasBeenHit = true;
@@ -32,4 +38,5 @@ public class Enemy : MapObject
         HasBeenHit = false;
         base.ReturnToPool();
     }
+
 }

@@ -13,10 +13,10 @@ public class Player : MonoBehaviour
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
     public const float HIT_AREA_OFFSET = 1;
-    public const float LOCAL_HIT_AREA_OFFSET = 0.5f;
+    public const float LOCAL_HIT_AREA_OFFSET = 0.25f;
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
-    public const float DAMAGE_AMOUNT = 4;
+    public const float DAMAGE_AMOUNT = 3;
     public const float HEALTH_RESTORE_AMOUNT = 1;
 
     public const string COLLIDER_NAME = "Player";
@@ -186,8 +186,8 @@ public class Player : MonoBehaviour
         IsAttacking = true;
         while (transform.position.y > GROUND_PLACEMENT)
         {
-            yield return new WaitForSecondsRealtime(0.00001f);
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 4);
+            yield return null;
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), 0.5f);
         }
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
@@ -208,7 +208,7 @@ public class Player : MonoBehaviour
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return new WaitForSecondsRealtime(0.00001f);
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 4);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.5f);
         }
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
