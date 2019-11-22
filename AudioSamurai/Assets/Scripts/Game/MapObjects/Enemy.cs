@@ -14,7 +14,6 @@ public class Enemy : MapObject
 
     protected override void OnEnemyMiss(Player player)
     {
-        player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
         ScoreSystem.Instance.ResetCombo();
         base.OnEnemyMiss(player);
     }
