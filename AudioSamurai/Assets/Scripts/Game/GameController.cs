@@ -240,6 +240,8 @@ public class GameController : Singleton<GameController>
     private void ResetGameState() {
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
+        spawnQueue.Clear();
+        timingQueue.Clear();
         player.IsRunning = false;
         player.transform.position = START_POSITION;
         if (hud.gameObject.activeSelf)

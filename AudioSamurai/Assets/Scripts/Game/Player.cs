@@ -184,12 +184,12 @@ public class Player : MonoBehaviour
         }
 
         IsAttacking = true;
+        hitCollider.gameObject.SetActive(true);
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return null;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), 0.5f);
         }
-        hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsAttacking = false;
         hitCollider.gameObject.SetActive(false);
@@ -205,12 +205,12 @@ public class Player : MonoBehaviour
         }
 
         IsJumpAttacking = true;
+        hitCollider.gameObject.SetActive(true);
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return new WaitForSecondsRealtime(0.00001f);
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.5f);
         }
-        hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
         hitCollider.gameObject.SetActive(false);
