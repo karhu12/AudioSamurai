@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MapObject : Poolable
 {
@@ -25,6 +26,7 @@ public class MapObject : Poolable
     }
 
     public float Timing { get; set; }
+    public bool HasHadCollision { get; private set; } = false;
 
     /* Placement constant of class. Must be overridden in derived class to change verticla placement! */
     public virtual VerticalPlacement Placement 
@@ -73,6 +75,12 @@ public class MapObject : Poolable
     protected virtual void OnPlayerCollision(Player player)
     {
         // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
+        if (!HasHadCollision) {
+            HasHadCollision = true;
+            float damage = player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
+            FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
+            ScoreSystem.Instance.ResetCombo();
+        }
     }
 
     /*
@@ -90,8 +98,16 @@ public class MapObject : Poolable
     protected virtual void OnPlayerHit(Player player)
     {
         // Debug.Log($"HitArea Collision at: {SongmapController.Instance.AudioSource.time}");
-        player.RestoreHealth();
-        ReturnToPool();
+    }
+
+    protected virtual IEnumerator DeathCoroutine()
+    {
+        yield return new WaitForSeconds(1);
+    }
+
+    public override void ReturnToPool() {
+        HasHadCollision = false;
+        base.ReturnToPool();
     }
 
 }

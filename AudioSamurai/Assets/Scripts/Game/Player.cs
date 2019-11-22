@@ -12,10 +12,11 @@ public class Player : MonoBehaviour
     public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
-    public const float HIT_AREA_OFFSET = 1.5f;
+    public const float HIT_AREA_OFFSET = 1;
+    public const float LOCAL_HIT_AREA_OFFSET = 0.5f;
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
-    public const float DAMAGE_AMOUNT = 4;
+    public const float DAMAGE_AMOUNT = 3;
     public const float HEALTH_RESTORE_AMOUNT = 1;
 
     public const string COLLIDER_NAME = "Player";
@@ -62,8 +63,8 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();
         hbc = healthBarControl.GetComponent<HealthBarController>();
         hitCollider.gameObject.SetActive(false);
-        hitCollider.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET);
-        hitIndicator.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET);
+        hitCollider.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET + LOCAL_HIT_AREA_OFFSET);
+        hitIndicator.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET + LOCAL_HIT_AREA_OFFSET);
         IsAttacking = false;
         IsJumpAttacking = false;
         IsRunning = false;
@@ -73,11 +74,13 @@ public class Player : MonoBehaviour
     }
 
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
-    public void TakeDamage(float damageMultiplier = 1) {
-        Health -= DAMAGE_AMOUNT * damageMultiplier;
+    public float TakeDamage(float damageMultiplier = 1) {
+        float damage = DAMAGE_AMOUNT * damageMultiplier;
+        Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
         Debug.Log(Health.ToString());
         /* TODO : Play damage taken sound + animation? */
+        return damage;
     }
 
     /* Restores players health by constant amount. Should be called when striking enemies. */
@@ -184,7 +187,7 @@ public class Player : MonoBehaviour
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return new WaitForSecondsRealtime(0.00001f);
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 4);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), (Time.deltaTime / (60 / currentBpm)) * GameController.BEAT_DISTANCE * 10);
         }
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
