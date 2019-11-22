@@ -1,36 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 public class HighScoreManager : Singleton<HighScoreManager>
 {
+    public int CurrentCombo { get; private set; }
+    public int CurrentHighScore { get; private set; }
+    public double CurrentHitPercentage { get; private set; }
+    public String formattedHighscore { get; private set; }
+
+    private readonly Int32 count = 3;
     private String[] currentHighScores = new string[3];
     private List<String> newHighScores = new List<String>();
+    private readonly String[] separator = { ";" };
     private String storable;
-    private String[] separator = { ";" };
-    private Int32 count = 3;
-    public int currentHighScore { get; private set; }
-    public int currentCombo { get; private set; }
-    public double currentHitPercentage { get; private set; }
 
     public void CompareToHighScore(int newScore, String mapName)
     {
-        Debug.Log(GetScores(mapName));
-        currentHighScores = GetScores(mapName).Split(separator, count ,StringSplitOptions.RemoveEmptyEntries);
-        try
-        {
-            String score = Convert.ToString(currentHighScores[0]);
-            currentHighScore = Convert.ToInt32(score);
-            String combo = Convert.ToString(currentHighScores[1]);
-            currentCombo = Convert.ToInt32(combo);
-            String hitP = Convert.ToString(currentHighScores[2]);
-            currentHitPercentage = Convert.ToDouble(hitP);
-        } catch(Exception e)
-        {
-            Debug.Log(e);
-        }
-        if (newScore >= currentHighScore)
+        if (newScore >= CurrentHighScore)
         {
             newHighScores.Clear();
             newHighScores.Add(newScore.ToString());
@@ -45,22 +34,43 @@ public class HighScoreManager : Singleton<HighScoreManager>
         storable = String.Join(";", list);
         PlayerPrefs.SetString(mapName, storable);
         PlayerPrefs.Save();
-        Debug.Log(GetScores(mapName));
     }
 
-    private String GetScores(String mapName)
+    private String GetScoreString(String mapName)
     {
-        String scoreString = PlayerPrefs.GetString(mapName);
-        if (!string.IsNullOrEmpty(scoreString))
-        {
-            storable = PlayerPrefs.GetString(mapName);
-        }
-        else 
+        storable = PlayerPrefs.GetString(mapName);
+        if (string.IsNullOrEmpty(storable))
         {
             PlayerPrefs.SetString(mapName, "0;0;0,0");
             PlayerPrefs.Save();
             storable = PlayerPrefs.GetString(mapName);
         }
         return storable;
+    }
+
+    public void SetCurrentHighs(String mapName)
+    {
+        currentHighScores = GetScoreString(mapName).Split(separator, count, StringSplitOptions.RemoveEmptyEntries);
+        try
+        {
+            String score = Convert.ToString(currentHighScores[0]);
+            CurrentHighScore = Convert.ToInt32(score);
+            String combo = Convert.ToString(currentHighScores[1]);
+            CurrentCombo = Convert.ToInt32(combo);
+            String hitP = Convert.ToString(currentHighScores[2]);
+            CurrentHitPercentage = Convert.ToDouble(hitP);
+            Format();
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+    }
+
+    private void Format()
+    {
+        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
+        nfi.NumberGroupSeparator = " ";
+        formattedHighscore = CurrentHighScore.ToString("#,0", nfi);
     }
 }
