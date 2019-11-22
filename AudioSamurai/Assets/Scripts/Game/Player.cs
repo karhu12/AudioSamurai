@@ -27,7 +27,6 @@ public class Player : MonoBehaviour
     public const string PARRY_ACTION  = "Parry";
 
     public Collider hitCollider;
-    public GameObject hitIndicator;
     public InputActionAsset inputActionAsset;
 
     /* Cosmetic */
@@ -64,7 +63,6 @@ public class Player : MonoBehaviour
         hbc = healthBarControl.GetComponent<HealthBarController>();
         hitCollider.gameObject.SetActive(false);
         hitCollider.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET + LOCAL_HIT_AREA_OFFSET);
-        hitIndicator.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET + LOCAL_HIT_AREA_OFFSET);
         IsAttacking = false;
         IsJumpAttacking = false;
         IsRunning = false;
@@ -188,7 +186,7 @@ public class Player : MonoBehaviour
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return null;
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), 0.5f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), 0.2f);
         }
         yield return new WaitForSeconds(ATTACK_TIME);
         IsAttacking = false;
@@ -209,7 +207,7 @@ public class Player : MonoBehaviour
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return new WaitForSecondsRealtime(0.00001f);
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.5f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.2f);
         }
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
