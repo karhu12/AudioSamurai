@@ -35,7 +35,6 @@ public class SongSelection : MonoBehaviour
     public void Refresh()
     {
         SongmapController.Instance.AudioSource.Stop();
-        FindObjectOfType<AudioManager>().Play("Refresh");
         views.Clear();
         playSongButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps();
@@ -43,6 +42,7 @@ public class SongSelection : MonoBehaviour
         foreach (Transform child in content)
         {
             Destroy(child.gameObject);
+            FindObjectOfType<AudioManager>().Play("Refresh");
         }
 
         foreach (var key in maps.Keys)
@@ -83,7 +83,7 @@ public class SongSelection : MonoBehaviour
      */
     public void OnSongmapParentClick(Text title)
     {
-        if (selectedChildView != null && selectedChildView.gameObject != null)
+        if (selectedChildView != null && selectedChildView.gameObject != null) 
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
 
         foreach (var view in views)
@@ -93,11 +93,13 @@ public class SongSelection : MonoBehaviour
                 if (view.ToggleChildren())
                 {
                     selectedView = view;
+                    FindObjectOfType<AudioManager>().Play("Click");
                     FindObjectOfType<AudioManager>().Pause("MenuMusic");
                     SongmapController.Instance.PlaySongmapAudio(maps[title.text][0]);
                 }
                 else
                 {
+                    FindObjectOfType<AudioManager>().Play("Click");
                     SongmapController.Instance.AudioSource.Stop();
                     playSongButton.gameObject.SetActive(false);
                     selectedView = null;
@@ -125,6 +127,7 @@ public class SongSelection : MonoBehaviour
 
                 selectedChildView = child;
                 child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
+                FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
             }
         }
@@ -135,6 +138,7 @@ public class SongSelection : MonoBehaviour
         if (GameController.Instance.LoadGame(selectedChildView.songmap))
         {
             ResetSongSelectionView();
+            FindObjectOfType<AudioManager>().Play("Click");
             GameController.Instance.StartGame();
         }
     }
@@ -205,6 +209,7 @@ public class SongmapView
         childrenExpanded = !childrenExpanded;
         foreach (var view in songmapChildViews)
         {
+
             view.gameObject.SetActive(childrenExpanded);
         }
         return childrenExpanded;
