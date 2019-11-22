@@ -233,11 +233,11 @@ public class GameController : Singleton<GameController>
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         State = GameState.EndScreen;
-        ResetGameState();
         GameData.Instance.MapName = Instance.SelectedSongmap.GetSongmapName();
         GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();
         GameData.Instance.CalculateHitPercentage();
         HighScoreManager.Instance.CompareToHighScore(GameData.Instance.FinalScore, GameData.Instance.MapName);
+        ResetGameState();
     }
 
     private void ResetGameState() {
@@ -250,9 +250,9 @@ public class GameController : Singleton<GameController>
         if (hud.gameObject.activeSelf)
             hud.gameObject.SetActive(false);
         player.RestoreHealth(true);
-        GameData.Instance.ResetHitsAndMisses();
         ScoreSystem.Instance.ResetCombo();
         ScoreSystem.Instance.ResetScore();
+        GameData.Instance.ResetHitsAndMisses();
     }
 
     private IEnumerator GameEndCoroutine()
