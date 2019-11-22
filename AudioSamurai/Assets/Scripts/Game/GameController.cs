@@ -129,8 +129,8 @@ public class GameController : Singleton<GameController>
     {
         if (State == GameState.EndScreen)
         {
-            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
             State = GameState.Idle;
+            CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
         }
     }
 
@@ -195,6 +195,7 @@ public class GameController : Singleton<GameController>
                 MapObject mapObject = MapObjectManager.Instance.GetMapObject(obj.Item3);
                 mapObject.Timing = obj.Item1;
                 mapObject.transform.position = new Vector3(0, mapObject.GetPlacementValue(), obj.Item2);
+
             }
         }
         foreach (var removeItem in removeList)
@@ -239,6 +240,8 @@ public class GameController : Singleton<GameController>
     private void ResetGameState() {
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
+        spawnQueue.Clear();
+        timingQueue.Clear();
         player.IsRunning = false;
         player.transform.position = START_POSITION;
         if (hud.gameObject.activeSelf)

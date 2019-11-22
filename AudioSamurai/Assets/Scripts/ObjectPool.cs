@@ -61,7 +61,7 @@ public class ObjectPool
     private Poolable InstantiateNewPoolable()
     {
         Poolable obj = MonoBehaviour.Instantiate<Poolable>(prefab);
-        obj.transform.parent = poolParent;
+        obj.transform.SetParent(poolParent, false);
         obj.transform.position = poolParent.position;
         obj.gameObject.SetActive(false);
         obj.Pool = this;
@@ -75,7 +75,7 @@ public class Poolable : MonoBehaviour
 {
     public ObjectPool Pool { get; set; }
 
-    public void ReturnToPool()
+    public virtual void ReturnToPool()
     {
         if (Pool != null)
             Pool.ReturnToPool(this);
