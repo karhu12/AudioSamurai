@@ -10,6 +10,9 @@ public class FloatingText : Poolable
     private void Start() 
     {
         animator = GetComponent<Animator>();
+    }
+
+    private void OnEnable() {
         StartCoroutine(ReturnToPoolCoroutine());
     }
 
