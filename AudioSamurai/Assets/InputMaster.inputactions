@@ -22,9 +22,17 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Parry",
+                    "name": "Attack Alt",
                     "type": "Button",
-                    "id": "a3584e53-bc17-474b-9220-cc22f0b47ffc",
+                    "id": "d7c62cf5-cf4a-44d8-b590-caac2c9b291e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "Jump Attack Alt",
+                    "type": "Button",
+                    "id": "601caa64-0900-4318-97a1-021e1a3765a5",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": ""
@@ -45,7 +53,7 @@
                 {
                     "name": "",
                     "id": "f4ef2c25-dac8-4a6d-b656-4847796e2780",
-                    "path": "<Keyboard>/s",
+                    "path": "<Keyboard>/d",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard",
@@ -55,12 +63,23 @@
                 },
                 {
                     "name": "",
-                    "id": "9ae92c83-64fb-4e03-b065-07024b6f5fd7",
-                    "path": "<Keyboard>/d",
+                    "id": "b2135e84-6ac1-4061-95dc-1d126a151bdd",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Keyboard",
-                    "action": "Parry",
+                    "groups": "",
+                    "action": "Attack Alt",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ee332d98-f239-4bae-9d00-3375adb8380c",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump Attack Alt",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
