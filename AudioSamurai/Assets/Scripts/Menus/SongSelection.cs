@@ -71,10 +71,15 @@ public class SongSelection : MonoBehaviour
     public void OnBackPress()
     {
         FindObjectOfType<AudioManager>().Play("ClickDeny");
+        /*if (gameObject == null)
+        {
+
+        }*/
         FindObjectOfType<AudioManager>().Pause("MenuMusic");
+        FindObjectOfType<AudioManager>().Play("MenuMusic");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         ResetSongSelectionView();
-        FindObjectOfType<AudioManager>().Play("MenuMusic");
+        
     }
 
     /*
