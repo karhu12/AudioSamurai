@@ -34,6 +34,10 @@ public class SongSelection : MonoBehaviour
      */
     public void Refresh()
     {
+        if (SongmapController.Instance.AudioSource.isPlaying)
+        {
+            SongmapController.Instance.AudioSource.Stop();
+        }
         views.Clear();
         playSongButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps();
@@ -80,6 +84,7 @@ public class SongSelection : MonoBehaviour
      */
     public void OnSongmapParentClick(Text title)
     {
+        playSongButton.gameObject.SetActive(false);
         if (selectedChildView != null && selectedChildView.gameObject != null)
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
 
@@ -95,7 +100,6 @@ public class SongSelection : MonoBehaviour
                 else
                 {
                     SongmapController.Instance.AudioSource.Stop();
-                    playSongButton.gameObject.SetActive(false);
                     selectedView = null;
                     selectedChildView = null;
                 }
