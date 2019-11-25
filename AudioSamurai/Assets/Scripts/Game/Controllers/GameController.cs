@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -147,7 +147,7 @@ public class GameController : Singleton<GameController>
         else if (hitTime >= accHitTime * 2 && hitTime <= accHitTime * 3) {
             return (int)ScoreSystem.HitType.Poor;
         }
-        return 0;
+        return (int)ScoreSystem.HitType.Miss;
     }
 
     /* Private methods */

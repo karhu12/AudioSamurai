@@ -28,8 +28,7 @@ public class Enemy : MapObject
             ScoreSystem.Instance.AddScore(score);
             if ((ScoreSystem.HitType)score == ScoreSystem.HitType.Miss) {
                 ScoreSystem.Instance.ResetCombo();
-            }
-            else {
+            } else {
                 player.RestoreHealth();
                 ReturnToPool();
             }
