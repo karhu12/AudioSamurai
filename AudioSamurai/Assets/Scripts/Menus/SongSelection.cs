@@ -42,6 +42,40 @@ public class SongSelection : MonoBehaviour
         foreach (Transform child in content)
         {
             Destroy(child.gameObject);
+        }
+
+        foreach (var key in maps.Keys)
+        {
+            SongmapView view = new SongmapView(ref content, songmapPrefab);
+            view.AddParentSongmapView(songmapParentPrefab);
+            view.parentSongmapView.title.text = key.ToString();
+
+            foreach (var map in maps[key])
+            {
+                view.AddSongmapChildView(songmapChildPrefab, map);
+                SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
+                HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
+                child.title.text = map.DifficultyTitle;
+                child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
+                child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
+                child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
+                child.highScore.text = $"Highscore: {HighScoreManager.Instance.formattedHighscore}";
+            }
+            views.Add(view);
+            view.ToggleChildren();
+        }
+    }
+
+    public void RefreshButton()
+    {
+        SongmapController.Instance.AudioSource.Stop();
+        views.Clear();
+        playSongButton.gameObject.SetActive(false);
+        maps = SongmapController.Instance.GetSongmaps();
+
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
             FindObjectOfType<AudioManager>().Play("Refresh");
         }
 
