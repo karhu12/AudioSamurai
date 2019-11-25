@@ -9,7 +9,7 @@ public class Enemy : MapObject
 
     protected void ShowScoreText(int score) {
         ScoreSystem.HitType type = (ScoreSystem.HitType)score;
-        FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(.5f, 1.5f, .5f),ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type));
+        FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(1f, 1.5f, .5f),ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type));
     }
 
     protected override void OnEnemyMiss(Player player)
