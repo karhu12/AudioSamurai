@@ -30,6 +30,7 @@ public class Enemy : MapObject
                 ScoreSystem.Instance.ResetCombo();
             }
             else {
+                FindObjectOfType<AudioManager>().Play("PlayerAttack");
                 player.RestoreHealth();
                 ReturnToPool();
             }
