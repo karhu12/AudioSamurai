@@ -53,10 +53,12 @@ public class SongSelection : MonoBehaviour
             {
                 view.AddSongmapChildView(songmapChildPrefab, map);
                 SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
+                HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
                 child.title.text = map.DifficultyTitle;
                 child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
                 child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
                 child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
+                child.highScore.text = $"Highscore: {HighScoreManager.Instance.formattedHighscore}";
             }
             views.Add(view);
             view.ToggleChildren();
@@ -240,6 +242,7 @@ public class SongmapChildView : View
     public Text difficulty;
     public Text healthDrain;
     public Text hitAccuracyLevel;
+    public Text highScore;
     public Songmap songmap;
 
     public SongmapChildView(GameObject gameObject, Songmap map) : base(gameObject)
@@ -249,5 +252,6 @@ public class SongmapChildView : View
         difficulty = this.gameObject.transform.Find("ItemDifficulty").GetComponent<Text>();
         healthDrain = this.gameObject.transform.Find("ItemHDL").GetComponent<Text>();
         hitAccuracyLevel = this.gameObject.transform.Find("ItemHAL").GetComponent<Text>();
+        highScore = this.gameObject.transform.Find("ItemHighscore").GetComponent<Text>();
     }
 }

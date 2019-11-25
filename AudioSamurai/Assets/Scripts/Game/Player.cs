@@ -12,8 +12,8 @@ public class Player : MonoBehaviour
     public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
-    public const float HIT_AREA_OFFSET = 1;
-    public const float LOCAL_HIT_AREA_OFFSET = 0.25f;
+    public const float HIT_AREA_OFFSET = 1.5f;
+    public const float LOCAL_HIT_AREA_OFFSET = .25f;
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
     public const float DAMAGE_AMOUNT = 3;
@@ -27,8 +27,9 @@ public class Player : MonoBehaviour
     public const string PARRY_ACTION  = "Parry";
 
     public Collider hitCollider;
-    public GameObject hitIndicator;
     public InputActionAsset inputActionAsset;
+    public HitIndicator airHitIndicator;
+    public HitIndicator groundHitIndicator;
 
     /* Cosmetic */
     public GameObject hatModel;
@@ -64,7 +65,6 @@ public class Player : MonoBehaviour
         hbc = healthBarControl.GetComponent<HealthBarController>();
         hitCollider.gameObject.SetActive(false);
         hitCollider.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET + LOCAL_HIT_AREA_OFFSET);
-        hitIndicator.transform.position = new Vector3(0, 1, HIT_AREA_OFFSET + LOCAL_HIT_AREA_OFFSET);
         IsAttacking = false;
         IsJumpAttacking = false;
         IsRunning = false;
@@ -184,6 +184,10 @@ public class Player : MonoBehaviour
         }
 
         IsAttacking = true;
+
+        if (groundHitIndicator != null)
+            groundHitIndicator.Pop();
+
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return null;
@@ -205,9 +209,13 @@ public class Player : MonoBehaviour
         }
 
         IsJumpAttacking = true;
+
+        if (airHitIndicator != null)
+            airHitIndicator.Pop();
+
         while (transform.position.y < AIR_PLACEMENT)
         {
-            yield return new WaitForSecondsRealtime(0.00001f);
+            yield return null;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.5f);
         }
         hitCollider.gameObject.SetActive(true);
