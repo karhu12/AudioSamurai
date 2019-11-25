@@ -187,12 +187,13 @@ public class Player : MonoBehaviour
 
         if (groundHitIndicator != null)
             groundHitIndicator.Pop();
-
+        /*
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return null;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), 0.5f);
-        }
+        }*/
+        transform.position = new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z);
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsAttacking = false;
@@ -212,12 +213,13 @@ public class Player : MonoBehaviour
 
         if (airHitIndicator != null)
             airHitIndicator.Pop();
-
+        /*
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return null;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.5f);
-        }
+        }*/
+        transform.position = new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z);
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;
