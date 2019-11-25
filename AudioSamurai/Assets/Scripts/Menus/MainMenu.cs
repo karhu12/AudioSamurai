@@ -8,8 +8,6 @@ public class MainMenu : MonoBehaviour
 
     public GameObject mainMenuUI;
 
-    
-
     // Update is called once per frame
     public void OnStart()
     {
@@ -49,7 +47,6 @@ public class MainMenu : MonoBehaviour
     public void LoadSettings()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
-        Debug.Log("loading...");
     }
 
     public void QuitGame()
