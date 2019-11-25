@@ -302,8 +302,8 @@ public class GameController : Singleton<GameController>
             yield return new WaitForSeconds(1);
         }
         Debug.Log("Go!");
-        //FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), "Go", Color.green);
-        //yield return new WaitForSeconds(.1f);
+        FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), "Go", Color.green);
+        yield return new WaitForSeconds(1);
     }
 
     private void GameFail() {
