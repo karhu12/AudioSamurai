@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KillPlane : MonoBehaviour
+public class FollowTarget : MonoBehaviour
 {
-    public const string COLLIDER_NAME = "KillPlane";
     public GameObject followTarget;
     public Vector3 followOffset;
     public Quaternion rotation;
@@ -14,10 +13,8 @@ public class KillPlane : MonoBehaviour
     public bool ignoreTargetZ = false;
 
 
-    public void Update()
-    {
-        if (followTarget != null)
-        {
+    public void Update() {
+        if (followTarget != null) {
             float targetX = (ignoreTargetX ? 0 : followTarget.transform.position.x);
             float targetY = (ignoreTargetY ? 0 : followTarget.transform.position.y);
             float targetZ = (ignoreTargetZ ? 0 : followTarget.transform.position.z);
