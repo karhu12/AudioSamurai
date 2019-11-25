@@ -16,16 +16,16 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
-        if (notFirstTime == false)
-        {
+        //if (notFirstTime == false)
+        //{
             Debug.Log(notFirstTime);
             FindObjectOfType<AudioManager>().Play("MenuMusic");
-            notFirstTime = !notFirstTime;
-        }
+            //notFirstTime = !notFirstTime;
+        /*}
         else
         {
             
-        }
+        }*/
         
     }
 

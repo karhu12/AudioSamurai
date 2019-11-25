@@ -19,11 +19,13 @@ public class FailMenu : MonoBehaviour
     }
 
     public void OnRetry() {
+        FindObjectOfType<AudioManager>().Play("Click");
         GameController.Instance.Retry();
         ToggleFailMusic(false);
     }
 
     public void OnBackToMenu() {
+        FindObjectOfType<AudioManager>().Play("Click");
         GameController.Instance.QuitGame();
         ToggleFailMusic(false);
     }
