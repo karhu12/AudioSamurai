@@ -15,10 +15,12 @@ public class Enemy : MapObject
     protected override void OnEnemyMiss(Player player)
     {
         ScoreSystem.Instance.ResetCombo();
+        GameData.Instance.OnHitMissed();
         base.OnEnemyMiss(player);
     }
 
     protected override void OnPlayerHit(Player player) {
+        GameData.Instance.OnSuccessfulHit();
         if (!HasBeenHit) {
             HasBeenHit = true;
             int score = GameController.Instance.CalculateHitScore(Timing);

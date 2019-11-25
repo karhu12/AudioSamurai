@@ -54,7 +54,6 @@ public class ScoreSystem : Singleton<ScoreSystem>
     private int combo;
     private int score;
 
-
     private void Start()
     {
         comboAnim = comboText.GetComponent<Animator>();
@@ -75,12 +74,18 @@ public class ScoreSystem : Singleton<ScoreSystem>
             score += scoreToAdd * (combo == 0 ? 1 : combo);
             combo += 1;
             comboAnim.Play("comboAnimation");
+            GameData.Instance.HighestCombo = combo;
         }
     }
 
     public void AddScore(HitType hit)
     {
         AddScore((int)hit);
+    }
+
+    public int GetScore()
+    {
+        return score;
     }
 
     public void ResetCombo()
