@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2138677392}
-  m_IndirectSpecularColor: {r: 0.01684425, g: 0.0036655108, b: 0.016346643, a: 1}
+  m_IndirectSpecularColor: {r: 0.016859887, g: 0.0036602032, b: 0.016365116, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1792,7 +1792,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 115091020}
-  m_LocalRotation: {x: 7.0877026e-10, y: 0.9998577, z: 0.01687038, w: -0.000000042007418}
+  m_LocalRotation: {x: -9.533932e-11, y: 0.9998577, z: 0.016870415, w: 0.0000000056497784}
   m_LocalPosition: {x: 0, y: 13.51, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2217,9 +2217,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: PlayerAttack
-    clip: {fileID: 8300000, guid: 61a4a9e699beded478b08b00552a0d8c, type: 3}
+    clip: {fileID: 8300000, guid: a4c7da565d46b1746be6bf2608a96a5b, type: 3}
     volume: 0.1
-    pitch: 1
+    pitch: 2.5
     loop: 0
     source: {fileID: 0}
   - name: MenuMusic
@@ -6204,7 +6204,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910635394}
-  m_LocalRotation: {x: -2.2354773e-11, y: 0.9999992, z: 0.0012999399, w: 0.000000017206498}
+  m_LocalRotation: {x: -2.2354783e-11, y: 0.9999992, z: 0.0012999399, w: 0.000000017206498}
   m_LocalPosition: {x: 0, y: 9.157001, z: -8.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -12080,7 +12080,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: 7.0877026e-10, y: 0.9998577, z: 0.01687038, w: -0.000000042007418}
+  m_LocalRotation: {x: -9.533932e-11, y: 0.9998577, z: 0.016870415, w: 0.0000000056497784}
   m_LocalPosition: {x: 0, y: 13.51, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []

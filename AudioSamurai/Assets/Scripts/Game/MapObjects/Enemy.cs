@@ -20,16 +20,16 @@ public class Enemy : MapObject
     }
 
     protected override void OnPlayerHit(Player player) {
-        GameData.Instance.OnSuccessfulHit();
         if (!HasBeenHit) {
             HasBeenHit = true;
+            FindObjectOfType<AudioManager>().Play("PlayerAttack");
+            GameData.Instance.OnSuccessfulHit();
             int score = GameController.Instance.CalculateHitScore(Timing);
             ShowScoreText(score);
             ScoreSystem.Instance.AddScore(score);
             if ((ScoreSystem.HitType)score == ScoreSystem.HitType.Miss) {
                 ScoreSystem.Instance.ResetCombo();
             } else {
-                FindObjectOfType<AudioManager>().Play("PlayerAttack");
                 player.RestoreHealth();
                 ReturnToPool();
             }
