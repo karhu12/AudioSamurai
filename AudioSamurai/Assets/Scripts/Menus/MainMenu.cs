@@ -51,13 +51,7 @@ public class MainMenu : MonoBehaviour
 
     public void QuitGame()
     {
-        if (Application.isEditor)
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        } else
-        {
-            Application.Quit();
-        }
-            
-    }   
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Quit);
+    }
+
 }
