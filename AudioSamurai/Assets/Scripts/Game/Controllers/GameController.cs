@@ -127,6 +127,8 @@ public class GameController : Singleton<GameController>
     /* If the game is currently on the result screen, it will move the game back to song selection and set the state back to idling. */
     public void MoveFromEndScreen()
     {
+        FindObjectOfType<AudioManager>().Stop("Win");
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
         if (State == GameState.EndScreen)
         {
             State = GameState.Idle;
@@ -228,6 +230,7 @@ public class GameController : Singleton<GameController>
     private void OnGameEnd() 
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
+        FindObjectOfType<AudioManager>().Play("Win");
         State = GameState.EndScreen;
         GameData.Instance.MapName = Instance.SelectedSongmap.GetSongmapName();
         GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();

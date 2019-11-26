@@ -20,9 +20,10 @@ public class Enemy : MapObject
     }
 
     protected override void OnPlayerHit(Player player) {
-        GameData.Instance.OnSuccessfulHit();
         if (!HasBeenHit) {
             HasBeenHit = true;
+            FindObjectOfType<AudioManager>().Play("PlayerAttack");
+            GameData.Instance.OnSuccessfulHit();
             int score = GameController.Instance.CalculateHitScore(Timing);
             ShowScoreText(score);
             ScoreSystem.Instance.AddScore(score);
