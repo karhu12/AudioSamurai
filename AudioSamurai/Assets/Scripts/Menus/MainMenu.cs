@@ -10,25 +10,10 @@ public class MainMenu : MonoBehaviour
 
     public GameObject mainMenuUI;
 
-    AudioSource audioSource;
-
-
-
     private void Start()
     {
-        //if (notFirstTime == false)
-        //{
-            Debug.Log(notFirstTime);
             FindObjectOfType<AudioManager>().Play("MenuMusic");
-            //notFirstTime = !notFirstTime;
-        /*}
-        else
-        {
-            
-        }*/
-        
     }
-
     // Update is called once per frame
     public void OnStart()
     {
@@ -71,7 +56,6 @@ public class MainMenu : MonoBehaviour
     {
         FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
-        Debug.Log("loading...");
     }
 
     public void QuitGame()

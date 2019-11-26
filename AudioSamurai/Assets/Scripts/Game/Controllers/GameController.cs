@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,19 +141,15 @@ public class GameController : Singleton<GameController>
         float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
         float hitTime = Math.Abs(SongmapController.Instance.AudioSource.time * 1000 - hitTiming);
         if (hitTime < accHitTime) {
-            Debug.Log($"hit offset = {hitTime}, PERFECT");
             return (int)ScoreSystem.HitType.Perfect;
         }
         else if (hitTime >= accHitTime && hitTime <= accHitTime * 2) {
-            Debug.Log($"hit offset = {hitTime}, NORMAL");
             return (int)ScoreSystem.HitType.Normal;
         }
         else if (hitTime >= accHitTime * 2 && hitTime <= accHitTime * 3) {
-            Debug.Log($"hit offset = {hitTime}, POOR");
             return (int)ScoreSystem.HitType.Poor;
         }
-        Debug.Log($"hit offset = {hitTime}, MISS");
-        return 0;
+        return (int)ScoreSystem.HitType.Miss;
     }
 
     /* Private methods */

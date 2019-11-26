@@ -28,8 +28,7 @@ public class Enemy : MapObject
             ScoreSystem.Instance.AddScore(score);
             if ((ScoreSystem.HitType)score == ScoreSystem.HitType.Miss) {
                 ScoreSystem.Instance.ResetCombo();
-            }
-            else {
+            } else {
                 FindObjectOfType<AudioManager>().Play("PlayerAttack");
                 player.RestoreHealth();
                 ReturnToPool();

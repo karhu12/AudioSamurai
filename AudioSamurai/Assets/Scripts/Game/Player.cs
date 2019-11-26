@@ -17,13 +17,15 @@ public class Player : MonoBehaviour
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
     public const float DAMAGE_AMOUNT = 3;
-    public const float HEALTH_RESTORE_AMOUNT = 1;
+    public const float HEALTH_RESTORE_AMOUNT = 2;
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
     public const string INPUT_MAP = "Player";
     public const string ATTACK_ACTION = "Attack";
     public const string JUMP_ATTACK_ACTION = "Jump Attack";
+    public const string ALT_ATTACK_ACTION = "Attack Alt";
+    public const string ALT_JUMP_ATTACK_ACTION = "Jump Attack Alt";
     public const string PARRY_ACTION  = "Parry";
 
     public Collider hitCollider;
@@ -45,9 +47,11 @@ public class Player : MonoBehaviour
     private Animator animator;
     private HealthBarController hbc;
     private InputAction playerAttack;
+    private InputAction playerAltAttack;
     private InputAction playerJumpAttack;
-    private InputAction playerParry;
-    
+    private InputAction playerAltJumpAttack;
+
+
 
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
@@ -59,7 +63,8 @@ public class Player : MonoBehaviour
         var inputActions = inputActionAsset.FindActionMap(Player.INPUT_MAP);
         playerAttack = inputActions.FindAction(Player.ATTACK_ACTION);
         playerJumpAttack = inputActions.FindAction(Player.JUMP_ATTACK_ACTION);
-        playerParry = inputActions.FindAction(Player.PARRY_ACTION);
+        playerAltAttack = inputActions.FindAction(Player.ALT_ATTACK_ACTION);
+        playerAltJumpAttack = inputActions.FindAction(Player.ALT_JUMP_ATTACK_ACTION);
         inputActionAsset.Enable();
         animator = GetComponent<Animator>();
         hbc = healthBarControl.GetComponent<HealthBarController>();
@@ -151,14 +156,16 @@ public class Player : MonoBehaviour
     }
     private void OnEnable() {
         playerAttack.performed += Attack;
+        playerAltAttack.performed += Attack;
         playerJumpAttack.performed += JumpAttack;
-        /* TODO? : playerParry.performed += Parry; */
+        playerAltJumpAttack.performed += JumpAttack;
     }
 
     private void OnDisable() {
         playerAttack.performed -= Attack;
+        playerAltAttack.performed -= Attack;
         playerJumpAttack.performed -= JumpAttack;
-        /* TODO? : playerParry.performed -= Parry; */
+        playerAltJumpAttack.performed -= JumpAttack;
     }
 
     /* Performs item equipping. NOTE : For some reason equipment is invisible after equipping if coroutine is not used to yield result after equip.*/
