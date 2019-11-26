@@ -1792,6 +1792,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 115091020}
+  m_LocalRotation: {x: 3.5842695e-10, y: 0.9998577, z: 0.016870402, w: -0.000000021243727}
   m_LocalRotation: {x: -9.533932e-11, y: 0.9998577, z: 0.016870415, w: 0.0000000056497784}
   m_LocalPosition: {x: 0, y: 13.51, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -2255,6 +2256,12 @@ MonoBehaviour:
   - name: Fail
     clip: {fileID: 8300000, guid: 42266468b8f64a04e9c0842b5f23b54e, type: 3}
     volume: 0.4
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
+  - name: Countdown
+    clip: {fileID: 8300000, guid: 1d9effe127c6fdb4e9660c0c30975744, type: 3}
+    volume: 0.133
     pitch: 1
     loop: 0
     source: {fileID: 0}
@@ -12080,7 +12087,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: -9.533932e-11, y: 0.9998577, z: 0.016870415, w: 0.0000000056497784}
+  m_LocalRotation: {x: 3.5842695e-10, y: 0.9998577, z: 0.016870402, w: -0.000000021243727}
   m_LocalPosition: {x: 0, y: 13.51, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
