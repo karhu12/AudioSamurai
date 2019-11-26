@@ -56,9 +56,6 @@ public class GameController : Singleton<GameController>
 
         if (failMenu == null)
             failMenu = GameObject.FindGameObjectWithTag(FailMenu.TAG).GetComponent<FailMenu>();
-
-        Mongo mongo = new Mongo();
-        mongo.Init();
     }
 
     public bool Pause()

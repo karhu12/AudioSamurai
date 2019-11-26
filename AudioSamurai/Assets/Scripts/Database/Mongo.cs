@@ -9,10 +9,11 @@ public class Mongo
     private const string DATABASE_NAME = "highscoredb";
 
     private MongoClient client;
-    //private MongoServer server;
     private IMongoDatabase db;
     private IMongoCollection<Model_Highscore> scoreCollection;
     Model_Highscore model = new Model_Highscore();
+
+    private int score;
 
     public void Init()
     {
@@ -20,31 +21,38 @@ public class Mongo
         db = client.GetDatabase(DATABASE_NAME);
         scoreCollection = db.GetCollection<Model_Highscore>("highscores");
         Debug.Log("Database has been initialized");
-        InsertHighScore("Faded", 1000000);
     }
 
     public void Shutdown()
     {
-
     }
 
-    #region
     public void InsertHighScore(string mapName, int highscore)
     {
-        model.MapName = mapName;
+        model.MapId = mapName;
         model.HighScore = highscore;
         scoreCollection.InsertOne(model);
     }
-    #endregion
 
-
-    #region
     public void Update(string mapName, int highscore)
     {
-        model.MapName = mapName;
-        model.HighScore = highscore;
-        var filter = Builders<Model_Highscore>.Filter.Eq(s => s.MapName, mapName);
-        scoreCollection.UpdateOne(filter, model);
+         model.MapId = mapName;
+         model.HighScore = highscore;
+         var filter = Builders<Model_Highscore>.Filter.Eq(x => x.MapId, mapName);
+         var update = Builders<Model_Highscore>.Update.Set(o => o.HighScore, highscore);
+         var result = scoreCollection.UpdateOneAsync(filter, update).Result;
     }
-    #endregion
+
+    public int GetCurrentHighScore(string mapName)
+    {
+        var list = scoreCollection.Find(new BsonDocument()).ToList();
+        foreach (var dox in list)
+        {
+            if (dox.MapId.Equals(mapName))
+            {
+                score = dox.HighScore;
+            }
+        }
+        return score;
+    }
 }

@@ -16,22 +16,37 @@ public class HighScoreManager : Singleton<HighScoreManager>
     private List<String> newHighScores = new List<String>();
     private readonly String[] separator = { ";" };
     private String storable;
+    Mongo mongo;
+
+    private void Start()
+    {
+        mongo = new Mongo();
+        mongo.Init();
+    }
 
     public void CompareToHighScore(int newScore, String mapName)
     {
+        SetCurrentHighs(mapName);
+        int score = mongo.GetCurrentHighScore(mapName);
         if (newScore >= CurrentHighScore)
         {
             newHighScores.Clear();
             newHighScores.Add(newScore.ToString());
             newHighScores.Add(GameData.Instance.HighestCombo.ToString());
             newHighScores.Add(GameData.Instance.RoundedHitPercentage.ToString());
-            SetNewHighScore(mapName, newHighScores);
+            SetNewHighScore(mapName, newScore, newHighScores);
         }
     }
 
-    private void SetNewHighScore(String mapName, List<String> list)
+    private void SetNewHighScore(String mapName, int newScore ,List<String> list)
     {
         storable = String.Join(";", list);
+        try
+        {
+            mongo.InsertHighScore(mapName, newScore);
+        } catch(Exception) { 
+            mongo.Update(mapName, newScore); 
+        }
         PlayerPrefs.SetString(mapName, storable);
         PlayerPrefs.Save();
     }
