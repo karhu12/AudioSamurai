@@ -39,7 +39,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
     private String GetScoreString(String mapName)
     {
         storable = PlayerPrefs.GetString(mapName);
-        Debug.Log(storable);
+
         if (string.IsNullOrEmpty(storable))
         {
             PlayerPrefs.SetString(mapName, "0;0;0,0");

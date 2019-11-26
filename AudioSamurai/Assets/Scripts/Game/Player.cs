@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     public const float HIT_AREA_DEPTH = 0.5f;
     public const float STARTING_HEALTH = 100;
     public const float DAMAGE_AMOUNT = 3;
-    public const float HEALTH_RESTORE_AMOUNT = 1;
+    public const float HEALTH_RESTORE_AMOUNT = 2;
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";

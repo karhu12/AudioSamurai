@@ -1793,6 +1793,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 115091020}
   m_LocalRotation: {x: 3.5842695e-10, y: 0.9998577, z: 0.016870402, w: -0.000000021243727}
+  m_LocalRotation: {x: -9.533932e-11, y: 0.9998577, z: 0.016870415, w: 0.0000000056497784}
   m_LocalPosition: {x: 0, y: 13.51, z: -8.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2217,9 +2218,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sounds:
   - name: PlayerAttack
-    clip: {fileID: 8300000, guid: 61a4a9e699beded478b08b00552a0d8c, type: 3}
+    clip: {fileID: 8300000, guid: a4c7da565d46b1746be6bf2608a96a5b, type: 3}
     volume: 0.1
-    pitch: 1
+    pitch: 2.5
     loop: 0
     source: {fileID: 0}
   - name: MenuMusic
@@ -3660,7 +3661,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 439087346}
-  m_LocalRotation: {x: 0.000000012430658, y: -0.94821924, z: -0.31761676, w: -0.0000000041637906}
+  m_LocalRotation: {x: 0.000000006993855, y: -0.94821924, z: -0.31761676, w: 0.000000012067267}
   m_LocalPosition: {x: 0, y: 14.6, z: -8.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -6210,7 +6211,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 910635394}
-  m_LocalRotation: {x: 2.2380377e-11, y: 0.9999992, z: 0.0012999598, w: -0.0000000172065}
+  m_LocalRotation: {x: -2.2354783e-11, y: 0.9999992, z: 0.0012999399, w: 0.000000017206498}
   m_LocalPosition: {x: 0, y: 9.157001, z: -8.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

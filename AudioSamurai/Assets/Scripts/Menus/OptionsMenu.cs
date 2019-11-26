@@ -14,7 +14,6 @@ public class OptionsMenu : MonoBehaviour
     public Toggle fullScreenToggle;
 
     private int screenInt;
-    private bool isFullScreen = false;
     private float logarithmicVolume;
 
     const string qualityValue = "qualityvalue";
@@ -31,7 +30,6 @@ public class OptionsMenu : MonoBehaviour
 
         if (screenInt == 1)
         {
-            isFullScreen = true;
             fullScreenToggle.isOn = true;
         } 
         
@@ -124,7 +122,6 @@ public class OptionsMenu : MonoBehaviour
         
         else
         {
-            isFullScreen = true;
             PlayerPrefs.SetInt("togglestate", 1);
         }
 
