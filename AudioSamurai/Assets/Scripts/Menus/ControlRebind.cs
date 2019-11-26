@@ -66,7 +66,6 @@ public class ControlRebind : MonoBehaviour
         string path = ac.effectivePath;
 
         PlayerPrefs.SetString(inputAction.name, path);
-        button.gameObject.SetActive(true);
     }
 
     void ButtonRebindCompleted()
