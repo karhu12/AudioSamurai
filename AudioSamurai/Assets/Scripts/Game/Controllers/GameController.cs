@@ -290,12 +290,16 @@ public class GameController : Singleton<GameController>
     /* Initiates countdown lasting for given amount of seconds. */
     private IEnumerator CountdownCoroutine(int seconds = 3)
     {
+        FindObjectOfType<AudioManager>().Play("Countdown");
         for (int second = seconds; second > 0; second--)
         {
             Debug.Log($"Countdown: {second}");
+            FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), $"{second}", Color.red);
             yield return new WaitForSeconds(1);
         }
         Debug.Log("Go!");
+        FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), "Go", Color.green);
+        yield return new WaitForSeconds(1);
     }
 
     private void GameFail() {

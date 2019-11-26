@@ -2258,6 +2258,12 @@ MonoBehaviour:
     pitch: 1
     loop: 0
     source: {fileID: 0}
+  - name: Countdown
+    clip: {fileID: 8300000, guid: 1d9effe127c6fdb4e9660c0c30975744, type: 3}
+    volume: 0.133
+    pitch: 1
+    loop: 0
+    source: {fileID: 0}
   audioMixer: {fileID: 24300002, guid: 7186b7b8dc54932449ef1d59eda59407, type: 2}
   instance: {fileID: 0}
 --- !u!4 &199987287
