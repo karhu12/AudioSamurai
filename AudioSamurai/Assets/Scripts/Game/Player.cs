@@ -37,6 +37,7 @@ public class Player : MonoBehaviour
     public GameObject hatModel;
     public GameObject swordModel;
     public GameObject healthBarControl;
+    public GameObject modMenu;
    
 
     public Equipment Equipment { get; private set; }
@@ -50,7 +51,6 @@ public class Player : MonoBehaviour
     private InputAction playerAltAttack;
     private InputAction playerJumpAttack;
     private InputAction playerAltJumpAttack;
-
 
 
     public bool IsAttacking { get; private set; }
@@ -80,6 +80,8 @@ public class Player : MonoBehaviour
 
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
     public float TakeDamage(float damageMultiplier = 1) {
+
+        int modMultiplier = ModMenu.Instance.ReturnMode();
         float damage = DAMAGE_AMOUNT * damageMultiplier;
         Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
