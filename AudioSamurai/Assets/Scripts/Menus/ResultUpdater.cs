@@ -13,8 +13,8 @@ public class ResultUpdater : MonoBehaviour
     public void Update()
     {
         titleText.GetComponent<Text>().text = GameData.Instance.MapName;
-        scoreText.GetComponent<Text>().text = "Score: " + GameData.Instance.FinalScore.ToString();
-        comboText.GetComponent<Text>().text = "Highest combo: " + GameData.Instance.HighestCombo.ToString();
-        hitPercentageText.GetComponent<Text>().text = "Hit percentage: " + GameData.Instance.RoundedHitPercentage.ToString();
+        scoreText.GetComponent<Text>().text = GameData.Instance.FinalScore.ToString();
+        comboText.GetComponent<Text>().text = GameData.Instance.HighestCombo.ToString();
+        hitPercentageText.GetComponent<Text>().text = $"{GameData.Instance.RoundedHitPercentage.ToString()} %";
     }
 }
