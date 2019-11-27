@@ -375,6 +375,17 @@ public class Songmap : IXmlSerializable
         return (HitAccuracyLevel + HealthDrainlevel) / 2;
     }
 
+    /* Returns the maximum achievable combo from given map. */
+    public int GetMaxCombo() {
+        int count = 0;
+        foreach (var obj in mapObjects) {
+            if (MapObjectManager.Instance.IsTypeOf<Enemy>(obj.Item2)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /* Returns AudioType object based on the currently selected audioFile */
     public AudioType GetAudioType()
     {

@@ -14,8 +14,7 @@ public class Enemy : MapObject
 
     protected override void OnEnemyMiss(Player player)
     {
-        ScoreSystem.Instance.ResetCombo();
-        GameData.Instance.OnHitMissed();
+        ScoreSystem.Instance.Miss();
         base.OnEnemyMiss(player);
     }
 
@@ -23,7 +22,6 @@ public class Enemy : MapObject
         if (!HasBeenHit) {
             HasBeenHit = true;
             FindObjectOfType<AudioManager>().Play("PlayerAttack");
-            GameData.Instance.OnSuccessfulHit();
             int score = GameController.Instance.CalculateHitScore(Timing);
             ShowScoreText(score);
             ScoreSystem.Instance.AddScore(score);

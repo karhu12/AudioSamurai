@@ -50,9 +50,15 @@ public class ScoreSystem : Singleton<ScoreSystem>
     public GameObject scoreText;
     public TextMeshProUGUI comboText;
     public Animator comboAnim;
+    public GameResult gameResult { get; private set; }
 
     private int combo;
     private int score;
+
+    private new void Awake() {
+        base.Awake();
+        gameResult = new GameResult();
+    }
 
     private void Start()
     {
@@ -71,11 +77,20 @@ public class ScoreSystem : Singleton<ScoreSystem>
     {
         if (GameController.Instance.State == GameController.GameState.Playing)
         {
-            score += scoreToAdd * (combo == 0 ? 1 : combo);
+            score += scoreToAdd * (combo + 1);
             combo += 1;
             comboAnim.Play("comboAnimation");
-            GameData.Instance.HighestCombo = combo;
+            gameResult.HighestCombo = combo;
+            gameResult.CountHit(scoreToAdd);
         }
+    }
+
+    public void FinalizeResult()
+    {
+        gameResult.MapName = GameController.Instance.SelectedSongmap.GetSongmapName();
+        gameResult.Score = score;
+        gameResult.CalculateHitPercentage(GameController.Instance.SelectedSongmap.GetMaxCombo());
+        HighScoreManager.Instance.CompareToHighScore(gameResult);
     }
 
     public void AddScore(HitType hit)
@@ -88,6 +103,11 @@ public class ScoreSystem : Singleton<ScoreSystem>
         return score;
     }
 
+    public void Miss() {
+        combo = 0;
+        gameResult.CountHit((int)HitType.Miss);
+    }
+
     public void ResetCombo()
     {
         combo = 0;
@@ -95,5 +115,6 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     public void ResetScore() {
         score = 0;
+        gameResult.Reset();
     }
 }

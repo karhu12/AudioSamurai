@@ -227,15 +227,13 @@ public class GameController : Singleton<GameController>
     }
 
     /* Handles moving the user from game scene to result screen and display the result ui. */
-    private void OnGameEnd() 
+    private void OnGameEnd()
     {
+        ScoreSystem.Instance.FinalizeResult();
+        FindObjectOfType<ResultUpdater>().UpdateResult();
+        State = GameState.EndScreen;
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         FindObjectOfType<AudioManager>().Play("Win");
-        State = GameState.EndScreen;
-        GameData.Instance.MapName = Instance.SelectedSongmap.GetSongmapName();
-        GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();
-        GameData.Instance.CalculateHitPercentage();
-        HighScoreManager.Instance.CompareToHighScore(GameData.Instance.FinalScore, GameData.Instance.MapName);
         ResetGameState();
     }
 
@@ -251,7 +249,6 @@ public class GameController : Singleton<GameController>
         player.RestoreHealth(true);
         ScoreSystem.Instance.ResetCombo();
         ScoreSystem.Instance.ResetScore();
-        GameData.Instance.ResetHitsAndMisses();
     }
 
     private IEnumerator GameEndCoroutine()

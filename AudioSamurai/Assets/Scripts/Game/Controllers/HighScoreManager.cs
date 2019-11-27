@@ -17,15 +17,15 @@ public class HighScoreManager : Singleton<HighScoreManager>
     private readonly String[] separator = { ";" };
     private String storable;
 
-    public void CompareToHighScore(int newScore, String mapName)
+    public void CompareToHighScore(GameResult newResult)
     {
-        if (newScore >= CurrentHighScore)
+        if (newResult.Score >= CurrentHighScore)
         {
             newHighScores.Clear();
-            newHighScores.Add(newScore.ToString());
-            newHighScores.Add(GameData.Instance.HighestCombo.ToString());
-            newHighScores.Add(GameData.Instance.RoundedHitPercentage.ToString());
-            SetNewHighScore(mapName, newHighScores);
+            newHighScores.Add(newResult.Score.ToString());
+            newHighScores.Add(newResult.HighestCombo.ToString());
+            newHighScores.Add(newResult.RoundedHitPercentage.ToString());
+            SetNewHighScore(newResult.MapName, newHighScores);
         }
     }
 
