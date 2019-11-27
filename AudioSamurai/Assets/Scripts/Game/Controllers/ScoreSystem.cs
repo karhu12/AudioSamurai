@@ -63,8 +63,17 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     void Update()
     {
-        scoreText.GetComponent<Text>().text = score.ToString();
-        comboText.GetComponent<TextMeshProUGUI>().text = combo.ToString() + "x";
+        if (scoreText == null)
+        {
+            
+        }
+
+        else
+        {
+            scoreText.GetComponent<Text>().text = score.ToString();
+            comboText.GetComponent<TextMeshProUGUI>().text = combo.ToString() + "x";
+        }
+        
     }
 
     public void AddScore(int scoreToAdd)
