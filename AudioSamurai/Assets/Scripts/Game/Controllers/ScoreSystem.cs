@@ -8,10 +8,12 @@ public class ScoreSystem : Singleton<ScoreSystem>
 {
     /* Constants */
     public const int HIT_TYPES = 3;
+    public const int NO_FAIL_MODE_PENALTY_DIVIDER = 2;
     public const string PERFECT_TEXT = "Perfect";
     public const string NORMAL_TEXT = "Normal";
     public const string POOR_TEXT = "Poor";
     public const string MISS_TEXT = "X";
+    
 
     public enum HitType
     {
@@ -71,6 +73,8 @@ public class ScoreSystem : Singleton<ScoreSystem>
     {
         if (GameController.Instance.State == GameController.GameState.Playing)
         {
+            if (ModeManager.Instance.GetMode() == 2)
+                scoreToAdd = scoreToAdd / NO_FAIL_MODE_PENALTY_DIVIDER;
             score += scoreToAdd * (combo == 0 ? 1 : combo);
             combo += 1;
             comboAnim.Play("comboAnimation");
