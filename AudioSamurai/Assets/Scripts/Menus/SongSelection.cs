@@ -15,6 +15,7 @@ public class SongSelection : MonoBehaviour
     public Button playSongButton;
     public ScrollRect scrollView;
     public RectTransform content;
+    Mongo mongo;
 
     List<SongmapView> views = new List<SongmapView>();
 
@@ -23,9 +24,10 @@ public class SongSelection : MonoBehaviour
     SongmapView selectedView;
     SongmapChildView selectedChildView;
 
-
     private void Start()
     {
+        mongo = new Mongo();
+        mongo.Init();
         Refresh();
     }
 
@@ -53,12 +55,12 @@ public class SongSelection : MonoBehaviour
             {
                 view.AddSongmapChildView(songmapChildPrefab, map);
                 SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
-                HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
+                HighScoreManager.Instance.SetCurrentHighs(mongo.GetPlayersMapScore("nahkapeitturi22", map.GetSongmapName()));
                 child.title.text = map.DifficultyTitle;
                 child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
                 child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
                 child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
-                child.highScore.text = $"Highscore: {HighScoreManager.Instance.formattedHighscore}";
+                child.highScore.text = $"Highscore: {HighScoreManager.Instance.FormattedHighscore}";
             }
             views.Add(view);
             view.ToggleChildren();
