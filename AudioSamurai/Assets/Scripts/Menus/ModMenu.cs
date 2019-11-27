@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-public class ModMenu : Singleton<ModMenu>
+public class ModMenu : MonoBehaviour
 {
+    public GameObject ToggleGroup;
     public Toggle sdModeToggle;
     public Toggle nfModeToggle;
-    public GameObject Panel;
    
     private int sdMode;
     private int nfMode;
@@ -16,7 +16,7 @@ public class ModMenu : Singleton<ModMenu>
     private const string SD_MODE_PREF = "SuddenDeathMode";
     private const string NF_MODE_PREF = "NoFailMode";
 
-    private new void Awake()
+    void Awake()
     {
         sdMode = PlayerPrefs.GetInt(SD_MODE_PREF);
         nfMode = PlayerPrefs.GetInt(NF_MODE_PREF);
@@ -35,25 +35,15 @@ public class ModMenu : Singleton<ModMenu>
 
     public void ToggleView()
     {
-        if (Panel != null)
+        if (ToggleGroup != null)
         {
-            Animator animator = Panel.GetComponent<Animator>();
+            Animator animator = ToggleGroup.GetComponent<Animator>();
             if (animator != null)
             {
                 bool isOpen = animator.GetBool("open");
                 animator.SetBool("open", !isOpen);
             }
         }
-    }
-
-    public int ReturnMode()
-    {
-        if (sdMode == 1)
-            return 100;
-        else if (nfMode == 1)
-            return 0;
-   
-        else return 1;
     }
 
     public void SDModeToggle(bool modeState)

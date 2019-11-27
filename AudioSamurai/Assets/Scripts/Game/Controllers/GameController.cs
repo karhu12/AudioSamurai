@@ -152,6 +152,26 @@ public class GameController : Singleton<GameController>
         return (int)ScoreSystem.HitType.Miss;
     }
 
+    public float GetDamage()
+    {
+        int gamemode = ModeManager.Instance.GetMode();
+        float damage = SelectedSongmap.HealthDrainlevel;
+        float hitpoints = player.Health;
+        if (gamemode > 0)
+        {
+            if (gamemode == 1) //Sudden Death -mode
+                damage = hitpoints;
+
+            if (gamemode == 2) //No Fail -mode
+            {
+                if (hitpoints <= 0)
+                    damage = 0;
+            }
+        }
+        float damageTaked = player.TakeDamage(damage);
+        return damageTaked;
+    }
+
     /* Private methods */
 
     /* Check internal state on update and do necessary stuff based on it. */
@@ -167,7 +187,7 @@ public class GameController : Singleton<GameController>
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
     private void OnPlayingUpdate() {
-        if (player.Health <= 0) {
+        if (player.Health <= 0 && ModeManager.Instance.GetMode() != 2) {
             GameFail();
         } else {
             HandleGameSpeed();
@@ -178,6 +198,7 @@ public class GameController : Singleton<GameController>
             }
         }
     }
+
     
     /* Checks if the items in the queue are within SPAWN_AHEAD_IN_MS from the current time in song and instantiates them in correct place if they are. */
     private void HandleSpawnQueue()

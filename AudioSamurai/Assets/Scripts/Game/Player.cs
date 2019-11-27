@@ -80,9 +80,9 @@ public class Player : MonoBehaviour
 
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
     public float TakeDamage(float damageMultiplier = 1) {
-
-        int modMultiplier = ModMenu.Instance.ReturnMode();
         float damage = DAMAGE_AMOUNT * damageMultiplier;
+        if (Health < damage)
+            damage = Health;
         Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
         Debug.Log(Health.ToString());
