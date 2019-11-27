@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using System;
 using System.IO;
@@ -10,6 +11,16 @@ using UnityEngine.Networking;
  */
 public class SongmapController : Singleton<SongmapController>
 {
+    public enum SongmapSortType
+    {
+        NAME, DIFF, HDL, HAL
+    }
+
+    public enum SongmapSortDirection
+    {
+        ASC, DESC
+    }
+
     public static readonly string APPLICATION_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AudioSamurai";
 
     private Dictionary<string, List<Songmap>> songmaps = new Dictionary<string, List<Songmap>>();
@@ -38,7 +49,47 @@ public class SongmapController : Singleton<SongmapController>
     public IReadOnlyDictionary<string, List<Songmap>> GetSongmaps()
     {
         LoadSongmaps();
-        return (IReadOnlyDictionary<string, List<Songmap>>) songmaps;
+        return songmaps;
+    }
+
+    /* Returns an readonly songmaps dictionary that contains different songmaps under their parent song. Songmaps are sorted by given field. */
+    public IReadOnlyDictionary<string, List<Songmap>> GetSongmaps(SongmapSortType sortType, SongmapSortDirection sortDirection = SongmapSortDirection.ASC) {
+        LoadSongmaps();
+        Dictionary<string, List<Songmap>> sortedSongmaps = new Dictionary<string, List<Songmap>>();
+        foreach (var key in songmaps.Keys) {
+            if (sortDirection == SongmapSortDirection.ASC) {
+                switch (sortType) {
+                    case SongmapSortType.DIFF:
+                        sortedSongmaps.Add(key, songmaps[key].OrderBy(map => map.GetDifficulty()).ToList());
+                        break;
+                    case SongmapSortType.NAME:
+                        sortedSongmaps.Add(key, songmaps[key].OrderBy(map => map.GetSongmapName()).ToList());
+                        break;
+                    case SongmapSortType.HDL:
+                        sortedSongmaps.Add(key, songmaps[key].OrderBy(map => map.HealthDrainlevel).ToList());
+                        break;
+                    case SongmapSortType.HAL:
+                        sortedSongmaps.Add(key, songmaps[key].OrderBy(map => map.HitAccuracyLevel).ToList());
+                        break;
+                }
+            } else {
+                switch (sortType) {
+                    case SongmapSortType.DIFF:
+                        sortedSongmaps.Add(key, songmaps[key].OrderByDescending(map => map.GetDifficulty()).ToList());
+                        break;
+                    case SongmapSortType.NAME:
+                        sortedSongmaps.Add(key, songmaps[key].OrderByDescending(map => map.GetSongmapName()).ToList());
+                        break;
+                    case SongmapSortType.HDL:
+                        sortedSongmaps.Add(key, songmaps[key].OrderByDescending(map => map.HealthDrainlevel).ToList());
+                        break;
+                    case SongmapSortType.HAL:
+                        sortedSongmaps.Add(key, songmaps[key].OrderByDescending(map => map.HitAccuracyLevel).ToList());
+                        break;
+                }
+            }
+        }
+        return sortedSongmaps;
     }
 
     /*

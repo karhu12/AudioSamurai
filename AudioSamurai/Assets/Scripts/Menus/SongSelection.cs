@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,7 +41,7 @@ public class SongSelection : MonoBehaviour
         }
         views.Clear();
         playSongButton.gameObject.SetActive(false);
-        maps = SongmapController.Instance.GetSongmaps();
+        maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
         {
@@ -52,7 +53,7 @@ public class SongSelection : MonoBehaviour
             SongmapView view = new SongmapView(ref content, songmapPrefab);
             view.AddParentSongmapView(songmapParentPrefab);
             view.parentSongmapView.title.text = key.ToString();
-
+            
             foreach (var map in maps[key])
             {
                 view.AddSongmapChildView(songmapChildPrefab, map);
@@ -74,7 +75,7 @@ public class SongSelection : MonoBehaviour
         SongmapController.Instance.AudioSource.Stop();
         views.Clear();
         playSongButton.gameObject.SetActive(false);
-        maps = SongmapController.Instance.GetSongmaps();
+        maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
         {
