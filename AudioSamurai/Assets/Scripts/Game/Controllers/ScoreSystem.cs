@@ -13,6 +13,12 @@ public class ScoreSystem : Singleton<ScoreSystem>
     public const string POOR_TEXT = "Poor";
     public const string MISS_TEXT = "X";
 
+    public Texture perfectTexture;
+    public Texture amazingTexture;
+    public Texture greatTexture;
+    public Texture okayTexture;
+    public Texture poorTexture;
+
     public enum HitType
     {
         Perfect = 300,
@@ -21,6 +27,44 @@ public class ScoreSystem : Singleton<ScoreSystem>
         Miss = 0
     }
 
+    public enum ResultGrade
+    {
+        Perfect,
+        Amazing,
+        Great,
+        Okay,
+        Poor,
+        None
+    }
+
+    /* Returns the image texture matching to the given grade */
+    public Texture GetResultGradeTexture(ResultGrade grade)
+    {
+        switch (grade) {
+            case ResultGrade.Perfect:
+                if (perfectTexture != null)
+                    return perfectTexture;
+                break;
+            case ResultGrade.Amazing:
+                if (amazingTexture != null)
+                    return amazingTexture;
+                break;
+            case ResultGrade.Great:
+                if (greatTexture != null)
+                    return greatTexture;
+                break;
+            case ResultGrade.Okay:
+                if (okayTexture != null)
+                    return okayTexture;
+                break;
+            case ResultGrade.Poor:
+                if (poorTexture != null)
+                    return poorTexture;
+                break;
+        }
+        return null;
+    }
+    
     public static string GetHitTypeString(HitType hitType)
     {
         switch (hitType) {
@@ -89,7 +133,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
     {
         gameResult.MapName = GameController.Instance.SelectedSongmap.GetSongmapName();
         gameResult.Score = score;
-        gameResult.CalculateHitPercentage(GameController.Instance.SelectedSongmap.GetMaxCombo());
+        gameResult.CalculateResult(GameController.Instance.SelectedSongmap.GetMaxCombo());
         HighScoreManager.Instance.CompareToHighScore(gameResult);
     }
 

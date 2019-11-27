@@ -5,6 +5,11 @@ using UnityEngine;
 
 public class GameResult
 {
+    public const float PERFECT_PERC_LINE = 95;
+    public const float AMAZING_PERC_LINE = 90;
+    public const float GREAT_PERC_LINE = 80;
+    public const float OKAY_PERC_LINE = 70;
+
     public int Score { get; set; } = 0;
     private int highestCombo = 0;
     public int HighestCombo
@@ -20,6 +25,7 @@ public class GameResult
     }
     private float hitPercentage = 0;
 
+    public ScoreSystem.ResultGrade ResultGrade { get; private set; } = ScoreSystem.ResultGrade.None;
     public string MapName { get; set; }
     public double RoundedHitPercentage { get; private set; } = 0;
 
@@ -28,12 +34,23 @@ public class GameResult
     public int poors = 0;
     public int misses = 0;
 
-    public void CalculateHitPercentage(int maxCombo)
+    public void CalculateResult(int maxCombo)
     {
         hitPercentage = (perfects * 1f + normals * .66f + poors * 0.33f) / maxCombo * 100;
         RoundedHitPercentage = Math.Round((double)hitPercentage, 1);
+        if (hitPercentage >= PERFECT_PERC_LINE) {
+            ResultGrade = ScoreSystem.ResultGrade.Perfect;
+        } else if (hitPercentage > AMAZING_PERC_LINE && hitPercentage < PERFECT_PERC_LINE) {
+            ResultGrade = ScoreSystem.ResultGrade.Amazing;
+        } else if (hitPercentage > GREAT_PERC_LINE && hitPercentage <= AMAZING_PERC_LINE) {
+            ResultGrade = ScoreSystem.ResultGrade.Great;
+        } else if (hitPercentage > OKAY_PERC_LINE && hitPercentage <= GREAT_PERC_LINE) {
+            ResultGrade = ScoreSystem.ResultGrade.Okay;
+        } else {
+            ResultGrade = ScoreSystem.ResultGrade.Poor;
+        }
     }
-
+    
     public void CountHit(int hitScore)
     {
         switch ((ScoreSystem.HitType)hitScore) {
@@ -53,6 +70,7 @@ public class GameResult
     }
 
     public void Reset() {
+        ResultGrade = ScoreSystem.ResultGrade.None;
         highestCombo = 0;
         perfects = 0;
         normals = 0;
