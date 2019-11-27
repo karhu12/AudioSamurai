@@ -13,9 +13,8 @@ public class OptionsMenu : MonoBehaviour
     public Dropdown qualityDropdown;
     public Toggle fullScreenToggle;
 
-
     private int screenInt;
-    private bool isFullScreen = false;
+    private float logarithmicVolume;
 
     const string qualityValue = "qualityvalue";
 
@@ -31,7 +30,6 @@ public class OptionsMenu : MonoBehaviour
 
         if (screenInt == 1)
         {
-            isFullScreen = true;
             fullScreenToggle.isOn = true;
         } 
         
@@ -52,8 +50,7 @@ public class OptionsMenu : MonoBehaviour
     void Start()
     {
         volumeSlider.value = PlayerPrefs.GetFloat("MVolume", 1f);
-        audioMixer.SetFloat("volume", PlayerPrefs.GetFloat("MVolume"));
-
+        audioMixer.SetFloat("volume", logarithmicVolume);
         qualityDropdown.value = PlayerPrefs.GetInt(qualityValue, 2);
 
         resolutions = Screen.resolutions;
@@ -97,12 +94,21 @@ public class OptionsMenu : MonoBehaviour
     public void SetVolume(float volume)
     {
         PlayerPrefs.SetFloat("MVolume", volume);
-        audioMixer.SetFloat("volume", PlayerPrefs.GetFloat("MVolume"));
+        logarithmicVolume = Mathf.Log10(PlayerPrefs.GetFloat("MVolume")) * 20;
+        Debug.Log(volume);
+        audioMixer.SetFloat("volume", logarithmicVolume);
+        Debug.Log(logarithmicVolume);
+        
     }
 
     public void SetQuality(int qualityIndex)
     {
-            QualitySettings.SetQualityLevel(qualityIndex);
+        QualitySettings.SetQualityLevel(qualityIndex);
+    }
+
+    public void PlayClickSound()
+    {
+        FindObjectOfType<AudioManager>().Play("Click");
     }
 
     public void SetFullscreen(bool isFullScreen)
@@ -116,10 +122,15 @@ public class OptionsMenu : MonoBehaviour
         
         else
         {
-            isFullScreen = true;
             PlayerPrefs.SetInt("togglestate", 1);
         }
 
+    }
+
+    public void OnBackButtonPress()
+    {
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
     }
 
 }

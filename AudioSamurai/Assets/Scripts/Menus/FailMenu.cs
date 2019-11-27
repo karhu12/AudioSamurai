@@ -12,18 +12,22 @@ public class FailMenu : MonoBehaviour
 
     public void ToggleFailMusic(bool on) {
         if (on) {
-            audioSource.PlayOneShot(failMusic);
+            FindObjectOfType<AudioManager>().Play("Fail");
+            //audioSource.PlayOneShot(failMusic);
         } else {
-            audioSource.Stop();
+            FindObjectOfType<AudioManager>().Stop("Fail");
+            //audioSource.Stop();
         }
     }
 
     public void OnRetry() {
+        FindObjectOfType<AudioManager>().Play("Click");
         GameController.Instance.Retry();
         ToggleFailMusic(false);
     }
 
     public void OnBackToMenu() {
+        FindObjectOfType<AudioManager>().Play("Click");
         GameController.Instance.QuitGame();
         ToggleFailMusic(false);
     }

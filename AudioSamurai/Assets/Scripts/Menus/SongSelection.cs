@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,11 +41,46 @@ public class SongSelection : MonoBehaviour
         }
         views.Clear();
         playSongButton.gameObject.SetActive(false);
-        maps = SongmapController.Instance.GetSongmaps();
+        maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
         {
             Destroy(child.gameObject);
+        }
+
+        foreach (var key in maps.Keys)
+        {
+            SongmapView view = new SongmapView(ref content, songmapPrefab);
+            view.AddParentSongmapView(songmapParentPrefab);
+            view.parentSongmapView.title.text = key.ToString();
+            
+            foreach (var map in maps[key])
+            {
+                view.AddSongmapChildView(songmapChildPrefab, map);
+                SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
+                HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
+                child.title.text = map.DifficultyTitle;
+                child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
+                child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
+                child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
+                child.highScore.text = $"Highscore: {HighScoreManager.Instance.formattedHighscore}";
+            }
+            views.Add(view);
+            view.ToggleChildren();
+        }
+    }
+
+    public void RefreshButton()
+    {
+        SongmapController.Instance.AudioSource.Stop();
+        views.Clear();
+        playSongButton.gameObject.SetActive(false);
+        maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
+
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
+            FindObjectOfType<AudioManager>().Play("Refresh");
         }
 
         foreach (var key in maps.Keys)
@@ -74,8 +110,12 @@ public class SongSelection : MonoBehaviour
      */
     public void OnBackPress()
     {
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
+        FindObjectOfType<AudioManager>().Pause("MenuMusic");
+        FindObjectOfType<AudioManager>().Play("MenuMusic");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         ResetSongSelectionView();
+        
     }
 
     /*
@@ -95,10 +135,13 @@ public class SongSelection : MonoBehaviour
                 if (view.ToggleChildren())
                 {
                     selectedView = view;
+                    FindObjectOfType<AudioManager>().Play("Click");
+                    FindObjectOfType<AudioManager>().Pause("MenuMusic");
                     SongmapController.Instance.PlaySongmapAudio(maps[title.text][0]);
                 }
                 else
                 {
+                    FindObjectOfType<AudioManager>().Play("Click");
                     SongmapController.Instance.AudioSource.Stop();
                     selectedView = null;
                     selectedChildView = null;
@@ -108,6 +151,7 @@ public class SongSelection : MonoBehaviour
                 view.ToggleChildren();
             }
         }
+        
     }
 
     /*
@@ -124,6 +168,7 @@ public class SongSelection : MonoBehaviour
 
                 selectedChildView = child;
                 child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
+                FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
             }
         }
@@ -134,6 +179,7 @@ public class SongSelection : MonoBehaviour
         if (GameController.Instance.LoadGame(selectedChildView.songmap))
         {
             ResetSongSelectionView();
+            FindObjectOfType<AudioManager>().Play("Click");
             GameController.Instance.StartGame();
         }
     }
@@ -204,6 +250,7 @@ public class SongmapView
         childrenExpanded = !childrenExpanded;
         foreach (var view in songmapChildViews)
         {
+
             view.gameObject.SetActive(childrenExpanded);
         }
         return childrenExpanded;
