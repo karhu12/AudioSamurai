@@ -30,6 +30,7 @@ public class Songmap : IXmlSerializable
 
     public const float MIN_HDL = 1;
     public const float MAX_HDL = 10;
+    public const float MAX_DIFFICULTY = (MAX_HAL + MAX_HDL) / 2;
 
     public const string XML_AUDIO_FILENAME = "AudioFilename";
     public const string XML_DIFF_TITLE = "DifficultyTitle";
@@ -126,9 +127,9 @@ public class Songmap : IXmlSerializable
     }
 
     /* Returns given songmaps name as a string */
-    public string GetSongmapName()
+    public string GetSongmapName(bool withDifficulty = true)
     {
-        return $"{Path.GetFileNameWithoutExtension(audioFilename)} {difficultyTitle}";
+        return $"{Path.GetFileNameWithoutExtension(audioFilename)}{(withDifficulty ? " " + difficultyTitle : "")}";
     }
 
     /* Returns readonly list from mapObjects. mapObjects can be edited only by using addMapObject, editMapObject and removeMapObject methods */

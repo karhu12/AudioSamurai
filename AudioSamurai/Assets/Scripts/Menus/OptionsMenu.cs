@@ -49,8 +49,10 @@ public class OptionsMenu : MonoBehaviour
 
     void Start()
     {
-        volumeSlider.value = PlayerPrefs.GetFloat("MVolume", 1f);
-        audioMixer.SetFloat("volume", logarithmicVolume);
+        float volume = PlayerPrefs.GetFloat("MVolume", 1f);
+        volumeSlider.value = volume;
+        SetVolume(volume);
+
         qualityDropdown.value = PlayerPrefs.GetInt(qualityValue, 2);
 
         resolutions = Screen.resolutions;
@@ -97,7 +99,6 @@ public class OptionsMenu : MonoBehaviour
         logarithmicVolume = Mathf.Log10(PlayerPrefs.GetFloat("MVolume")) * 20;
         Debug.Log(volume);
         audioMixer.SetFloat("volume", logarithmicVolume);
-        
     }
 
     public void SetQuality(int qualityIndex)
