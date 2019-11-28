@@ -11,12 +11,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
     public double CurrentHitPercentage { get; private set; }
     public String FormattedHighscore { get; private set; }
 
-    private readonly Int32 count = 3;
-    private String[] currentHighScores = new string[3];
-    private List<String> newHighScores = new List<String>();
-    private readonly String[] separator = { ";" };
-    private String storable;
-    Mongo mongo;
+    private Mongo mongo;
 
     private void Start()
     {
@@ -24,42 +19,32 @@ public class HighScoreManager : Singleton<HighScoreManager>
         mongo.Init();
     }
 
-    public void CompareToHighScore(int newScore, String mapName)
+    //Compare new score from the previous run to the current highscore available for that map.
+    public void CompareToHighScore(String mapName, int newScore)
     {
-        HighScore hs = mongo.GetPlayersMapScore("nahkapeitturi22", mapName);
-        SetCurrentHighs(hs);
+        SetCurrentHighs("isohannu", mapName);
         if (newScore >= CurrentHighScore)
         {
-            SetNewHighScore(mapName, newScore, newHighScores);
+            SetNewHighScore(mapName);
         }
     }
 
-    private void SetNewHighScore(String mapName, int newScore ,List<String> list)
+    //Set new highscore data if the previous highscore on a map was beaten by the player.
+    private void SetNewHighScore(String mapName)
     {
         try
         {
-            mongo.Insert("nahkapeitturi22", new HighScore(mapName, GameData.Instance.FinalScore, GameData.Instance.RoundedHitPercentage, GameData.Instance.HighestCombo));
+            mongo.Insert("isohannu", new HighScore(mapName, GameData.Instance.FinalScore, GameData.Instance.RoundedHitPercentage, GameData.Instance.HighestCombo));
         }
         catch (Exception) { }
     }
 
-    /*private String GetScoreString(String mapName)
-    {
-        storable = PlayerPrefs.GetString(mapName);
-        Debug.Log(storable);
-        if (string.IsNullOrEmpty(storable))
-        {
-            PlayerPrefs.SetString(mapName, "0;0;0,0");
-            PlayerPrefs.Save();
-            storable = PlayerPrefs.GetString(mapName);
-        }
-        return storable;
-    }*/
-
-    public void SetCurrentHighs (HighScore hs) //String mapName
+    //Get player's current highscore data on a certain map from mongodb and set to those values to current highs. 
+    public void SetCurrentHighs (String playerName, String mapName)
     {
         try
         {
+            HighScore hs = mongo.GetPlayersMapScore(playerName, mapName);
             CurrentHighScore = hs.Score;
             CurrentCombo = hs.Combo;
             CurrentHitPercentage = hs.HitP;
@@ -70,6 +55,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
         }
     }
 
+    //Change the score format so that numbers are grouped in threes. Makes it clearer to read when displayed on the screen.
     private void Format()
     {
         var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();

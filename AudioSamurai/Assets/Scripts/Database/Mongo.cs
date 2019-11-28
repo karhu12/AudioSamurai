@@ -22,10 +22,6 @@ public class Mongo
         playerCollection = db.GetCollection<PlayerRef>("highscores");
     }
 
-    public void Shutdown()
-    {
-    }
-
     public void Insert(string playerName, HighScore highScore)
     {
         GetPlayerByName(playerName);

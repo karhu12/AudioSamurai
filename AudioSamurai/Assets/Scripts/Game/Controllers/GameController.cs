@@ -236,7 +236,7 @@ public class GameController : Singleton<GameController>
         GameData.Instance.MapName = Instance.SelectedSongmap.GetSongmapName();
         GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();
         GameData.Instance.CalculateHitPercentage();
-        HighScoreManager.Instance.CompareToHighScore(GameData.Instance.FinalScore, GameData.Instance.MapName);
+        HighScoreManager.Instance.CompareToHighScore(GameData.Instance.MapName, GameData.Instance.FinalScore);
         ResetGameState();
     }
 
