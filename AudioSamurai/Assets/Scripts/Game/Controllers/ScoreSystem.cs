@@ -133,8 +133,8 @@ public class ScoreSystem : Singleton<ScoreSystem>
     {
         gameResult.MapName = GameController.Instance.SelectedSongmap.GetSongmapName();
         gameResult.Score = score;
-        gameResult.CalculateResult(GameController.Instance.SelectedSongmap.GetMaxCombo());
-        HighScoreManager.Instance.CompareToHighScore(gameResult);
+        gameResult.CalculateResult();
+        HighScoreManager.Instance.CompareToHighScore(gameResult, HighScoreManager.Instance.GetGameResult(gameResult.MapName));
     }
 
     public void AddScore(HitType hit)

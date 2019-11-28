@@ -6,72 +6,36 @@ using UnityEngine;
 
 public class HighScoreManager : Singleton<HighScoreManager>
 {
-    public int CurrentCombo { get; private set; }
-    public int CurrentHighScore { get; private set; }
-    public double CurrentHitPercentage { get; private set; }
-    public String formattedHighscore { get; private set; }
-
-    private readonly Int32 count = 3;
-    private String[] currentHighScores = new string[3];
-    private List<String> newHighScores = new List<String>();
-    private readonly String[] separator = { ";" };
-    private String storable;
-
-    public void CompareToHighScore(GameResult newResult)
+    public void CompareToHighScore(GameResult newResult, GameResult oldResult)
     {
-        if (newResult.Score >= CurrentHighScore)
+        if (newResult.Score >= oldResult.Score)
         {
-            newHighScores.Clear();
-            newHighScores.Add(newResult.Score.ToString());
-            newHighScores.Add(newResult.HighestCombo.ToString());
-            newHighScores.Add(newResult.RoundedHitPercentage.ToString());
-            SetNewHighScore(newResult.MapName, newHighScores);
+            SetNewGameResult(newResult);
         }
     }
 
-    private void SetNewHighScore(String mapName, List<String> list)
+    public GameResult GetGameResult(String mapName)
     {
-        storable = String.Join(";", list);
-        PlayerPrefs.SetString(mapName, storable);
-        PlayerPrefs.Save();
-    }
+        string gameResult = PlayerPrefs.GetString(mapName);
 
-    private String GetScoreString(String mapName)
-    {
-        storable = PlayerPrefs.GetString(mapName);
-
-        if (string.IsNullOrEmpty(storable))
+        if (string.IsNullOrEmpty(gameResult))
         {
-            PlayerPrefs.SetString(mapName, "0;0;0,0");
+            PlayerPrefs.SetString(mapName, GameResult.GetEmptyResultSerialization());
             PlayerPrefs.Save();
-            storable = PlayerPrefs.GetString(mapName);
+            gameResult = PlayerPrefs.GetString(mapName);
         }
-        return storable;
+
+        return GameResult.Deserialize(gameResult);
     }
 
-    public void SetCurrentHighs(String mapName)
-    {
-        currentHighScores = GetScoreString(mapName).Split(separator, count, StringSplitOptions.RemoveEmptyEntries);
-        try
-        {
-            String score = Convert.ToString(currentHighScores[0]);
-            CurrentHighScore = Convert.ToInt32(score);
-            String combo = Convert.ToString(currentHighScores[1]);
-            CurrentCombo = Convert.ToInt32(combo);
-            String hitP = Convert.ToString(currentHighScores[2]);
-            CurrentHitPercentage = Convert.ToDouble(hitP);
-            Format();
-        }
-        catch (Exception e)
-        {
-            Debug.Log(e);
-        }
-    }
-
-    private void Format()
+    public static string GetFormattedHighscore(GameResult result)
     {
         var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
         nfi.NumberGroupSeparator = " ";
-        formattedHighscore = CurrentHighScore.ToString("#,0", nfi);
+        return result.Score.ToString("#,0", nfi);
+    }
+    private void SetNewGameResult(GameResult result) {
+        PlayerPrefs.SetString(result.MapName, result.Serialize());
+        PlayerPrefs.Save();
     }
 }

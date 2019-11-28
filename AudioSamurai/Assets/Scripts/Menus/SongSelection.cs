@@ -277,12 +277,14 @@ public class SongmapChildView : View
 {
     public Text title;
     public Text difficulty;
+    public Text highScoreLabel;
     public Text highScore;
     public Text gradeTitle;
     public RawImage grade;
     public RectTransform difficultyForeground;
     public RectTransform difficultyMask;
     public Songmap songmap;
+    public GameResult gameResult;
 
     public SongmapChildView(GameObject gameObject, Songmap map) : base(gameObject)
     {
@@ -290,17 +292,37 @@ public class SongmapChildView : View
         Transform infoPanel = this.gameObject.transform.Find("HorizontalPanel").Find("InfoPanel").Find("InfoPanel (1)");
         title = infoPanel.Find("ItemTitle").GetComponent<Text>();
         difficulty = infoPanel.Find("ItemDifficultyName").GetComponent<Text>();
-        highScore = this.gameObject.transform.Find("HorizontalPanel").Find("HiscorePanel").Find("ItemHiscore").GetComponent<Text>();
+        Transform highScorePanel = this.gameObject.transform.Find("HorizontalPanel").Find("HiscorePanel");
+        highScoreLabel = highScorePanel.Find("ItemHiscoreLabel").GetComponent<Text>();
+        highScore = highScorePanel.Find("ItemHiscore").GetComponent<Text>();
         Transform gradePanel = this.gameObject.transform.Find("HorizontalPanel").Find("GradePanel");
         gradeTitle = gradePanel.Find("ItemGradeTitle").GetComponent<Text>();
         grade = gradePanel.Find("ItemGrade").GetComponent<RawImage>();
         difficultyMask = this.gameObject.transform.Find("HorizontalPanel").Find("InfoPanel").Find("DifficultyPanel").Find("ForegroundMask").GetComponent<RectTransform>();
         difficultyForeground = difficultyMask.transform.Find("DifficultyForeground").GetComponent<RectTransform>();
 
-        HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
         title.text = map.GetSongmapName(false);
         difficulty.text = map.DifficultyTitle;
-        highScore.text = $"{HighScoreManager.Instance.formattedHighscore}";
+        gameResult = HighScoreManager.Instance.GetGameResult(map.GetSongmapName());
+        highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
+        
+        if (gameResult.Score >= 0)
+        {
+            highScore.text = gameResult.Score.ToString();
+        } else
+        {
+            highScorePanel.gameObject.SetActive(false);
+        }
+
+        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses >= 0)
+        {
+            grade.texture = ScoreSystem.Instance.GetResultGradeTexture(gameResult.ResultGrade);
+            gradeTitle.text = gameResult.ResultGrade.ToString();
+        } else
+        {
+            gradePanel.gameObject.SetActive(false);
+        }
+
         float difficultyStep = (difficultyForeground.sizeDelta.x / Songmap.MAX_DIFFICULTY);
         float maskOffset = Songmap.MAX_DIFFICULTY * difficultyStep - difficultyStep * map.GetDifficulty();
         difficultyMask.offsetMin = new Vector2(0, 0);

@@ -337,6 +337,7 @@ public class GameController : Singleton<GameController>
             timingQueue.Add((timing.Item1, timing.Item2, timing.Item3));
         }
 
+        ScoreSystem.Instance.gameResult.MaxCombo = SelectedSongmap.GetMaxCombo();
         HandleSpawnQueue();
     }
 }
