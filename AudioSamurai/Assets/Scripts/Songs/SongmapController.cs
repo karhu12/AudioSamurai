@@ -24,13 +24,25 @@ public class SongmapController : Singleton<SongmapController>
     public static readonly string APPLICATION_FOLDER = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\AudioSamurai";
 
     private Dictionary<string, List<Songmap>> songmaps = new Dictionary<string, List<Songmap>>();
-
+    private float sampleRate = 0;
     public AudioSource AudioSource;
 
     void Start()
     {
         EnsureApplicationFolders();
         LoadSongmaps();
+    }
+
+    /* Returns the accurately calculated song postion from sample amount divided by sample rate in seconds. */
+    public float GetAccuratePlaybackPosition()
+    {
+        return AudioSource.timeSamples / sampleRate;
+    }
+
+    /* Returns the accurately calculated song postion from sample amount divided by sample rate in milliseconds. */
+    public float GetAccuratePlaybackPositionMs()
+    {
+        return GetAccuratePlaybackPosition() * 1000;
     }
 
     /* Starts an couroutine that loads the songmaps audio clip and starts playing it. */
@@ -174,6 +186,7 @@ public class SongmapController : Singleton<SongmapController>
             {
                 AudioSource.clip = DownloadHandlerAudioClip.GetContent(www);
                 AudioSource.volume = .5f;
+                sampleRate = AudioSource.clip.samples / AudioSource.clip.length;
             }
         }
     }
