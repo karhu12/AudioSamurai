@@ -25,7 +25,9 @@ public class HighScoreManager : Singleton<HighScoreManager>
             gameResult = PlayerPrefs.GetString(mapName);
         }
 
-        return GameResult.Deserialize(gameResult);
+        GameResult result = GameResult.Deserialize(gameResult);
+        result.MapName = mapName;
+        return result;
     }
 
     public static string GetFormattedHighscore(GameResult result)

@@ -97,7 +97,6 @@ public class OptionsMenu : MonoBehaviour
     {
         PlayerPrefs.SetFloat("MVolume", volume);
         logarithmicVolume = Mathf.Log10(PlayerPrefs.GetFloat("MVolume")) * 20;
-        Debug.Log(volume);
         audioMixer.SetFloat("volume", logarithmicVolume);
     }
 

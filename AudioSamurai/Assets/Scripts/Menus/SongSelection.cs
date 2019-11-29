@@ -277,8 +277,8 @@ public class SongmapChildView : View
 {
     public Text title;
     public Text difficulty;
-    public Text highScoreLabel;
     public Text highScore;
+    public Text accuracy;
     public Text gradeTitle;
     public RawImage grade;
     public RectTransform difficultyForeground;
@@ -293,8 +293,8 @@ public class SongmapChildView : View
         title = infoPanel.Find("ItemTitle").GetComponent<Text>();
         difficulty = infoPanel.Find("ItemDifficultyName").GetComponent<Text>();
         Transform highScorePanel = this.gameObject.transform.Find("HorizontalPanel").Find("HiscorePanel");
-        highScoreLabel = highScorePanel.Find("ItemHiscoreLabel").GetComponent<Text>();
         highScore = highScorePanel.Find("ItemHiscore").GetComponent<Text>();
+        accuracy = highScorePanel.Find("ItemAccuracy").GetComponent<Text>();
         Transform gradePanel = this.gameObject.transform.Find("HorizontalPanel").Find("GradePanel");
         gradeTitle = gradePanel.Find("ItemGradeTitle").GetComponent<Text>();
         grade = gradePanel.Find("ItemGrade").GetComponent<RawImage>();
@@ -304,11 +304,11 @@ public class SongmapChildView : View
         title.text = map.GetSongmapName(false);
         difficulty.text = map.DifficultyTitle;
         gameResult = HighScoreManager.Instance.GetGameResult(map.GetSongmapName());
-        highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
         
         if (gameResult.Score >= 0)
         {
-            highScore.text = gameResult.Score.ToString();
+            highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
+            accuracy.text = $"{gameResult.RoundedHitPercentage} %";
         } else
         {
             highScorePanel.gameObject.SetActive(false);

@@ -143,6 +143,10 @@ public class GameResult
     {
         GameResult deserialized = new GameResult();
         var splitStrings = gameResultStr.Split(new [] { separator }, StringSplitOptions.None);
+
+        if (splitStrings.Length != SERIALIZABLE_ITEMS)
+            splitStrings = GameResult.GetEmptyResultSerialization().Split(new[] { separator }, StringSplitOptions.None);
+
         try 
         {
             for (int i = 0; i < splitStrings.Length; i++) {
