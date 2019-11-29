@@ -26,7 +26,7 @@ public class MapObject : Poolable
     }
 
     public float Timing { get; set; }
-    public bool HasHadCollision { get; private set; } = false;
+    public bool HasHadCollision { get; protected set; } = false;
 
     /* Placement constant of class. Must be overridden in derived class to change verticla placement! */
     public virtual VerticalPlacement Placement 

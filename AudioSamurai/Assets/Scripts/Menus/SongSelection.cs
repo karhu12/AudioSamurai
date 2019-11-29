@@ -53,17 +53,10 @@ public class SongSelection : MonoBehaviour
             SongmapView view = new SongmapView(ref content, songmapPrefab);
             view.AddParentSongmapView(songmapParentPrefab);
             view.parentSongmapView.title.text = key.ToString();
-            
+
             foreach (var map in maps[key])
             {
                 view.AddSongmapChildView(songmapChildPrefab, map);
-                SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
-                HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
-                child.title.text = map.DifficultyTitle;
-                child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
-                child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
-                child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
-                child.highScore.text = $"Highscore: {HighScoreManager.Instance.formattedHighscore}";
             }
             views.Add(view);
             view.ToggleChildren();
@@ -92,13 +85,6 @@ public class SongSelection : MonoBehaviour
             foreach (var map in maps[key])
             {
                 view.AddSongmapChildView(songmapChildPrefab, map);
-                SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
-                HighScoreManager.Instance.SetCurrentHighs(map.GetSongmapName());
-                child.title.text = map.DifficultyTitle;
-                child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
-                child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
-                child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
-                child.highScore.text = $"Highscore: {HighScoreManager.Instance.formattedHighscore}";
             }
             views.Add(view);
             view.ToggleChildren();
@@ -157,11 +143,11 @@ public class SongSelection : MonoBehaviour
     /*
      * Fired when songmap title has been expanded and its child has been pressed. Will selected the given children, set play button active and high light the selection.
      */
-    public void OnSongmapClick(Text title)
+    public void OnSongmapClick(Text difficulty)
     {
         foreach (var child in selectedView.songmapChildViews)
         {
-            if (child.title.text == title.text)
+            if (child.difficulty.text == difficulty.text)
             {
                 if (selectedChildView != null && selectedChildView.gameObject != null)
                     selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
@@ -291,18 +277,55 @@ public class SongmapChildView : View
 {
     public Text title;
     public Text difficulty;
-    public Text healthDrain;
-    public Text hitAccuracyLevel;
     public Text highScore;
+    public Text accuracy;
+    public Text gradeTitle;
+    public RawImage grade;
+    public RectTransform difficultyForeground;
+    public RectTransform difficultyMask;
     public Songmap songmap;
+    public GameResult gameResult;
 
     public SongmapChildView(GameObject gameObject, Songmap map) : base(gameObject)
     {
         songmap = map;
-        title = this.gameObject.transform.Find("ItemTitle").GetComponent<Text>();
-        difficulty = this.gameObject.transform.Find("ItemDifficulty").GetComponent<Text>();
-        healthDrain = this.gameObject.transform.Find("ItemHDL").GetComponent<Text>();
-        hitAccuracyLevel = this.gameObject.transform.Find("ItemHAL").GetComponent<Text>();
-        highScore = this.gameObject.transform.Find("ItemHighscore").GetComponent<Text>();
+        Transform infoPanel = this.gameObject.transform.Find("HorizontalPanel").Find("InfoPanel").Find("InfoPanel (1)");
+        title = infoPanel.Find("ItemTitle").GetComponent<Text>();
+        difficulty = infoPanel.Find("ItemDifficultyName").GetComponent<Text>();
+        Transform highScorePanel = this.gameObject.transform.Find("HorizontalPanel").Find("HiscorePanel");
+        highScore = highScorePanel.Find("ItemHiscore").GetComponent<Text>();
+        accuracy = highScorePanel.Find("ItemAccuracy").GetComponent<Text>();
+        Transform gradePanel = this.gameObject.transform.Find("HorizontalPanel").Find("GradePanel");
+        gradeTitle = gradePanel.Find("ItemGradeTitle").GetComponent<Text>();
+        grade = gradePanel.Find("ItemGrade").GetComponent<RawImage>();
+        difficultyMask = this.gameObject.transform.Find("HorizontalPanel").Find("InfoPanel").Find("DifficultyPanel").Find("ForegroundMask").GetComponent<RectTransform>();
+        difficultyForeground = difficultyMask.transform.Find("DifficultyForeground").GetComponent<RectTransform>();
+
+        title.text = map.GetSongmapName(false);
+        difficulty.text = map.DifficultyTitle;
+        gameResult = HighScoreManager.Instance.GetGameResult(map.GetSongmapName());
+        
+        if (gameResult.Score >= 0)
+        {
+            highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
+            accuracy.text = $"{gameResult.RoundedHitPercentage} %";
+        } else
+        {
+            highScorePanel.gameObject.SetActive(false);
+        }
+
+        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses >= 0)
+        {
+            grade.texture = ScoreSystem.Instance.GetResultGradeTexture(gameResult.ResultGrade);
+            gradeTitle.text = gameResult.ResultGrade.ToString();
+        } else
+        {
+            gradePanel.gameObject.SetActive(false);
+        }
+
+        float difficultyStep = (difficultyForeground.sizeDelta.x / Songmap.MAX_DIFFICULTY);
+        float maskOffset = Songmap.MAX_DIFFICULTY * difficultyStep - difficultyStep * map.GetDifficulty();
+        difficultyMask.offsetMin = new Vector2(0, 0);
+        difficultyMask.offsetMax = new Vector2(-maskOffset, 0);
     }
 }
