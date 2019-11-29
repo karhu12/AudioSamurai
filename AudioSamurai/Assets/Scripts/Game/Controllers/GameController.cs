@@ -140,7 +140,6 @@ public class GameController : Singleton<GameController>
     public int CalculateHitScore(float hitTiming, float originalHitTime) {
         float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
         float hitTime = Math.Abs(originalHitTime - hitTiming);
-        Debug.Log($"Hit time: {hitTime}ms");
         if (hitTime < accHitTime) {
             return (int)ScoreSystem.HitType.Perfect;
         }

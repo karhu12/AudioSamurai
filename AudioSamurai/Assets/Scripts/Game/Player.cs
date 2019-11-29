@@ -82,7 +82,6 @@ public class Player : MonoBehaviour
         float damage = DAMAGE_AMOUNT * damageMultiplier;
         Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
-        Debug.Log(Health.ToString());
         /* TODO : Play damage taken sound + animation? */
         return damage;
     }
