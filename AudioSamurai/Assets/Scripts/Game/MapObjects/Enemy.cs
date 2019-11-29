@@ -35,10 +35,11 @@ public class Enemy : MapObject
     }
 
     protected override void OnPlayerHit(Player player) {
+        float hitTime = SongmapController.Instance.GetAccuratePlaybackPositionMs();
         if (!HasBeenHit) {
             HasBeenHit = true;
+            int score = GameController.Instance.CalculateHitScore(Timing, hitTime);
             FindObjectOfType<AudioManager>().Play("PlayerAttack");
-            int score = GameController.Instance.CalculateHitScore(Timing);
             ShowScoreText(score);
             ScoreSystem.Instance.AddScore(score);
             if ((ScoreSystem.HitType)score == ScoreSystem.HitType.Miss) {

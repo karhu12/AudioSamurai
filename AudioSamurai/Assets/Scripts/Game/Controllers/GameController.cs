@@ -137,9 +137,10 @@ public class GameController : Singleton<GameController>
     }
 
     /* Calculates what score it should reward player with based on the hitTiming */
-    public int CalculateHitScore(float hitTiming) {
+    public int CalculateHitScore(float hitTiming, float originalHitTime) {
         float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
-        float hitTime = Math.Abs(SongmapController.Instance.AudioSource.time * 1000 - hitTiming);
+        float hitTime = Math.Abs(originalHitTime - hitTiming);
+        Debug.Log($"Hit time: {hitTime}ms");
         if (hitTime < accHitTime) {
             return (int)ScoreSystem.HitType.Perfect;
         }
@@ -186,7 +187,7 @@ public class GameController : Singleton<GameController>
         /* Note. mapObject ms position can not be less than first beat becaues of map validation. */
         foreach (var obj in spawnQueue)
         {
-            float songPosMs = SongmapController.Instance.AudioSource.time * 1000;
+            float songPosMs = SongmapController.Instance.GetAccuratePlaybackPositionMs();
             if (obj.Item1 <= (songPosMs + SPAWN_AHEAD_IN_MS))
             {
                 removeList.Add(obj);
@@ -212,7 +213,7 @@ public class GameController : Singleton<GameController>
 
         foreach (var timing in timingQueue)
         {
-            if (timing.Item1 <= SongmapController.Instance.AudioSource.time * 1000)
+            if (timing.Item1 <= SongmapController.Instance.GetAccuratePlaybackPositionMs())
             {
                 player.ChangeSpeed(timing.Item2);
                 CurrentTiming = timing;
@@ -242,11 +243,9 @@ public class GameController : Singleton<GameController>
         SongmapController.Instance.AudioSource.Stop();
         spawnQueue.Clear();
         timingQueue.Clear();
-        player.IsRunning = false;
-        player.transform.position = START_POSITION;
+        player.ResetPlayerStatus();
         if (hud.gameObject.activeSelf)
             hud.gameObject.SetActive(false);
-        player.RestoreHealth(true);
         ScoreSystem.Instance.ResetCombo();
         ScoreSystem.Instance.ResetScore();
     }
