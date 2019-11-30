@@ -65,4 +65,16 @@ public class MapObjectManager : Singleton<MapObjectManager>
         }
         return objTypes;
     }
+
+    /* Checks if map object prefabs contain given type of class that has its object type. */
+    public bool IsTypeOf<T>(string objectType)
+    {
+        foreach (var obj in mapObjectPrefabs)
+        {
+            if (obj.GetType().IsSubclassOf(typeof(T)) && objectType == obj.GetMapObjectType()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
