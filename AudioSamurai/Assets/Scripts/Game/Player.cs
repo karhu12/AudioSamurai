@@ -12,18 +12,20 @@ public class Player : MonoBehaviour
     public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
-    public const float HIT_AREA_OFFSET = 1.5f;
-    public const float LOCAL_HIT_AREA_OFFSET = .25f;
-    public const float HIT_AREA_DEPTH = 0.5f;
+    public const float HIT_AREA_OFFSET = 1.75f;
+    public const float LOCAL_HIT_AREA_OFFSET = 0f;
+    public const float HIT_AREA_DEPTH = .5f;
     public const float STARTING_HEALTH = 100;
     public const float DAMAGE_AMOUNT = 3;
-    public const float HEALTH_RESTORE_AMOUNT = 1;
+    public const float HEALTH_RESTORE_AMOUNT = 2;
 
     public const string COLLIDER_NAME = "Player";
     public const string HIT_COLLIDER_NAME = "HitArea";
     public const string INPUT_MAP = "Player";
     public const string ATTACK_ACTION = "Attack";
     public const string JUMP_ATTACK_ACTION = "Jump Attack";
+    public const string ALT_ATTACK_ACTION = "Attack Alt";
+    public const string ALT_JUMP_ATTACK_ACTION = "Jump Attack Alt";
     public const string PARRY_ACTION  = "Parry";
 
     public Collider hitCollider;
@@ -35,6 +37,7 @@ public class Player : MonoBehaviour
     public GameObject hatModel;
     public GameObject swordModel;
     public GameObject healthBarControl;
+    public GameObject modMenu;
    
 
     public Equipment Equipment { get; private set; }
@@ -42,12 +45,13 @@ public class Player : MonoBehaviour
     private IEnumerator jumpAttack;
     private IEnumerator attack;
     private float currentBpm = 0;
+    private float lastMovementTime = 0;
     private Animator animator;
     private HealthBarController hbc;
     private InputAction playerAttack;
+    private InputAction playerAltAttack;
     private InputAction playerJumpAttack;
-    private InputAction playerParry;
-    
+    private InputAction playerAltJumpAttack;
 
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
@@ -59,7 +63,8 @@ public class Player : MonoBehaviour
         var inputActions = inputActionAsset.FindActionMap(Player.INPUT_MAP);
         playerAttack = inputActions.FindAction(Player.ATTACK_ACTION);
         playerJumpAttack = inputActions.FindAction(Player.JUMP_ATTACK_ACTION);
-        playerParry = inputActions.FindAction(Player.PARRY_ACTION);
+        playerAltAttack = inputActions.FindAction(Player.ALT_ATTACK_ACTION);
+        playerAltJumpAttack = inputActions.FindAction(Player.ALT_JUMP_ATTACK_ACTION);
         inputActionAsset.Enable();
         animator = GetComponent<Animator>();
         hbc = healthBarControl.GetComponent<HealthBarController>();
@@ -76,11 +81,20 @@ public class Player : MonoBehaviour
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
     public float TakeDamage(float damageMultiplier = 1) {
         float damage = DAMAGE_AMOUNT * damageMultiplier;
+        if (Health < damage)
+            damage = Health;
         Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
-        Debug.Log(Health.ToString());
         /* TODO : Play damage taken sound + animation? */
         return damage;
+    }
+
+    public void ResetPlayerStatus()
+    {
+        IsRunning = false;
+        lastMovementTime = 0;
+        transform.position = GameController.START_POSITION;
+        RestoreHealth(true);
     }
 
     /* Restores players health by constant amount. Should be called when striking enemies. */
@@ -136,29 +150,32 @@ public class Player : MonoBehaviour
 
     /* Private methods */
 
-    private void Update() {
+    private void FixedUpdate() {
         animator.SetBool("IsRunning", IsRunning);
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
         animator.SetFloat("Y", transform.position.y);
-    }
 
-    private void FixedUpdate() {
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning) {
-            transform.position += new Vector3(0f, 0f, GameController.BEAT_DISTANCE * (Time.fixedDeltaTime / (60 / currentBpm)));
+            float msPos = SongmapController.Instance.GetAccuratePlaybackPosition();
+            float elapsed = msPos - lastMovementTime;
+            transform.Translate(new Vector3(0f, 0f, GameController.BEAT_DISTANCE * (elapsed / (60 / currentBpm))));
+            lastMovementTime = msPos;
         }
     }
     private void OnEnable() {
         playerAttack.performed += Attack;
+        playerAltAttack.performed += Attack;
         playerJumpAttack.performed += JumpAttack;
-        /* TODO? : playerParry.performed += Parry; */
+        playerAltJumpAttack.performed += JumpAttack;
     }
 
     private void OnDisable() {
         playerAttack.performed -= Attack;
+        playerAltAttack.performed -= Attack;
         playerJumpAttack.performed -= JumpAttack;
-        /* TODO? : playerParry.performed -= Parry; */
+        playerAltJumpAttack.performed -= JumpAttack;
     }
 
     /* Performs item equipping. NOTE : For some reason equipment is invisible after equipping if coroutine is not used to yield result after equip.*/
@@ -187,12 +204,13 @@ public class Player : MonoBehaviour
 
         if (groundHitIndicator != null)
             groundHitIndicator.Pop();
-
+        /*
         while (transform.position.y > GROUND_PLACEMENT)
         {
             yield return null;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z), 0.5f);
-        }
+        }*/
+        transform.position = new Vector3(transform.position.x, GROUND_PLACEMENT, transform.position.z);
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsAttacking = false;
@@ -212,12 +230,13 @@ public class Player : MonoBehaviour
 
         if (airHitIndicator != null)
             airHitIndicator.Pop();
-
+        /*
         while (transform.position.y < AIR_PLACEMENT)
         {
             yield return null;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z), 0.5f);
-        }
+        }*/
+        transform.position = new Vector3(transform.position.x, AIR_PLACEMENT, transform.position.z);
         hitCollider.gameObject.SetActive(true);
         yield return new WaitForSeconds(ATTACK_TIME);
         IsJumpAttacking = false;

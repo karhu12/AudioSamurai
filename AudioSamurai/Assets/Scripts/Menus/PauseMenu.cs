@@ -25,6 +25,7 @@ public class PauseMenu : MonoBehaviour
 
     public void OnRestart()
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         Resume(false);
         GameController.Instance.Retry();
     }
@@ -33,6 +34,7 @@ public class PauseMenu : MonoBehaviour
     public void Resume(bool withUnpause = true)
     {
         if (withUnpause ? GameController.Instance.Unpause() : true) {
+            FindObjectOfType<AudioManager>().Play("Click");
             pauseUI.SetActive(false);
             Time.timeScale = 1f;
             onPause = false;
@@ -52,6 +54,7 @@ public class PauseMenu : MonoBehaviour
     //MenuButton OnClick
     public void LoadMainMenu()
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         Resume();
         GameController.Instance.QuitGame();
         Debug.Log("Loading main menu...");

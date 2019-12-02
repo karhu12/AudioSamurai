@@ -35,9 +35,17 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""Parry"",
+                    ""name"": ""Attack Alt"",
                     ""type"": ""Button"",
-                    ""id"": ""a3584e53-bc17-474b-9220-cc22f0b47ffc"",
+                    ""id"": ""d7c62cf5-cf4a-44d8-b590-caac2c9b291e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Jump Attack Alt"",
+                    ""type"": ""Button"",
+                    ""id"": ""601caa64-0900-4318-97a1-021e1a3765a5"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """"
@@ -58,7 +66,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""f4ef2c25-dac8-4a6d-b656-4847796e2780"",
-                    ""path"": ""<Keyboard>/s"",
+                    ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard"",
@@ -68,12 +76,23 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9ae92c83-64fb-4e03-b065-07024b6f5fd7"",
-                    ""path"": ""<Keyboard>/d"",
+                    ""id"": ""b2135e84-6ac1-4061-95dc-1d126a151bdd"",
+                    ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard"",
-                    ""action"": ""Parry"",
+                    ""groups"": """",
+                    ""action"": ""Attack Alt"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ee332d98-f239-4bae-9d00-3375adb8380c"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump Attack Alt"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -98,7 +117,8 @@ public class @InputMaster : IInputActionCollection, IDisposable
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_JumpAttack = m_Player.FindAction("Jump Attack", throwIfNotFound: true);
-        m_Player_Parry = m_Player.FindAction("Parry", throwIfNotFound: true);
+        m_Player_AttackAlt = m_Player.FindAction("Attack Alt", throwIfNotFound: true);
+        m_Player_JumpAttackAlt = m_Player.FindAction("Jump Attack Alt", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -150,14 +170,16 @@ public class @InputMaster : IInputActionCollection, IDisposable
     private IPlayerActions m_PlayerActionsCallbackInterface;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_JumpAttack;
-    private readonly InputAction m_Player_Parry;
+    private readonly InputAction m_Player_AttackAlt;
+    private readonly InputAction m_Player_JumpAttackAlt;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
         public PlayerActions(@InputMaster wrapper) { m_Wrapper = wrapper; }
         public InputAction @Attack => m_Wrapper.m_Player_Attack;
         public InputAction @JumpAttack => m_Wrapper.m_Player_JumpAttack;
-        public InputAction @Parry => m_Wrapper.m_Player_Parry;
+        public InputAction @AttackAlt => m_Wrapper.m_Player_AttackAlt;
+        public InputAction @JumpAttackAlt => m_Wrapper.m_Player_JumpAttackAlt;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -173,9 +195,12 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @JumpAttack.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJumpAttack;
                 @JumpAttack.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJumpAttack;
                 @JumpAttack.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJumpAttack;
-                @Parry.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnParry;
-                @Parry.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnParry;
-                @Parry.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnParry;
+                @AttackAlt.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackAlt;
+                @AttackAlt.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackAlt;
+                @AttackAlt.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnAttackAlt;
+                @JumpAttackAlt.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJumpAttackAlt;
+                @JumpAttackAlt.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJumpAttackAlt;
+                @JumpAttackAlt.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJumpAttackAlt;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -186,9 +211,12 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @JumpAttack.started += instance.OnJumpAttack;
                 @JumpAttack.performed += instance.OnJumpAttack;
                 @JumpAttack.canceled += instance.OnJumpAttack;
-                @Parry.started += instance.OnParry;
-                @Parry.performed += instance.OnParry;
-                @Parry.canceled += instance.OnParry;
+                @AttackAlt.started += instance.OnAttackAlt;
+                @AttackAlt.performed += instance.OnAttackAlt;
+                @AttackAlt.canceled += instance.OnAttackAlt;
+                @JumpAttackAlt.started += instance.OnJumpAttackAlt;
+                @JumpAttackAlt.performed += instance.OnJumpAttackAlt;
+                @JumpAttackAlt.canceled += instance.OnJumpAttackAlt;
             }
         }
     }
@@ -206,6 +234,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
     {
         void OnAttack(InputAction.CallbackContext context);
         void OnJumpAttack(InputAction.CallbackContext context);
-        void OnParry(InputAction.CallbackContext context);
+        void OnAttackAlt(InputAction.CallbackContext context);
+        void OnJumpAttackAlt(InputAction.CallbackContext context);
     }
 }

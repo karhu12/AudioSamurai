@@ -44,6 +44,7 @@ public class ControlRebind : MonoBehaviour
 
     void RemapButtonClicked(string name, int bindingIndex = 0)
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         inputAction.Disable();
         button.enabled = false;
         text.text = "Press any key...";
@@ -65,7 +66,6 @@ public class ControlRebind : MonoBehaviour
         string path = ac.effectivePath;
 
         PlayerPrefs.SetString(inputAction.name, path);
-        button.gameObject.SetActive(true);
     }
 
     void ButtonRebindCompleted()

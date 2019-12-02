@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -127,6 +127,8 @@ public class GameController : Singleton<GameController>
     /* If the game is currently on the result screen, it will move the game back to song selection and set the state back to idling. */
     public void MoveFromEndScreen()
     {
+        FindObjectOfType<AudioManager>().Stop("Win");
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
         if (State == GameState.EndScreen)
         {
             State = GameState.Idle;
@@ -135,23 +137,36 @@ public class GameController : Singleton<GameController>
     }
 
     /* Calculates what score it should reward player with based on the hitTiming */
-    public int CalculateHitScore(float hitTiming) {
+    public int CalculateHitScore(float hitTiming, float originalHitTime) {
         float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
-        float hitTime = Math.Abs(SongmapController.Instance.AudioSource.time * 1000 - hitTiming);
+        float hitTime = Math.Abs(originalHitTime - hitTiming);
         if (hitTime < accHitTime) {
-            Debug.Log($"hit offset = {hitTime}, PERFECT");
             return (int)ScoreSystem.HitType.Perfect;
         }
         else if (hitTime >= accHitTime && hitTime <= accHitTime * 2) {
-            Debug.Log($"hit offset = {hitTime}, NORMAL");
             return (int)ScoreSystem.HitType.Normal;
         }
         else if (hitTime >= accHitTime * 2 && hitTime <= accHitTime * 3) {
-            Debug.Log($"hit offset = {hitTime}, POOR");
             return (int)ScoreSystem.HitType.Poor;
         }
-        Debug.Log($"hit offset = {hitTime}, MISS");
-        return 0;
+        return (int)ScoreSystem.HitType.Miss;
+    }
+
+    /* Calculates what the damage multiplier should be based on current mods. */
+    public float GetDamageMultiplier()
+    {
+        float damageMultiplier = SelectedSongmap.HealthDrainlevel;
+        switch (ModeManager.Instance.GetMode())
+        {
+            case ModeManager.SUDDEN_DEATH_MOD:
+                damageMultiplier = Player.STARTING_HEALTH / Player.DAMAGE_AMOUNT;
+                break;
+            case ModeManager.NO_FAIL_MOD:
+                if (player.Health <= 0)
+                    damageMultiplier = 0;
+                break;
+        }
+        return damageMultiplier;
     }
 
     /* Private methods */
@@ -169,7 +184,7 @@ public class GameController : Singleton<GameController>
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
     private void OnPlayingUpdate() {
-        if (player.Health <= 0) {
+        if (player.Health <= 0 && ModeManager.Instance.GetMode() != ModeManager.NO_FAIL_MOD) {
             GameFail();
         } else {
             HandleGameSpeed();
@@ -180,6 +195,7 @@ public class GameController : Singleton<GameController>
             }
         }
     }
+
     
     /* Checks if the items in the queue are within SPAWN_AHEAD_IN_MS from the current time in song and instantiates them in correct place if they are. */
     private void HandleSpawnQueue()
@@ -188,7 +204,7 @@ public class GameController : Singleton<GameController>
         /* Note. mapObject ms position can not be less than first beat becaues of map validation. */
         foreach (var obj in spawnQueue)
         {
-            float songPosMs = SongmapController.Instance.AudioSource.time * 1000;
+            float songPosMs = SongmapController.Instance.GetAccuratePlaybackPositionMs();
             if (obj.Item1 <= (songPosMs + SPAWN_AHEAD_IN_MS))
             {
                 removeList.Add(obj);
@@ -214,7 +230,7 @@ public class GameController : Singleton<GameController>
 
         foreach (var timing in timingQueue)
         {
-            if (timing.Item1 <= SongmapController.Instance.AudioSource.time * 1000)
+            if (timing.Item1 <= SongmapController.Instance.GetAccuratePlaybackPositionMs())
             {
                 player.ChangeSpeed(timing.Item2);
                 CurrentTiming = timing;
@@ -229,14 +245,13 @@ public class GameController : Singleton<GameController>
     }
 
     /* Handles moving the user from game scene to result screen and display the result ui. */
-    private void OnGameEnd() 
+    private void OnGameEnd()
     {
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
+        bool isHighScore = ScoreSystem.Instance.FinalizeResult();
+        FindObjectOfType<ResultUpdater>().UpdateResult(isHighScore);
         State = GameState.EndScreen;
-        GameData.Instance.MapName = Instance.SelectedSongmap.GetSongmapName();
-        GameData.Instance.FinalScore = ScoreSystem.Instance.GetScore();
-        GameData.Instance.CalculateHitPercentage();
-        HighScoreManager.Instance.CompareToHighScore(GameData.Instance.MapName, GameData.Instance.FinalScore);
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
+        FindObjectOfType<AudioManager>().Play("Win");
         ResetGameState();
     }
 
@@ -245,14 +260,11 @@ public class GameController : Singleton<GameController>
         SongmapController.Instance.AudioSource.Stop();
         spawnQueue.Clear();
         timingQueue.Clear();
-        player.IsRunning = false;
-        player.transform.position = START_POSITION;
+        player.ResetPlayerStatus();
         if (hud.gameObject.activeSelf)
             hud.gameObject.SetActive(false);
-        player.RestoreHealth(true);
         ScoreSystem.Instance.ResetCombo();
         ScoreSystem.Instance.ResetScore();
-        GameData.Instance.ResetHitsAndMisses();
     }
 
     private IEnumerator GameEndCoroutine()
@@ -291,12 +303,16 @@ public class GameController : Singleton<GameController>
     /* Initiates countdown lasting for given amount of seconds. */
     private IEnumerator CountdownCoroutine(int seconds = 3)
     {
+        FindObjectOfType<AudioManager>().Play("Countdown");
         for (int second = seconds; second > 0; second--)
         {
             Debug.Log($"Countdown: {second}");
+            FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), $"{second}", Color.red);
             yield return new WaitForSeconds(1);
         }
         Debug.Log("Go!");
+        FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), "Go", Color.green);
+        yield return new WaitForSeconds(1);
     }
 
     private void GameFail() {
@@ -337,6 +353,7 @@ public class GameController : Singleton<GameController>
             timingQueue.Add((timing.Item1, timing.Item2, timing.Item3));
         }
 
+        ScoreSystem.Instance.gameResult.MaxCombo = SelectedSongmap.GetMaxCombo();
         HandleSpawnQueue();
     }
 }
