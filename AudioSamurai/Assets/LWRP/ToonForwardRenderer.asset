@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: Sobel Outlines
   m_EditorClassIdentifier: 
   settings:
-    Event: 500
+    Event: 450
     blitMaterial: {fileID: 2100000, guid: 0c4ab75cc4011794c9bff8ce01888adf, type: 2}
     blitMaterialPassIndex: 0
     destination: 0
