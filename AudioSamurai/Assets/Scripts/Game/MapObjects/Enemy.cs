@@ -26,7 +26,7 @@ public class Enemy : MapObject
     protected override void OnPlayerCollision(Player player) {
         if (!HasHadCollision) {
             HasHadCollision = true;
-            float damage = player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
+            float damage = player.TakeDamage(GameController.Instance.GetDamageMultiplier());
             FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
             if (!HasBeenMissed) {
                 ScoreSystem.Instance.Miss();

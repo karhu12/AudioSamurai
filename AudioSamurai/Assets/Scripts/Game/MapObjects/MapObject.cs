@@ -77,7 +77,7 @@ public class MapObject : Poolable
         // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
         if (!HasHadCollision) {
             HasHadCollision = true;
-            float damage = GameController.Instance.GetDamage();
+            float damage = player.TakeDamage(GameController.Instance.GetDamageMultiplier());
             FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
             ScoreSystem.Instance.ResetCombo();
         }

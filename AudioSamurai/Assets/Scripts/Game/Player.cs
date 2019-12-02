@@ -155,6 +155,7 @@ public class Player : MonoBehaviour
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
         animator.SetFloat("Y", transform.position.y);
+
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning) {
             float msPos = SongmapController.Instance.GetAccuratePlaybackPosition();
