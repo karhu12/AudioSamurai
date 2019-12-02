@@ -46,6 +46,10 @@ public class MainMenu : MonoBehaviour
         onMainMenu = true;
     }
      
+    public void LoadHelpMenu()
+    {
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.HelpMenu);
+    }
     public void LoadSettings()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
