@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5afd052da875543babee5c7198fc10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraState: 0
 --- !u!95 &6159890931448479744
 Animator:
   serializedVersion: 3
