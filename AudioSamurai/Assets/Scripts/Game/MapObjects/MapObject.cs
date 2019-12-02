@@ -26,7 +26,7 @@ public class MapObject : Poolable
     }
 
     public float Timing { get; set; }
-    public bool HasHadCollision { get; private set; } = false;
+    public bool HasHadCollision { get; protected set; } = false;
 
     /* Placement constant of class. Must be overridden in derived class to change verticla placement! */
     public virtual VerticalPlacement Placement 
@@ -77,7 +77,7 @@ public class MapObject : Poolable
         // Debug.Log($"Player Collision at: {SongmapController.Instance.AudioSource.time}");
         if (!HasHadCollision) {
             HasHadCollision = true;
-            float damage = player.TakeDamage(GameController.Instance.SelectedSongmap.HealthDrainlevel);
+            float damage = player.TakeDamage(GameController.Instance.GetDamageMultiplier());
             FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
             ScoreSystem.Instance.ResetCombo();
         }

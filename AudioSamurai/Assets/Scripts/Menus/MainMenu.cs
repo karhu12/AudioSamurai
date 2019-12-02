@@ -6,9 +6,7 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
-
-    static bool notFirstTime = false;
-
+    
     public GameObject mainMenuUI;
 
     private void Start()
