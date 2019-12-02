@@ -152,24 +152,21 @@ public class GameController : Singleton<GameController>
         return (int)ScoreSystem.HitType.Miss;
     }
 
-    public float GetDamage()
+    /* Calculates what the damage multiplier should be based on current mods. */
+    public float GetDamageMultiplier()
     {
-        int gamemode = ModeManager.Instance.GetMode();
-        float damage = SelectedSongmap.HealthDrainlevel;
-        float hitpoints = player.Health;
-        if (gamemode > 0)
+        float damageMultiplier = SelectedSongmap.HealthDrainlevel;
+        switch (ModeManager.Instance.GetMode())
         {
-            if (gamemode == 1) //Sudden Death -mode
-                damage = hitpoints;
-
-            if (gamemode == 2) //No Fail -mode
-            {
-                if (hitpoints <= 0)
-                    damage = 0;
-            }
+            case ModeManager.SUDDEN_DEATH_MOD:
+                damageMultiplier = Player.STARTING_HEALTH / Player.DAMAGE_AMOUNT;
+                break;
+            case ModeManager.NO_FAIL_MOD:
+                if (player.Health <= 0)
+                    damageMultiplier = 0;
+                break;
         }
-        float damageTaked = player.TakeDamage(damage);
-        return damageTaked;
+        return damageMultiplier;
     }
 
     /* Private methods */
@@ -187,7 +184,7 @@ public class GameController : Singleton<GameController>
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
     private void OnPlayingUpdate() {
-        if (player.Health <= 0 && ModeManager.Instance.GetMode() != 2) {
+        if (player.Health <= 0 && ModeManager.Instance.GetMode() != ModeManager.NO_FAIL_MOD) {
             GameFail();
         } else {
             HandleGameSpeed();
@@ -250,8 +247,8 @@ public class GameController : Singleton<GameController>
     /* Handles moving the user from game scene to result screen and display the result ui. */
     private void OnGameEnd()
     {
-        ScoreSystem.Instance.FinalizeResult();
-        FindObjectOfType<ResultUpdater>().UpdateResult();
+        bool isHighScore = ScoreSystem.Instance.FinalizeResult();
+        FindObjectOfType<ResultUpdater>().UpdateResult(isHighScore);
         State = GameState.EndScreen;
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         FindObjectOfType<AudioManager>().Play("Win");

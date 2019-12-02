@@ -115,8 +115,17 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     void Update()
     {
-        scoreText.GetComponent<Text>().text = score.ToString();
-        comboText.GetComponent<TextMeshProUGUI>().text = combo.ToString() + "x";
+        if (scoreText == null)
+        {
+            
+        }
+
+        else
+        {
+            scoreText.GetComponent<Text>().text = score.ToString();
+            comboText.GetComponent<TextMeshProUGUI>().text = combo.ToString() + "x";
+        }
+        
     }
 
     public void AddScore(int scoreToAdd)
@@ -125,7 +134,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
         {
             if (ModeManager.Instance.GetMode() == 2)
                 scoreToAdd = scoreToAdd / NO_FAIL_MODE_PENALTY_DIVIDER;
-            score += scoreToAdd * (combo == 0 ? 1 : combo);
+            score += scoreToAdd * (combo + 1);
             combo += 1;
             comboAnim.Play("comboAnimation");
             gameResult.HighestCombo = combo;
@@ -133,12 +142,13 @@ public class ScoreSystem : Singleton<ScoreSystem>
         }
     }
 
-    public void FinalizeResult()
+    /* Saves the gameResult score, calculates accuracy and compares it to old highscore. Returns boolean if its the new highscore. */
+    public bool FinalizeResult()
     {
         gameResult.MapName = GameController.Instance.SelectedSongmap.GetSongmapName();
         gameResult.Score = score;
         gameResult.CalculateResult();
-        HighScoreManager.Instance.CompareToHighScore(gameResult, HighScoreManager.Instance.GetGameResult(gameResult.MapName));
+        return HighScoreManager.Instance.CompareToHighScore(gameResult, HighScoreManager.Instance.GetGameResult(gameResult.MapName));
     }
 
     public void AddScore(HitType hit)
