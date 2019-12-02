@@ -142,12 +142,13 @@ public class ScoreSystem : Singleton<ScoreSystem>
         }
     }
 
-    public void FinalizeResult()
+    /* Saves the gameResult score, calculates accuracy and compares it to old highscore. Returns boolean if its the new highscore. */
+    public bool FinalizeResult()
     {
         gameResult.MapName = GameController.Instance.SelectedSongmap.GetSongmapName();
         gameResult.Score = score;
         gameResult.CalculateResult();
-        HighScoreManager.Instance.CompareToHighScore(gameResult, HighScoreManager.Instance.GetGameResult(gameResult.MapName));
+        return HighScoreManager.Instance.CompareToHighScore(gameResult, HighScoreManager.Instance.GetGameResult(gameResult.MapName));
     }
 
     public void AddScore(HitType hit)
