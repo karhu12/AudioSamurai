@@ -15,6 +15,12 @@ public class ScoreSystem : Singleton<ScoreSystem>
     public const string MISS_TEXT = "X";
     
 
+    public Texture perfectTexture;
+    public Texture amazingTexture;
+    public Texture greatTexture;
+    public Texture okayTexture;
+    public Texture poorTexture;
+
     public enum HitType
     {
         Perfect = 300,
@@ -23,6 +29,44 @@ public class ScoreSystem : Singleton<ScoreSystem>
         Miss = 0
     }
 
+    public enum ResultGrade
+    {
+        Perfect,
+        Amazing,
+        Great,
+        Okay,
+        Poor,
+        None
+    }
+
+    /* Returns the image texture matching to the given grade */
+    public Texture GetResultGradeTexture(ResultGrade grade)
+    {
+        switch (grade) {
+            case ResultGrade.Perfect:
+                if (perfectTexture != null)
+                    return perfectTexture;
+                break;
+            case ResultGrade.Amazing:
+                if (amazingTexture != null)
+                    return amazingTexture;
+                break;
+            case ResultGrade.Great:
+                if (greatTexture != null)
+                    return greatTexture;
+                break;
+            case ResultGrade.Okay:
+                if (okayTexture != null)
+                    return okayTexture;
+                break;
+            case ResultGrade.Poor:
+                if (poorTexture != null)
+                    return poorTexture;
+                break;
+        }
+        return null;
+    }
+    
     public static string GetHitTypeString(HitType hitType)
     {
         switch (hitType) {
@@ -52,9 +96,15 @@ public class ScoreSystem : Singleton<ScoreSystem>
     public GameObject scoreText;
     public TextMeshProUGUI comboText;
     public Animator comboAnim;
+    public GameResult gameResult { get; private set; }
 
     private int combo;
     private int score;
+
+    private new void Awake() {
+        base.Awake();
+        gameResult = new GameResult();
+    }
 
     private void Start()
     {
@@ -75,11 +125,20 @@ public class ScoreSystem : Singleton<ScoreSystem>
         {
             if (ModeManager.Instance.GetMode() == 2)
                 scoreToAdd = scoreToAdd / NO_FAIL_MODE_PENALTY_DIVIDER;
-            score += scoreToAdd * (combo == 0 ? 1 : combo);
+            score += scoreToAdd * (combo + 1);
             combo += 1;
             comboAnim.Play("comboAnimation");
-            GameData.Instance.HighestCombo = combo;
+            gameResult.HighestCombo = combo;
+            gameResult.CountHit(scoreToAdd);
         }
+    }
+
+    public void FinalizeResult()
+    {
+        gameResult.MapName = GameController.Instance.SelectedSongmap.GetSongmapName();
+        gameResult.Score = score;
+        gameResult.CalculateResult();
+        HighScoreManager.Instance.CompareToHighScore(gameResult, HighScoreManager.Instance.GetGameResult(gameResult.MapName));
     }
 
     public void AddScore(HitType hit)
@@ -92,6 +151,11 @@ public class ScoreSystem : Singleton<ScoreSystem>
         return score;
     }
 
+    public void Miss() {
+        combo = 0;
+        gameResult.CountHit((int)HitType.Miss);
+    }
+
     public void ResetCombo()
     {
         combo = 0;
@@ -99,5 +163,6 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     public void ResetScore() {
         score = 0;
+        gameResult.Reset();
     }
 }

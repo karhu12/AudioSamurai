@@ -12,9 +12,9 @@ public class Player : MonoBehaviour
     public const float AIR_PLACEMENT = 2f;
     public const float ATTACK_TIME = 0.1f;
     public const float DEFAULT_SPEED = 10f;
-    public const float HIT_AREA_OFFSET = 1.5f;
-    public const float LOCAL_HIT_AREA_OFFSET = .25f;
-    public const float HIT_AREA_DEPTH = 0.5f;
+    public const float HIT_AREA_OFFSET = 1.75f;
+    public const float LOCAL_HIT_AREA_OFFSET = 0f;
+    public const float HIT_AREA_DEPTH = .5f;
     public const float STARTING_HEALTH = 100;
     public const float DAMAGE_AMOUNT = 3;
     public const float HEALTH_RESTORE_AMOUNT = 2;
@@ -45,13 +45,13 @@ public class Player : MonoBehaviour
     private IEnumerator jumpAttack;
     private IEnumerator attack;
     private float currentBpm = 0;
+    private float lastMovementTime = 0;
     private Animator animator;
     private HealthBarController hbc;
     private InputAction playerAttack;
     private InputAction playerAltAttack;
     private InputAction playerJumpAttack;
     private InputAction playerAltJumpAttack;
-
 
     public bool IsAttacking { get; private set; }
     public bool IsJumpAttacking { get; private set; }
@@ -85,9 +85,16 @@ public class Player : MonoBehaviour
             damage = Health;
         Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
-        Debug.Log(Health.ToString());
         /* TODO : Play damage taken sound + animation? */
         return damage;
+    }
+
+    public void ResetPlayerStatus()
+    {
+        IsRunning = false;
+        lastMovementTime = 0;
+        transform.position = GameController.START_POSITION;
+        RestoreHealth(true);
     }
 
     /* Restores players health by constant amount. Should be called when striking enemies. */
@@ -143,17 +150,17 @@ public class Player : MonoBehaviour
 
     /* Private methods */
 
-    private void Update() {
+    private void FixedUpdate() {
         animator.SetBool("IsRunning", IsRunning);
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
         animator.SetFloat("Y", transform.position.y);
-    }
-
-    private void FixedUpdate() {
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning) {
-            transform.position += new Vector3(0f, 0f, GameController.BEAT_DISTANCE * (Time.fixedDeltaTime / (60 / currentBpm)));
+            float msPos = SongmapController.Instance.GetAccuratePlaybackPosition();
+            float elapsed = msPos - lastMovementTime;
+            transform.Translate(new Vector3(0f, 0f, GameController.BEAT_DISTANCE * (elapsed / (60 / currentBpm))));
+            lastMovementTime = msPos;
         }
     }
     private void OnEnable() {

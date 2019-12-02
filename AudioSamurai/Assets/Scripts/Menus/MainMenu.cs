@@ -5,9 +5,7 @@ using UnityEngine;
 public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
-
-    static bool notFirstTime = false;
-
+    
     public GameObject mainMenuUI;
 
     private void Start()
@@ -60,15 +58,12 @@ public class MainMenu : MonoBehaviour
 
     public void QuitGame()
     {
-        if (Application.isEditor)
-        {
+        #if UNITY_EDITOR
             FindObjectOfType<AudioManager>().Play("Click");
             UnityEditor.EditorApplication.isPlaying = false;
-        } else
-        {
+        #else
             FindObjectOfType<AudioManager>().Play("Click");
             Application.Quit();
-        }
-            
+        #endif
     }   
 }
