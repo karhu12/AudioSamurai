@@ -6,11 +6,13 @@ public class PlayerRef
 {
     [BsonId]
     public string Name { get; set; }
-    public HighScoresCollection highScoresCollection { get; set; }
+
+    public string Password { get; set; }
+    public HighScoresCollection ScoreCollection { get; set; }
 
     public PlayerRef()
     {
-        highScoresCollection = new HighScoresCollection();
+        ScoreCollection = new HighScoresCollection();
     }
 }
 
@@ -27,9 +29,6 @@ public class HighScoresCollection
 [BsonIgnoreExtraElements]
 public class HighScore
 {
-    /*First implementation with players personal hiscores, then if we have time left maybe try to implement global leaderboard for all players.
-     * 
-     **/
     [BsonId]
     public string MapId { get; set; }
     public int Score { get; set; }

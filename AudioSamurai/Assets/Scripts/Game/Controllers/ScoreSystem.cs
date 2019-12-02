@@ -57,7 +57,6 @@ public class ScoreSystem : Singleton<ScoreSystem>
     private void Start()
     {
         comboAnim = comboText.GetComponent<Animator>();
-        comboAnim.Play("New State");
         combo = 0;
         score = 0;
     }

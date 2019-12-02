@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using EncryptStringSample;
 
 public class Mongo
 {
@@ -22,17 +23,16 @@ public class Mongo
         playerCollection = db.GetCollection<PlayerRef>("highscores");
     }
 
-    public void Insert(string playerName, HighScore highScore)
+    public void InsertUpdates(string playerName, HighScore highScore, string pw)
     {
-        GetPlayerByName(playerName);
+        GetPlayerByCredentials(playerName, pw);
         UpdatePlayerData(player, highScore);
-        playerCollection.InsertOne(player);
     }
 
     public void UpdatePlayerData(PlayerRef player, HighScore highScore)
     {
         var playerFilter = Builders<PlayerRef>.Filter.Eq(x => x.Name, player.Name);
-        var update = Builders<PlayerRef>.Update.Set(o => o.highScoresCollection, UpdateCollectionItem(hsCollection, highScore));
+        var update = Builders<PlayerRef>.Update.Set(o => o.ScoreCollection, UpdateCollectionItem(hsCollection, highScore));
         var result = playerCollection.UpdateOneAsync(playerFilter, update).Result;
     }
 
@@ -52,7 +52,7 @@ public class Mongo
         return highScoresCollection;
     }
 
-    public PlayerRef GetPlayerByName(string playerName)
+    public PlayerRef GetPlayerByCredentials(string playerName, string pw)
     {
         bool isMatch = false;
         var list = playerCollection.Find(new BsonDocument()).ToList();
@@ -60,29 +60,48 @@ public class Mongo
         {
             if (dox.Name.Equals(playerName))
             {
-                isMatch = true;
-                player = dox;
-                hsCollection = dox.highScoresCollection;
+                var decrypted = PasswordHandler.Decrypt(dox.Password, dox.Name);
+                if (decrypted.Equals(pw))
+                {
+                    isMatch = true;
+                    player = dox;
+                    hsCollection = dox.ScoreCollection;
+                    Debug.Log("Login successful");
+                }
+                else
+                {
+                    Debug.Log("Invalid username or password.");
+                }
+            }
+            else
+            {
+                Debug.Log("Invalid username or password.");
             }
         }
         if(isMatch == false)
         {
-            player = new PlayerRef();
-            player.Name = playerName;
-            playerCollection.InsertOne(player);
-            hsCollection = player.highScoresCollection;
+            RegisterNewPlayer(playerName, pw);
         }
         return player;
     }
 
-    public HighScore GetPlayersMapScore(string playerName, string mapName)
+    public HighScore GetPlayersMapScore(string playerName, string mapName, string pw)
     {
-        var playerObj = GetPlayerByName(playerName);
-        var scoreObj = playerObj.highScoresCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
+        var playerObj = GetPlayerByCredentials(playerName, pw);
+        var scoreObj = playerObj.ScoreCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
         if (scoreObj == null)
         {
             scoreObj = new HighScore(mapName, 0, 0, 0);
         }
         return scoreObj;
+    }
+
+    public async void RegisterNewPlayer(string playerName, string pw)
+    {
+        player = new PlayerRef();
+        player.Name = playerName;
+        player.Password = PasswordHandler.Encrypt(pw, player.Name);
+        await playerCollection.InsertOneAsync(player);
+        hsCollection = player.ScoreCollection;
     }
 }

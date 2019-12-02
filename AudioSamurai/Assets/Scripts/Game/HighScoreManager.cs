@@ -22,7 +22,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
     //Compare new score from the previous run to the current highscore available for that map.
     public void CompareToHighScore(String mapName, int newScore)
     {
-        SetCurrentHighs("isohannu", mapName);
+        SetCurrentHighs("janispetke", mapName);
         if (newScore >= CurrentHighScore)
         {
             SetNewHighScore(mapName);
@@ -34,7 +34,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
     {
         try
         {
-            mongo.Insert("isohannu", new HighScore(mapName, GameData.Instance.FinalScore, GameData.Instance.RoundedHitPercentage, GameData.Instance.HighestCombo));
+            mongo.InsertUpdates("janispetke", new HighScore(mapName, GameData.Instance.FinalScore, GameData.Instance.RoundedHitPercentage, GameData.Instance.HighestCombo), "salis123");
         }
         catch (Exception) { }
     }
@@ -44,7 +44,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
     {
         try
         {
-            HighScore hs = mongo.GetPlayersMapScore(playerName, mapName);
+            HighScore hs = mongo.GetPlayersMapScore(playerName, mapName, "salis123");
             CurrentHighScore = hs.Score;
             CurrentCombo = hs.Combo;
             CurrentHitPercentage = hs.HitP;
