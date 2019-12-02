@@ -37,6 +37,7 @@ public class Player : MonoBehaviour
     public GameObject hatModel;
     public GameObject swordModel;
     public GameObject healthBarControl;
+    public GameObject modMenu;
    
 
     public Equipment Equipment { get; private set; }
@@ -80,6 +81,8 @@ public class Player : MonoBehaviour
     /* Makes the player take constant amount of damage multiplied by the given multiplier */
     public float TakeDamage(float damageMultiplier = 1) {
         float damage = DAMAGE_AMOUNT * damageMultiplier;
+        if (Health < damage)
+            damage = Health;
         Health -= damage;
         hbc.TakeDamageEffect(STARTING_HEALTH, Health);
         /* TODO : Play damage taken sound + animation? */
@@ -152,6 +155,7 @@ public class Player : MonoBehaviour
         animator.SetBool("IsAttacking", IsAttacking);
         animator.SetBool("IsJumpAttacking", IsJumpAttacking);
         animator.SetFloat("Y", transform.position.y);
+
         //Add direction and velocity to player character depending on a song bpm
         if (IsRunning) {
             float msPos = SongmapController.Instance.GetAccuratePlaybackPosition();

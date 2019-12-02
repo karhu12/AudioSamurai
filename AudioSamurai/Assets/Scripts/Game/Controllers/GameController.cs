@@ -152,6 +152,23 @@ public class GameController : Singleton<GameController>
         return (int)ScoreSystem.HitType.Miss;
     }
 
+    /* Calculates what the damage multiplier should be based on current mods. */
+    public float GetDamageMultiplier()
+    {
+        float damageMultiplier = SelectedSongmap.HealthDrainlevel;
+        switch (ModeManager.Instance.GetMode())
+        {
+            case ModeManager.SUDDEN_DEATH_MOD:
+                damageMultiplier = Player.STARTING_HEALTH / Player.DAMAGE_AMOUNT;
+                break;
+            case ModeManager.NO_FAIL_MOD:
+                if (player.Health <= 0)
+                    damageMultiplier = 0;
+                break;
+        }
+        return damageMultiplier;
+    }
+
     /* Private methods */
 
     /* Check internal state on update and do necessary stuff based on it. */
@@ -167,7 +184,7 @@ public class GameController : Singleton<GameController>
 
     /* Called for every frame while playing. Controls the map object spawning and settings the correct pace. */
     private void OnPlayingUpdate() {
-        if (player.Health <= 0) {
+        if (player.Health <= 0 && ModeManager.Instance.GetMode() != ModeManager.NO_FAIL_MOD) {
             GameFail();
         } else {
             HandleGameSpeed();
@@ -178,6 +195,7 @@ public class GameController : Singleton<GameController>
             }
         }
     }
+
     
     /* Checks if the items in the queue are within SPAWN_AHEAD_IN_MS from the current time in song and instantiates them in correct place if they are. */
     private void HandleSpawnQueue()
