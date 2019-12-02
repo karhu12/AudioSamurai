@@ -247,8 +247,8 @@ public class GameController : Singleton<GameController>
     /* Handles moving the user from game scene to result screen and display the result ui. */
     private void OnGameEnd()
     {
-        ScoreSystem.Instance.FinalizeResult();
-        FindObjectOfType<ResultUpdater>().UpdateResult();
+        bool isHighScore = ScoreSystem.Instance.FinalizeResult();
+        FindObjectOfType<ResultUpdater>().UpdateResult(isHighScore);
         State = GameState.EndScreen;
         CameraController.Instance.SetCameraToState(CameraController.CameraState.GameResult);
         FindObjectOfType<AudioManager>().Play("Win");
