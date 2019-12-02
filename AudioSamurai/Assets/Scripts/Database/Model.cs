@@ -33,15 +33,26 @@ public class HighScore
     public string MapId { get; set; }
     public int Score { get; set; }
 
-    public double HitP { get; set; }
+    //public double HitP { get; set; }
 
-    public int Combo { get; set; }
+    public int HighestCombo { get; set; }
 
-    public HighScore(string map, int score, double hitp, int combo)
+    public int MaxCombo { get; set; }
+    public int Perfects { get; set; }
+    public int Normals { get; set; }
+    public int Poors { get; set; }
+    public int Misses { get; set; }
+
+    public HighScore(string map, int score, int highestCombo, int maxCombo, int perfects, int normals, int poors, int misses)
     {
         this.MapId = map;
         this.Score = score;
-        this.HitP = hitp;
-        this.Combo = combo;
+        //this.HitP = hitp;
+        this.HighestCombo = highestCombo;
+        this.MaxCombo = maxCombo;
+        this.Perfects = perfects;
+        this.Normals = normals;
+        this.Poors = poors;
+        this.Misses = misses;
     }
 }

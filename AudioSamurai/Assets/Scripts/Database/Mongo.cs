@@ -42,12 +42,17 @@ public class Mongo
         if(obj != null)
         {
             obj.Score = highScore.Score;
-            obj.Combo = highScore.Combo;
-            obj.HitP = highScore.HitP;
+            obj.HighestCombo = highScore.HighestCombo;
+            obj.MaxCombo = highScore.MaxCombo;
+            //obj.HitP = highScore.HitP;
+            obj.Perfects = highScore.Perfects;
+            obj.Normals = highScore.Normals;
+            obj.Poors = highScore.Poors;
+            obj.Misses = highScore.Misses;
         }
         else
         {
-            highScoresCollection.Hiscores.Add(new HighScore(highScore.MapId, highScore.Score, highScore.HitP, highScore.Combo));
+            highScoresCollection.Hiscores.Add(new HighScore(highScore.MapId, highScore.Score, highScore.HighestCombo,highScore.MaxCombo, highScore.Perfects, highScore.Normals, highScore.Poors, highScore.Misses));
         }
         return highScoresCollection;
     }
@@ -91,7 +96,7 @@ public class Mongo
         var scoreObj = playerObj.ScoreCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
         if (scoreObj == null)
         {
-            scoreObj = new HighScore(mapName, 0, 0, 0);
+            scoreObj = new HighScore(mapName, 0, 0, 0, 0, 0, 0, 0);
         }
         return scoreObj;
     }

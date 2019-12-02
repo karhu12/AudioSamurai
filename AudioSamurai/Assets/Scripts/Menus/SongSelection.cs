@@ -303,7 +303,7 @@ public class SongmapChildView : View
         difficulty.text = map.DifficultyTitle;
         gameResult = HighScoreManager.Instance.GetGameResult(map.GetSongmapName());
         
-        if (gameResult.Score >= 0)
+        if (gameResult.Score > 0)
         {
             highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
             accuracy.text = $"{gameResult.RoundedHitPercentage} %";
@@ -312,7 +312,7 @@ public class SongmapChildView : View
             highScorePanel.gameObject.SetActive(false);
         }
 
-        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses >= 0)
+        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses > 0)
         {
             grade.texture = ScoreSystem.Instance.GetResultGradeTexture(gameResult.ResultGrade);
             gradeTitle.text = gameResult.ResultGrade.ToString();

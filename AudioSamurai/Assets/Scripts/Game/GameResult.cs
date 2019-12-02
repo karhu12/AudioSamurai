@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 public class GameResult
 {
     /* Constants */
@@ -42,6 +43,7 @@ public class GameResult
     private float hitPercentage = 0;
 
     public ScoreSystem.ResultGrade ResultGrade { get; private set; } = ScoreSystem.ResultGrade.None;
+    [BsonId]
     public string MapName { get; set; }
     public double RoundedHitPercentage { get; private set; } = 0;
 
