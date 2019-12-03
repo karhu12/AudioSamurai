@@ -94,10 +94,12 @@ public class LoginMenu : MonoBehaviour
     public void ReadUsername(string text)
     {
         username = text;
+        Debug.Log(username);
     }
 
     public void ReadPassword(string text)
     {
         password = text;
+        Debug.Log(password);
     }
 }
