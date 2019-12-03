@@ -48,7 +48,6 @@ public class LoginMenu : MonoBehaviour
         {
             SuccessfulLogin();
         }
-        
     }
 
     public void TryToSignIn()
