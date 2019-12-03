@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using EncryptStringSample;
+using System.Threading.Tasks;
 
-public class Mongo
+public class Mongo : Singleton<Mongo>
 {
     private const string MONGO_URI = "mongodb+srv://admin:audiosamurai123@cluster0-cofmk.mongodb.net/test?retryWrites=true&w=majority";
     private const string DATABASE_NAME = "highscoredb";
@@ -15,17 +16,19 @@ public class Mongo
     private IMongoCollection<PlayerRef> playerCollection;
     PlayerRef player;
     HighScoresCollection hsCollection;
+    public bool Success { get; private set; }
 
     public void Init()
     {
         client = new MongoClient(MONGO_URI);
         db = client.GetDatabase(DATABASE_NAME);
         playerCollection = db.GetCollection<PlayerRef>("highscores");
+        player = new PlayerRef();
     }
 
-    public void InsertUpdates(string playerName, HighScore highScore, string pw)
+    public void InsertUpdates(string playerName, HighScore highScore) // , string pw
     {
-        GetPlayerByCredentials(playerName, pw);
+        //GetPlayerByCredentials(playerName, pw);
         UpdatePlayerData(player, highScore);
     }
 
@@ -59,7 +62,6 @@ public class Mongo
 
     public PlayerRef GetPlayerByCredentials(string playerName, string pw)
     {
-        bool isMatch = false;
         var list = playerCollection.Find(new BsonDocument()).ToList();
         foreach (var dox in list)
         {
@@ -68,31 +70,61 @@ public class Mongo
                 var decrypted = PasswordHandler.Decrypt(dox.Password, dox.Name);
                 if (decrypted.Equals(pw))
                 {
-                    isMatch = true;
+                    Success = true;
                     player = dox;
                     hsCollection = dox.ScoreCollection;
-                    Debug.Log("Login successful");
                 }
                 else
                 {
-                    Debug.Log("Invalid username or password.");
+                    Success = false;
                 }
             }
-            else
-            {
-                Debug.Log("Invalid username or password.");
-            }
-        }
-        if(isMatch == false)
-        {
-            RegisterNewPlayer(playerName, pw);
         }
         return player;
     }
 
-    public HighScore GetPlayersMapScore(string playerName, string mapName, string pw)
+
+    public void SetDataIfLogin(string playerName)
     {
-        var playerObj = GetPlayerByCredentials(playerName, pw);
+        var list = playerCollection.Find(new BsonDocument()).ToList();
+        foreach (var dox in list)
+        {
+            if (dox.Name.Equals(playerName))
+            {
+                    player = dox;
+                    player.Name = dox.Name;
+                    player.Password = dox.Password;
+                    hsCollection = dox.ScoreCollection;
+                Debug.Log(player.Name);
+            }
+            else
+            {
+                    Success = false;
+            }
+        }
+    }
+
+    public bool CheckIfAvailable(string playerName)
+    {
+        var list = playerCollection.Find(new BsonDocument()).ToList();
+        foreach (var dox in list)
+        {
+            if (dox.Name.Equals(playerName))
+            {
+                Success = false;
+                break;
+            }
+            else
+            {
+                Success = true;
+            }
+        }
+        return Success;
+    }
+
+    public HighScore GetPlayersMapScore(string mapName) // string playerName, 
+    {
+        var playerObj = player;
         var scoreObj = playerObj.ScoreCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
         if (scoreObj == null)
         {
@@ -103,10 +135,15 @@ public class Mongo
 
     public async void RegisterNewPlayer(string playerName, string pw)
     {
-        player = new PlayerRef();
+        //player = new PlayerRef();
         player.Name = playerName;
         player.Password = PasswordHandler.Encrypt(pw, player.Name);
         await playerCollection.InsertOneAsync(player);
         hsCollection = player.ScoreCollection;
+    }
+
+    public string ReturnPlayerName()
+    {
+        return player.Name;
     }
 }

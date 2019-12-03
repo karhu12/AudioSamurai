@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class HighScoreManager : Singleton<HighScoreManager>
 {
-    Mongo mongo = new Mongo();
+    //Mongo mongo = new Mongo();
     /* Compares old gameResult to a new one. Returns true and saves the result if its the new highscore and false if not. */
     public bool CompareToHighScore(GameResult newResult, GameResult oldResult)
     {
@@ -21,18 +21,9 @@ public class HighScoreManager : Singleton<HighScoreManager>
     /* Returns gameResult of given map if it exists. Otherwise returns default empty result. */
     public GameResult GetGameResult(String mapName)
     {
-        mongo.Init();
-        HighScore hs = mongo.GetPlayersMapScore("janispetke", mapName, "salis123");
-        /*string gameResult = PlayerPrefs.GetString(mapName);
-
-        if (string.IsNullOrEmpty(gameResult))
-        {
-            PlayerPrefs.SetString(mapName, GameResult.GetEmptyResultSerialization());
-            PlayerPrefs.Save();
-            gameResult = PlayerPrefs.GetString(mapName);
-        }*/
-
-        GameResult result = new GameResult();//GameResult.Deserialize(gameResult);
+        HighScore hs;
+        GameResult result = new GameResult();
+        hs = Mongo.Instance.GetPlayersMapScore(mapName);
         result.MapName = hs.MapId;
         result.HighestCombo = hs.HighestCombo;
         result.MaxCombo = hs.MaxCombo;
@@ -46,7 +37,18 @@ public class HighScoreManager : Singleton<HighScoreManager>
             result.CalculateResult();
         }
         //result.MapName = mapName;
+        
         return result;
+        /*string gameResult = PlayerPrefs.GetString(mapName);
+
+        if (string.IsNullOrEmpty(gameResult))
+        {
+            PlayerPrefs.SetString(mapName, GameResult.GetEmptyResultSerialization());
+            PlayerPrefs.Save();
+            gameResult = PlayerPrefs.GetString(mapName);
+        }*/
+
+        //GameResult.Deserialize(gameResult);
     }
 
     /* Returns an formatted highscore result from given result. */
@@ -59,7 +61,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
 
     /* Saves given result as new highscore. */
     private void SetNewGameResult(GameResult result) {
-        mongo.InsertUpdates("janispetke", new HighScore(result.MapName, result.Score, result.HighestCombo, result.MaxCombo, result.perfects, result.normals, result.poors, result.misses), "salis123");
+        Mongo.Instance.InsertUpdates(Mongo.Instance.ReturnPlayerName(), new HighScore(result.MapName, result.Score, result.HighestCombo, result.MaxCombo, result.perfects, result.normals, result.poors, result.misses));
         //PlayerPrefs.SetString(result.MapName, result.Serialize());
         //PlayerPrefs.Save();
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,14 +17,19 @@ public class LoginMenu : MonoBehaviour
     public GameObject SignInUI;
 
     private string username, password;
+    //private Mongo mongo;
     void Start()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
+        //mongo = new Mongo();
+        Mongo.Instance.Init();
         //ToDo: Login music
 
+        //PlayerPrefs.SetInt(LOGIN_PREF, 0);
         /* Checks if already logged in */
         if (PlayerPrefs.GetInt(LOGIN_PREF) == LOGGED_IN)
         {
+            Mongo.Instance.SetDataIfLogin(PlayerPrefs.GetString(USERNAME_PREF));
             onLogin = false;
             CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         }
@@ -37,7 +43,12 @@ public class LoginMenu : MonoBehaviour
          *  if successful SuccesfullLogin();
          *  else FailedToLogin();
          */
-        SuccesfullLogin();
+        Mongo.Instance.GetPlayerByCredentials(username, password);
+        if(Mongo.Instance.Success)
+        {
+            SuccessfulLogin();
+        }
+        
     }
 
     public void TryToSignIn()
@@ -47,10 +58,18 @@ public class LoginMenu : MonoBehaviour
          *  if username is already taken save FailedToSignIn();
          *  else SuccesfullSignIn(); 
          */
-        SuccesfullSignIn();
+        if (Mongo.Instance.CheckIfAvailable(username))
+        {
+            Mongo.Instance.RegisterNewPlayer(username, password);
+            SuccessfulSignIn();
+        }
+        else
+        {
+            FailedToSignIn();
+        }
     }
 
-    public void SuccesfullLogin()
+    public void SuccessfulLogin()
     {
         PlayerPrefs.SetInt(LOGIN_PREF, 1);
         PlayerPrefs.SetString(USERNAME_PREF, username);
@@ -62,7 +81,7 @@ public class LoginMenu : MonoBehaviour
         //complain about Login
     }
 
-    public void SuccesfullSignIn()
+    public void SuccessfulSignIn()
     {
         //Save username and password
     }
