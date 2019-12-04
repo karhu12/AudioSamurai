@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,9 +35,13 @@ public class SongSelection : MonoBehaviour
      */
     public void Refresh()
     {
+        if (SongmapController.Instance.AudioSource.isPlaying)
+        {
+            SongmapController.Instance.AudioSource.Stop();
+        }
         views.Clear();
         playSongButton.gameObject.SetActive(false);
-        maps = SongmapController.Instance.GetSongmaps();
+        maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
         {
@@ -52,11 +57,34 @@ public class SongSelection : MonoBehaviour
             foreach (var map in maps[key])
             {
                 view.AddSongmapChildView(songmapChildPrefab, map);
-                SongmapChildView child = view.songmapChildViews[view.songmapChildViews.Count - 1];
-                child.title.text = map.DifficultyTitle;
-                child.hitAccuracyLevel.text = $"HAL: {map.HitAccuracyLevel}";
-                child.healthDrain.text = $"HDL: {map.HealthDrainlevel}";
-                child.difficulty.text = $"Difficulty: {map.GetDifficulty()}";
+            }
+            views.Add(view);
+            view.ToggleChildren();
+        }
+    }
+
+    public void RefreshButton()
+    {
+        SongmapController.Instance.AudioSource.Stop();
+        views.Clear();
+        playSongButton.gameObject.SetActive(false);
+        maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
+
+        foreach (Transform child in content)
+        {
+            Destroy(child.gameObject);
+            FindObjectOfType<AudioManager>().Play("Refresh");
+        }
+
+        foreach (var key in maps.Keys)
+        {
+            SongmapView view = new SongmapView(ref content, songmapPrefab);
+            view.AddParentSongmapView(songmapParentPrefab);
+            view.parentSongmapView.title.text = key.ToString();
+
+            foreach (var map in maps[key])
+            {
+                view.AddSongmapChildView(songmapChildPrefab, map);
             }
             views.Add(view);
             view.ToggleChildren();
@@ -68,6 +96,9 @@ public class SongSelection : MonoBehaviour
      */
     public void OnBackPress()
     {
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
+        FindObjectOfType<AudioManager>().Pause("MenuMusic");
+        FindObjectOfType<AudioManager>().Play("MenuMusic");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
         ResetSongSelectionView();
     }
@@ -78,6 +109,7 @@ public class SongSelection : MonoBehaviour
      */
     public void OnSongmapParentClick(Text title)
     {
+        playSongButton.gameObject.SetActive(false);
         if (selectedChildView != null && selectedChildView.gameObject != null)
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
 
@@ -88,12 +120,14 @@ public class SongSelection : MonoBehaviour
                 if (view.ToggleChildren())
                 {
                     selectedView = view;
+                    FindObjectOfType<AudioManager>().Play("Click");
+                    FindObjectOfType<AudioManager>().Pause("MenuMusic");
                     SongmapController.Instance.PlaySongmapAudio(maps[title.text][0]);
                 }
                 else
                 {
+                    FindObjectOfType<AudioManager>().Play("Click");
                     SongmapController.Instance.AudioSource.Stop();
-                    playSongButton.gameObject.SetActive(false);
                     selectedView = null;
                     selectedChildView = null;
                 }
@@ -102,22 +136,24 @@ public class SongSelection : MonoBehaviour
                 view.ToggleChildren();
             }
         }
+        
     }
 
     /*
      * Fired when songmap title has been expanded and its child has been pressed. Will selected the given children, set play button active and high light the selection.
      */
-    public void OnSongmapClick(Text title)
+    public void OnSongmapClick(Text difficulty)
     {
         foreach (var child in selectedView.songmapChildViews)
         {
-            if (child.title.text == title.text)
+            if (child.difficulty.text == difficulty.text)
             {
                 if (selectedChildView != null && selectedChildView.gameObject != null)
                     selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
 
                 selectedChildView = child;
                 child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
+                FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
             }
         }
@@ -128,6 +164,7 @@ public class SongSelection : MonoBehaviour
         if (GameController.Instance.LoadGame(selectedChildView.songmap))
         {
             ResetSongSelectionView();
+            FindObjectOfType<AudioManager>().Play("Click");
             GameController.Instance.StartGame();
         }
     }
@@ -198,6 +235,7 @@ public class SongmapView
         childrenExpanded = !childrenExpanded;
         foreach (var view in songmapChildViews)
         {
+
             view.gameObject.SetActive(childrenExpanded);
         }
         return childrenExpanded;
@@ -238,16 +276,55 @@ public class SongmapChildView : View
 {
     public Text title;
     public Text difficulty;
-    public Text healthDrain;
-    public Text hitAccuracyLevel;
+    public Text highScore;
+    public Text accuracy;
+    public Text gradeTitle;
+    public RawImage grade;
+    public RectTransform difficultyForeground;
+    public RectTransform difficultyMask;
     public Songmap songmap;
+    public GameResult gameResult;
 
     public SongmapChildView(GameObject gameObject, Songmap map) : base(gameObject)
     {
         songmap = map;
-        title = this.gameObject.transform.Find("ItemTitle").GetComponent<Text>();
-        difficulty = this.gameObject.transform.Find("ItemDifficulty").GetComponent<Text>();
-        healthDrain = this.gameObject.transform.Find("ItemHDL").GetComponent<Text>();
-        hitAccuracyLevel = this.gameObject.transform.Find("ItemHAL").GetComponent<Text>();
+        Transform infoPanel = this.gameObject.transform.Find("HorizontalPanel").Find("InfoPanel").Find("InfoPanel (1)");
+        title = infoPanel.Find("ItemTitle").GetComponent<Text>();
+        difficulty = infoPanel.Find("ItemDifficultyName").GetComponent<Text>();
+        Transform highScorePanel = this.gameObject.transform.Find("HorizontalPanel").Find("HiscorePanel");
+        highScore = highScorePanel.Find("ItemHiscore").GetComponent<Text>();
+        accuracy = highScorePanel.Find("ItemAccuracy").GetComponent<Text>();
+        Transform gradePanel = this.gameObject.transform.Find("HorizontalPanel").Find("GradePanel");
+        gradeTitle = gradePanel.Find("ItemGradeTitle").GetComponent<Text>();
+        grade = gradePanel.Find("ItemGrade").GetComponent<RawImage>();
+        difficultyMask = this.gameObject.transform.Find("HorizontalPanel").Find("InfoPanel").Find("DifficultyPanel").Find("ForegroundMask").GetComponent<RectTransform>();
+        difficultyForeground = difficultyMask.transform.Find("DifficultyForeground").GetComponent<RectTransform>();
+
+        title.text = map.GetSongmapName(false);
+        difficulty.text = map.DifficultyTitle;
+        gameResult = HighScoreManager.Instance.GetGameResult(map.GetSongmapName());
+        
+        if (gameResult.Score >= 0)
+        {
+            highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
+            accuracy.text = $"{gameResult.RoundedHitPercentage} %";
+        } else
+        {
+            highScorePanel.gameObject.SetActive(false);
+        }
+
+        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses >= 0)
+        {
+            grade.texture = ScoreSystem.Instance.GetResultGradeTexture(gameResult.ResultGrade);
+            gradeTitle.text = gameResult.ResultGrade.ToString();
+        } else
+        {
+            gradePanel.gameObject.SetActive(false);
+        }
+
+        float difficultyStep = (difficultyForeground.sizeDelta.x / Songmap.MAX_DIFFICULTY);
+        float maskOffset = Songmap.MAX_DIFFICULTY * difficultyStep - difficultyStep * map.GetDifficulty();
+        difficultyMask.offsetMin = new Vector2(0, 0);
+        difficultyMask.offsetMax = new Vector2(-maskOffset, 0);
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using System.Linq;
 
 public class OptionsMenu : MonoBehaviour
 {
@@ -13,9 +14,8 @@ public class OptionsMenu : MonoBehaviour
     public Dropdown qualityDropdown;
     public Toggle fullScreenToggle;
 
-
     private int screenInt;
-    private bool isFullScreen = false;
+    private float logarithmicVolume;
 
     const string qualityValue = "qualityvalue";
 
@@ -31,7 +31,6 @@ public class OptionsMenu : MonoBehaviour
 
         if (screenInt == 1)
         {
-            isFullScreen = true;
             fullScreenToggle.isOn = true;
         } 
         
@@ -51,12 +50,13 @@ public class OptionsMenu : MonoBehaviour
 
     void Start()
     {
-        volumeSlider.value = PlayerPrefs.GetFloat("MVolume", 1f);
-        audioMixer.SetFloat("volume", PlayerPrefs.GetFloat("MVolume"));
+        float volume = PlayerPrefs.GetFloat("MVolume", 1f);
+        volumeSlider.value = volume;
+        SetVolume(volume);
 
         qualityDropdown.value = PlayerPrefs.GetInt(qualityValue, 2);
 
-        resolutions = Screen.resolutions;
+        resolutions = Screen.resolutions.Distinct().ToArray();
         
         resolutionDropdown.ClearOptions();
 
@@ -64,7 +64,7 @@ public class OptionsMenu : MonoBehaviour
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            string option = resolutions[i].width + " x " + resolutions[i].height;
+            string option = resolutions[i].ToString();
             options.Add(option);
 
             if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height)
@@ -97,12 +97,18 @@ public class OptionsMenu : MonoBehaviour
     public void SetVolume(float volume)
     {
         PlayerPrefs.SetFloat("MVolume", volume);
-        audioMixer.SetFloat("volume", PlayerPrefs.GetFloat("MVolume"));
+        logarithmicVolume = Mathf.Log10(PlayerPrefs.GetFloat("MVolume")) * 20;
+        audioMixer.SetFloat("volume", logarithmicVolume);
     }
 
     public void SetQuality(int qualityIndex)
     {
-            QualitySettings.SetQualityLevel(qualityIndex);
+        QualitySettings.SetQualityLevel(qualityIndex);
+    }
+
+    public void PlayClickSound()
+    {
+        FindObjectOfType<AudioManager>().Play("Click");
     }
 
     public void SetFullscreen(bool isFullScreen)
@@ -116,10 +122,15 @@ public class OptionsMenu : MonoBehaviour
         
         else
         {
-            isFullScreen = true;
             PlayerPrefs.SetInt("togglestate", 1);
         }
 
+    }
+
+    public void OnBackButtonPress()
+    {
+        FindObjectOfType<AudioManager>().Play("ClickDeny");
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
     }
 
 }

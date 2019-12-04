@@ -1,18 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
-
+    
     public GameObject mainMenuUI;
 
-    
-
+    private void Start()
+    {
+            FindObjectOfType<AudioManager>().Play("MenuMusic");
+    }
     // Update is called once per frame
     public void OnStart()
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
     }
 
@@ -38,6 +42,7 @@ public class MainMenu : MonoBehaviour
     {
         mainMenuUI.SetActive(false);
         onMainMenu = false;
+        FindObjectOfType<AudioManager>().Pause("MenuMusic");
     }
 
     public void LoadMenu()
@@ -52,19 +57,14 @@ public class MainMenu : MonoBehaviour
     }
     public void LoadSettings()
     {
+        FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
-        Debug.Log("loading...");
     }
 
     public void QuitGame()
     {
-        if (Application.isEditor)
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        } else
-        {
-            Application.Quit();
-        }
-            
-    }   
+        SceneManager.LoadScene(sceneName: "Credits");
+        //CameraController.Instance.SetCameraToState(CameraController.CameraState.Quit);
+    }
+
 }

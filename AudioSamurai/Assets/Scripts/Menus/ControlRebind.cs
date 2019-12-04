@@ -8,6 +8,7 @@ public class ControlRebind : MonoBehaviour
     public int defaultBindingIndex;
 
     private InputAction inputAction;
+    private InputAction old;
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
     private Button button;
     private Text text;
@@ -44,17 +45,21 @@ public class ControlRebind : MonoBehaviour
 
     void RemapButtonClicked(string name, int bindingIndex = 0)
     {
+        old = inputAction.Clone();
+        FindObjectOfType<AudioManager>().Play("Click");
         inputAction.Disable();
         button.enabled = false;
         text.text = "Press any key...";
-
+        foreach (var action in InputSystem.ListEnabledActions()) {
+            
+        }
         rebindingOperation?.Dispose();
         rebindingOperation = inputAction.PerformInteractiveRebinding()
             .WithControlsExcluding("<Mouse>/position")
             .WithControlsExcluding("<Mouse>/delta")
             .OnMatchWaitForAnother(0.1f)
-            .OnComplete(operation => ButtonRebindCompleted());
-        rebindingOperation.Start();
+            .OnComplete(operation => ButtonRebindCompleted())
+            .Start();
     }
 
     void ResetButtonMappingTextValue()
@@ -65,11 +70,21 @@ public class ControlRebind : MonoBehaviour
         string path = ac.effectivePath;
 
         PlayerPrefs.SetString(inputAction.name, path);
-        button.gameObject.SetActive(true);
     }
 
     void ButtonRebindCompleted()
     {
+        bool duplicate = false;
+        foreach (var action in InputSystem.ListEnabledActions()) {
+            if (action.bindings.First().effectivePath == inputAction.bindings.First().effectivePath) {
+                duplicate = true;
+                break;
+            }
+        }
+        if (duplicate) {
+            inputAction = old;
+            FindObjectOfType<AudioManager>().Play("ClickDeny");
+        }
         inputAction.Enable();
         rebindingOperation.Dispose();
         rebindingOperation = null;
