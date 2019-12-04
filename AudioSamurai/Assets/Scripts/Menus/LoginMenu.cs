@@ -111,6 +111,7 @@ public class LoginMenu : MonoBehaviour
         SuccessfulSign.SetActive(false);
         if (onLogin)
         {
+            Clear(LogInUI);
             LogInUI.SetActive(false);
             onLogin = false;
             SignInUI.SetActive(true);
@@ -118,6 +119,7 @@ public class LoginMenu : MonoBehaviour
         }
         else
         {
+            Clear(SignInUI);
             SignInUI.SetActive(false);
             onSignin = false;
             LogInUI.SetActive(true);

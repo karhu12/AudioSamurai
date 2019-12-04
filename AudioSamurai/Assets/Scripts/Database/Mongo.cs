@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using EncryptStringSample;
 using UnityEngine;
+using System;
 
 public class Mongo : Singleton<Mongo>
 {
@@ -83,6 +84,7 @@ public class Mongo : Singleton<Mongo>
 
     public void SetDataIfLogin(string playerName)
     {
+        playerList = playerCollection.Find(new BsonDocument()).ToList();
         foreach (var dox in playerList)
         {
             if (dox.Name.Equals(playerName))
@@ -94,18 +96,27 @@ public class Mongo : Singleton<Mongo>
 
     public bool CheckIfAvailable(string playerName)
     {
-        foreach (var dox in playerList)
+        playerList = playerCollection.Find(new BsonDocument()).ToList();
+        if (playerList.Count > 0)
         {
-            if (dox.Name.Equals(playerName))
+            foreach (var dox in playerList)
             {
-                SignInSuccess = false;
-                break;
-            }
-            else
-            {
-                SignInSuccess = true;
+                if (dox.Name.Equals(playerName))
+                {
+                    SignInSuccess = false;
+                    break;
+                }
+                else
+                {
+                    SignInSuccess = true;
+                }
             }
         }
+        else
+        {
+            SignInSuccess = true;
+        }
+        Debug.Log(SignInSuccess);
         return SignInSuccess;
     }
 
@@ -122,10 +133,17 @@ public class Mongo : Singleton<Mongo>
 
     public async void RegisterNewPlayer(string playerName, string pw)
     {
-        player.Name = playerName;
-        player.Password = PasswordHandler.Encrypt(pw, player.Name);
-        await playerCollection.InsertOneAsync(player);
-        hsCollection = player.ScoreCollection;
+        try
+        {
+            player.Name = playerName;
+            player.Password = PasswordHandler.Encrypt(pw, player.Name);
+            await playerCollection.InsertOneAsync(player);
+            hsCollection = player.ScoreCollection;
+        } catch(Exception e)
+        {
+            Debug.LogWarning(e);
+        }
+        
     }
 
     public string GetPlayerName()
@@ -138,6 +156,5 @@ public class Mongo : Singleton<Mongo>
         player = new PlayerRef();
         LoginSuccess = false;
         SignInSuccess = false;
-        playerList = new List<PlayerRef>();
     }
 }
