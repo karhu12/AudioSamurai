@@ -284,8 +284,6 @@ public class GameController : Singleton<GameController>
     /* Coroutine that ensures everything is setup for playing. */
     private IEnumerator GameStartCoroutine() {
         yield return InitialCoroutine();
-        if (!hud.gameObject.activeSelf)
-            hud.gameObject.SetActive(true);
         yield return CountdownCoroutine();
         SongmapController.Instance.AudioSource.Play();
         State = GameState.Playing;
@@ -298,6 +296,8 @@ public class GameController : Singleton<GameController>
         SongmapController.Instance.AudioSource.Pause();
         SongmapController.Instance.AudioSource.time = 0;
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Game);
+        if (!hud.gameObject.activeSelf)
+            hud.gameObject.SetActive(true);
         yield return new WaitForSeconds(1); // Wait for the camera to get in place.
     }
 
