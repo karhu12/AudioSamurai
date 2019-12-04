@@ -24,5 +24,6 @@ public class ShowHideToggle : MonoBehaviour
             else
                 obj.SetActive(false);
         }
+        FindObjectOfType<AudioManager>().Play("Click");
     }
 }
