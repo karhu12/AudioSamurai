@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LoginMenu : MonoBehaviour
 {
@@ -17,15 +18,12 @@ public class LoginMenu : MonoBehaviour
     public GameObject SignInUI;
 
     private string username, password;
-    //private Mongo mongo;
     void Start()
     {
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
-        //mongo = new Mongo();
         Mongo.Instance.Init();
         //ToDo: Login music
 
-        //PlayerPrefs.SetInt(LOGIN_PREF, 0);
         /* Checks if already logged in */
         if (PlayerPrefs.GetInt(LOGIN_PREF) == LOGGED_IN)
         {
@@ -35,36 +33,37 @@ public class LoginMenu : MonoBehaviour
         }
     }
 
-
     public void TryToLogin()
     {
-        /*
-         * Todo: Check username and password from database
-         *  if successful SuccesfullLogin();
-         *  else FailedToLogin();
-         */
+        SetCredentialValues(LogInUI);
         Mongo.Instance.GetPlayerByCredentials(username, password);
-        if(Mongo.Instance.Success)
+        if(Mongo.Instance.LoginSuccess)
         {
             SuccessfulLogin();
+            Debug.Log("Logged in");
+        }
+        else
+        {
+            Debug.Log("Error while logging. Try again.");
         }
     }
 
     public void TryToSignIn()
     {
-        /*
-         * Todo: Check username and password from database
-         *  if username is already taken save FailedToSignIn();
-         *  else SuccesfullSignIn(); 
-         */
-        if (Mongo.Instance.CheckIfAvailable(username))
+        SetCredentialValues(SignInUI);
+        if (!username.Equals("") && !password.Equals(""))
         {
-            Mongo.Instance.RegisterNewPlayer(username, password);
-            SuccessfulSignIn();
-        }
-        else
-        {
-            FailedToSignIn();
+            if (Mongo.Instance.CheckIfAvailable(username))
+            {
+                Mongo.Instance.RegisterNewPlayer(username, password);
+                SuccessfulSignIn();
+                Debug.Log("User created.");
+            }
+            else
+            {
+                FailedToSignIn();
+                Debug.Log("Username taken. Try again.");
+            }
         }
     }
 
@@ -73,6 +72,7 @@ public class LoginMenu : MonoBehaviour
         PlayerPrefs.SetInt(LOGIN_PREF, 1);
         PlayerPrefs.SetString(USERNAME_PREF, username);
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+        Clear(LogInUI);
     }
 
     public void FailedToLogin()
@@ -83,6 +83,7 @@ public class LoginMenu : MonoBehaviour
     public void SuccessfulSignIn()
     {
         //Save username and password
+        Clear(SignInUI);
     }
 
     public void FailedToSignIn()
@@ -108,14 +109,21 @@ public class LoginMenu : MonoBehaviour
         }
     }
 
-
-    public void ReadUsername(string text)
+    public void SetCredentialValues(GameObject gameObject)
     {
-        username = text;
+        Transform pass = gameObject.transform.Find("Password").Find("InputFieldPass");
+        Transform user = gameObject.transform.Find("User").Find("InputFieldUser");
+        password = pass.GetComponent<InputField>().text;
+        username = user.GetComponent<InputField>().text;
     }
 
-    public void ReadPassword(string text)
+    public void Clear(GameObject gameObject)
     {
-        password = text;
+        Transform pass = gameObject.transform.Find("Password").Find("InputFieldPass");
+        Transform user = gameObject.transform.Find("User").Find("InputFieldUser");
+        pass.GetComponent<InputField>().text = "";
+        user.GetComponent<InputField>().text = "";
+        password = "";
+        username = "";   
     }
 }

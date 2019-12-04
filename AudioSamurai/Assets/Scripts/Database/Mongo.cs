@@ -16,7 +16,8 @@ public class Mongo : Singleton<Mongo>
     private IMongoCollection<PlayerRef> playerCollection;
     PlayerRef player;
     HighScoresCollection hsCollection;
-    public bool Success { get; private set; }
+    public bool LoginSuccess { get; private set; }
+    public bool SignInSuccess { get; private set; }
 
     public void Init()
     {
@@ -24,11 +25,12 @@ public class Mongo : Singleton<Mongo>
         db = client.GetDatabase(DATABASE_NAME);
         playerCollection = db.GetCollection<PlayerRef>("highscores");
         player = new PlayerRef();
+        LoginSuccess = false;
+        SignInSuccess = false;
     }
 
-    public void InsertUpdates(string playerName, HighScore highScore) // , string pw
+    public void InsertUpdates(string playerName, HighScore highScore)
     {
-        //GetPlayerByCredentials(playerName, pw);
         UpdatePlayerData(player, highScore);
     }
 
@@ -70,13 +72,13 @@ public class Mongo : Singleton<Mongo>
                 var decrypted = PasswordHandler.Decrypt(dox.Password, dox.Name);
                 if (decrypted.Equals(pw))
                 {
-                    Success = true;
+                    LoginSuccess = true;
                     player = dox;
                     hsCollection = dox.ScoreCollection;
                 }
                 else
                 {
-                    Success = false;
+                    LoginSuccess = false;
                 }
             }
         }
@@ -95,11 +97,6 @@ public class Mongo : Singleton<Mongo>
                     player.Name = dox.Name;
                     player.Password = dox.Password;
                     hsCollection = dox.ScoreCollection;
-                Debug.Log(player.Name);
-            }
-            else
-            {
-                    Success = false;
             }
         }
     }
@@ -111,15 +108,15 @@ public class Mongo : Singleton<Mongo>
         {
             if (dox.Name.Equals(playerName))
             {
-                Success = false;
+                SignInSuccess = false;
                 break;
             }
             else
             {
-                Success = true;
+                SignInSuccess = true;
             }
         }
-        return Success;
+        return SignInSuccess;
     }
 
     public HighScore GetPlayersMapScore(string mapName) // string playerName, 
@@ -135,7 +132,6 @@ public class Mongo : Singleton<Mongo>
 
     public async void RegisterNewPlayer(string playerName, string pw)
     {
-        //player = new PlayerRef();
         player.Name = playerName;
         player.Password = PasswordHandler.Encrypt(pw, player.Name);
         await playerCollection.InsertOneAsync(player);
@@ -145,5 +141,10 @@ public class Mongo : Singleton<Mongo>
     public string ReturnPlayerName()
     {
         return player.Name;
+    }
+
+    public void ResetAfterLogOut()
+    {
+        player = new PlayerRef();
     }
 }
