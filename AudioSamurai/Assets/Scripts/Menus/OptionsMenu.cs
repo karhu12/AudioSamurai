@@ -6,6 +6,8 @@ using UnityEngine.Events;
 
 public class OptionsMenu : MonoBehaviour
 {
+    private const string LOGIN_PREF = "login";
+    private const string USERNAME_PREF = "username";
 
     public AudioMixer audioMixer;
     public Slider volumeSlider;
@@ -130,6 +132,13 @@ public class OptionsMenu : MonoBehaviour
     {
         FindObjectOfType<AudioManager>().Play("ClickDeny");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+    }
+
+    public void LogOut()
+    {
+        PlayerPrefs.SetInt(LOGIN_PREF, 0);
+        PlayerPrefs.DeleteKey(USERNAME_PREF);
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
     }
 
 }
