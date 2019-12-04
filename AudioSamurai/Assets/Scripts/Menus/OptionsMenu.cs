@@ -136,9 +136,10 @@ public class OptionsMenu : MonoBehaviour
 
     public void LogOut()
     {
-        PlayerPrefs.SetInt(LOGIN_PREF, 0);
+        LoginManager.Instance.LogOut();
+        /*PlayerPrefs.SetInt(LOGIN_PREF, 0);
         PlayerPrefs.DeleteKey(USERNAME_PREF);
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);*/
     }
 
 }

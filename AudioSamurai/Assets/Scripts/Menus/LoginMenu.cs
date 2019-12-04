@@ -6,11 +6,6 @@ using UnityEngine.UI;
 
 public class LoginMenu : MonoBehaviour
 {
-    private const string LOGIN_PREF = "login";
-    private const string USERNAME_PREF = "username";
-
-    public const int LOGGED_IN = 1;
-
     public static bool onLogin = true;
     public static bool onSignin = false;
 
@@ -25,11 +20,18 @@ public class LoginMenu : MonoBehaviour
         //ToDo: Login music
 
         /* Checks if already logged in */
-        if (PlayerPrefs.GetInt(LOGIN_PREF) == LOGGED_IN)
+        switch (LoginManager.Instance.GetLoginStatus())
         {
-            Mongo.Instance.SetDataIfLogin(PlayerPrefs.GetString(USERNAME_PREF));
-            onLogin = false;
-            CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+            case LoginManager.LOGGED_IN:
+                onLogin = false;
+                CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+                break;
+
+            case LoginManager.OFFLINE:
+                onLogin = false;
+                CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
+                break;
+                
         }
     }
 
@@ -69,10 +71,7 @@ public class LoginMenu : MonoBehaviour
 
     public void SuccessfulLogin()
     {
-        PlayerPrefs.SetInt(LOGIN_PREF, 1);
-        PlayerPrefs.SetString(USERNAME_PREF, username);
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
-        Clear(LogInUI);
+        LoginManager.Instance.LogIn(LoginManager.LOGGED_IN,username);
     }
 
     public void FailedToLogin()
@@ -89,6 +88,11 @@ public class LoginMenu : MonoBehaviour
     public void FailedToSignIn()
     {
         //complain about Sign in
+    }
+
+    public void PlayOffline()
+    {
+        LoginManager.Instance.LogIn(LoginManager.OFFLINE, "");
     }
 
     public void SwapView()
