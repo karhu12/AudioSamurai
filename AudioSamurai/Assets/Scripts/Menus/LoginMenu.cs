@@ -9,7 +9,7 @@ public class LoginMenu : MonoBehaviour
 
     public GameObject LogInUI;
     public GameObject SignInUI;
-    public GameObject SuccessfulSignIn;
+    public GameObject SuccessfulSign;
     public GameObject OfflineButton;
 
     private string username, password;
@@ -69,7 +69,7 @@ public class LoginMenu : MonoBehaviour
     {
         onLogin = false;
         SignInUI.SetActive(false);
-        SuccessfulSignIn.SetActive(true);
+        SuccessfulSign.SetActive(true);
         OfflineButton.SetActive(false);
         //Save username and password
     }
@@ -88,7 +88,7 @@ public class LoginMenu : MonoBehaviour
 
     public void SwapView()
     {
-        SuccessfulSignIn.SetActive(false);
+        SuccessfulSign.SetActive(false);
         if (onLogin)
         {
             LogInUI.SetActive(false);
