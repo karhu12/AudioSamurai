@@ -11,10 +11,13 @@ public class LoginMenu : MonoBehaviour
 
     public GameObject LogInUI;
     public GameObject SignInUI;
+    public GameObject SuccessfulSignIn;
+    public GameObject OfflineButton;
 
     private string username, password;
     void Start()
     {
+
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
         Mongo.Instance.Init();
         //ToDo: Login music
@@ -83,6 +86,10 @@ public class LoginMenu : MonoBehaviour
 
     public void SuccessfulSignIn()
     {
+        onLogin = false;
+        SignInUI.SetActive(false);
+        SuccessfulSignIn.SetActive(true);
+        OfflineButton.SetActive(false);
         //Save username and password
         Clear(SignInUI);
     }
@@ -95,10 +102,13 @@ public class LoginMenu : MonoBehaviour
     public void PlayOffline()
     {
         LoginManager.Instance.LogIn(LoginManager.OFFLINE, "");
+        if (onSignin)
+            SwapView();
     }
 
     public void SwapView()
     {
+        SuccessfulSignIn.SetActive(false);
         if (onLogin)
         {
             LogInUI.SetActive(false);
@@ -113,6 +123,7 @@ public class LoginMenu : MonoBehaviour
             LogInUI.SetActive(true);
             onLogin = true;
         }
+        OfflineButton.SetActive(true);
     }
 
     public void SetCredentialValues(GameObject gameObject)
