@@ -1,10 +1,9 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
 using EncryptStringSample;
-using System.Threading.Tasks;
+using UnityEngine;
 
 public class Mongo : Singleton<Mongo>
 {
@@ -16,6 +15,7 @@ public class Mongo : Singleton<Mongo>
     private IMongoCollection<PlayerRef> playerCollection;
     PlayerRef player;
     HighScoresCollection hsCollection;
+    List<PlayerRef> playerList;
     public bool LoginSuccess { get; private set; }
     public bool SignInSuccess { get; private set; }
 
@@ -24,9 +24,7 @@ public class Mongo : Singleton<Mongo>
         client = new MongoClient(MONGO_URI);
         db = client.GetDatabase(DATABASE_NAME);
         playerCollection = db.GetCollection<PlayerRef>("highscores");
-        player = new PlayerRef();
-        LoginSuccess = false;
-        SignInSuccess = false;
+        ResetValues();
     }
 
     public void InsertUpdates(string playerName, HighScore highScore)
@@ -49,7 +47,6 @@ public class Mongo : Singleton<Mongo>
             obj.Score = highScore.Score;
             obj.HighestCombo = highScore.HighestCombo;
             obj.MaxCombo = highScore.MaxCombo;
-            //obj.HitP = highScore.HitP;
             obj.Perfects = highScore.Perfects;
             obj.Normals = highScore.Normals;
             obj.Poors = highScore.Poors;
@@ -64,8 +61,8 @@ public class Mongo : Singleton<Mongo>
 
     public PlayerRef GetPlayerByCredentials(string playerName, string pw)
     {
-        var list = playerCollection.Find(new BsonDocument()).ToList();
-        foreach (var dox in list)
+        playerList = playerCollection.Find(new BsonDocument()).ToList();
+        foreach (var dox in playerList)
         {
             if (dox.Name.Equals(playerName))
             {
@@ -88,23 +85,18 @@ public class Mongo : Singleton<Mongo>
 
     public void SetDataIfLogin(string playerName)
     {
-        var list = playerCollection.Find(new BsonDocument()).ToList();
-        foreach (var dox in list)
+        foreach (var dox in playerList)
         {
             if (dox.Name.Equals(playerName))
             {
-                    player = dox;
-                    player.Name = dox.Name;
-                    player.Password = dox.Password;
-                    hsCollection = dox.ScoreCollection;
+                player = dox;
             }
         }
     }
 
     public bool CheckIfAvailable(string playerName)
     {
-        var list = playerCollection.Find(new BsonDocument()).ToList();
-        foreach (var dox in list)
+        foreach (var dox in playerList)
         {
             if (dox.Name.Equals(playerName))
             {
@@ -119,7 +111,7 @@ public class Mongo : Singleton<Mongo>
         return SignInSuccess;
     }
 
-    public HighScore GetPlayersMapScore(string mapName) // string playerName, 
+    public HighScore GetPlayersMapScore(string mapName)
     {
         var playerObj = player;
         var scoreObj = playerObj.ScoreCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
@@ -138,13 +130,16 @@ public class Mongo : Singleton<Mongo>
         hsCollection = player.ScoreCollection;
     }
 
-    public string ReturnPlayerName()
+    public string GetPlayerName()
     {
         return player.Name;
     }
 
-    public void ResetAfterLogOut()
+    public void ResetValues()
     {
         player = new PlayerRef();
+        LoginSuccess = false;
+        SignInSuccess = false;
+        playerList = new List<PlayerRef>();
     }
 }

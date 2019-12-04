@@ -23,6 +23,7 @@ public class LoginMenu : MonoBehaviour
         switch (LoginManager.Instance.GetLoginStatus())
         {
             case LoginManager.LOGGED_IN:
+                Mongo.Instance.SetDataIfLogin(PlayerPrefs.GetString(LoginManager.USERNAME_PREF));
                 onLogin = false;
                 CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
                 break;
@@ -72,6 +73,7 @@ public class LoginMenu : MonoBehaviour
     public void SuccessfulLogin()
     {
         LoginManager.Instance.LogIn(LoginManager.LOGGED_IN,username);
+        Clear(LogInUI);
     }
 
     public void FailedToLogin()

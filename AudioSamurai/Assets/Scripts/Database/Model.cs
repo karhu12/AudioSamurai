@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
 
 public class PlayerRef
@@ -32,11 +31,7 @@ public class HighScore
     [BsonId]
     public string MapId { get; set; }
     public int Score { get; set; }
-
-    //public double HitP { get; set; }
-
     public int HighestCombo { get; set; }
-
     public int MaxCombo { get; set; }
     public int Perfects { get; set; }
     public int Normals { get; set; }
@@ -47,7 +42,6 @@ public class HighScore
     {
         this.MapId = map;
         this.Score = score;
-        //this.HitP = hitp;
         this.HighestCombo = highestCombo;
         this.MaxCombo = maxCombo;
         this.Perfects = perfects;
