@@ -7,18 +7,17 @@ using UnityEngine;
 
 public class Mongo : Singleton<Mongo>
 {
+    public bool LoginSuccess { get; private set; }
+    public bool SignInSuccess { get; private set; }
     private const string MONGO_URI = "mongodb+srv://admin:audiosamurai123@cluster0-cofmk.mongodb.net/test?retryWrites=true&w=majority";
     private const string DATABASE_NAME = "highscoredb";
-
     private MongoClient client;
     private IMongoDatabase db;
     private IMongoCollection<PlayerRef> playerCollection;
-    PlayerRef player;
-    HighScoresCollection hsCollection;
-    List<PlayerRef> playerList;
-    public bool LoginSuccess { get; private set; }
-    public bool SignInSuccess { get; private set; }
-
+    private PlayerRef player;
+    private HighScoresCollection hsCollection;
+    private List<PlayerRef> playerList;
+    
     public void Init()
     {
         client = new MongoClient(MONGO_URI);
@@ -81,7 +80,6 @@ public class Mongo : Singleton<Mongo>
         }
         return player;
     }
-
 
     public void SetDataIfLogin(string playerName)
     {

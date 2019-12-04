@@ -69,5 +69,4 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(sceneName: "Credits");
         //CameraController.Instance.SetCameraToState(CameraController.CameraState.Quit);
     }
-
 }
