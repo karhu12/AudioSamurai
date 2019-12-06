@@ -12,5 +12,4 @@ Main communication tool for this project is [Discord](https://discord.gg/syNbGB)
 ## Development Requirements
 Developing with this repository requires you to have certain prequisites set.
 * [Git Large File Storage (LFS)](https://git-lfs.github.com/) needs to be installed in order to keep track of the large assets easier.
-* Keep track of work hours using work_hours.xlsx which is found in the project folder.
 * Version control is done using [git flow method](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). 
