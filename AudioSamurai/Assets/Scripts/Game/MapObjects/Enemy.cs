@@ -28,7 +28,7 @@ public class Enemy : MapObject
         if (!HasHadCollision) {
             HasHadCollision = true;
             float damage = player.TakeDamage(GameController.Instance.GetDamageMultiplier());
-            FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
+            FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red, true);
             if (!HasBeenMissed) {
                 ScoreSystem.Instance.Miss();
             }
