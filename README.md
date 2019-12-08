@@ -7,7 +7,7 @@ The quirk of the game that we have planned is being able to play your own songs 
 Project is planned using [Trello](https://trello.com/b/59yEvth0/audio-samurai). Request access if you do not have it. 
 
 ## Communication
-Main communication tool for this project is [Discord](https://discord.gg/syNbGB). It's used for holding meetings internally and general development chat. Also in addition one of the requirements is to use [Microsoft Teams](https://teams.microsoft.com/l/team/19%3adfa9f9ed465c49d49f70077d39dc99bd%40thread.skype/conversations?groupId=5f6719f1-923f-4486-a3c6-f9bf0e7ef904&tenantId=386d3ea4-7f15-47e4-9dd7-9f0f28e57746) for holding meetings with the teachers observing the project.
+Main communication tool for this project is Discord. It's used for holding meetings internally and general development chat. Also in addition one of the requirements is to use Microsoft Teams for holding meetings with the teachers observing the project.
 
 ## Development Requirements
 Developing with this repository requires you to have certain prequisites set.
