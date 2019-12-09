@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using System.Linq;
 
 public class OptionsMenu : MonoBehaviour
 {
@@ -55,7 +56,7 @@ public class OptionsMenu : MonoBehaviour
 
         qualityDropdown.value = PlayerPrefs.GetInt(qualityValue, 2);
 
-        resolutions = Screen.resolutions;
+        resolutions = Screen.resolutions.Distinct().ToArray();
         
         resolutionDropdown.ClearOptions();
 
@@ -63,7 +64,7 @@ public class OptionsMenu : MonoBehaviour
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            string option = resolutions[i].width + " x " + resolutions[i].height;
+            string option = resolutions[i].ToString();
             options.Add(option);
 
             if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height)

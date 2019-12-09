@@ -7,10 +7,11 @@ public class Enemy : MapObject
 {
     public bool HasBeenHit { get; protected set; } = false;
     public bool HasBeenMissed { get; protected set; } = false;
+    protected float OverheadPosition { get; set; } = 1.5f;
 
     protected void ShowScoreText(int score) {
         ScoreSystem.HitType type = (ScoreSystem.HitType)score;
-        FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(1f, 1.5f, .5f),ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type));
+        FloatingTextManager.Instance.PlaceFloatingText(transform.position, new Vector3(.5f, OverheadPosition, .5f), ScoreSystem.GetHitTypeString(type), ScoreSystem.GetHitTypeColor(type), true);
     }
 
     protected override void OnEnemyMiss(Player player)
@@ -27,7 +28,7 @@ public class Enemy : MapObject
         if (!HasHadCollision) {
             HasHadCollision = true;
             float damage = player.TakeDamage(GameController.Instance.GetDamageMultiplier());
-            FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red);
+            FloatingTextManager.Instance.PlaceFloatingText(player.transform.position, new Vector3(.5f, 2.5f, .5f), $"-{damage}", Color.red, true);
             if (!HasBeenMissed) {
                 ScoreSystem.Instance.Miss();
             }

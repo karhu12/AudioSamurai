@@ -51,6 +51,11 @@ public class MainMenu : MonoBehaviour
         onMainMenu = true;
     }
      
+    public void LoadHelpMenu()
+    {
+        FindObjectOfType<AudioManager>().Play("Click");
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.HelpMenu);
+    }
     public void LoadSettings()
     {
         FindObjectOfType<AudioManager>().Play("Click");
