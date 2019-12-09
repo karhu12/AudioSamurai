@@ -32,7 +32,7 @@ public class HighScoreManager : Singleton<HighScoreManager>
             result.perfects = hs.Perfects;
             result.normals = hs.Normals;
             result.poors = hs.Poors;
-            result.misses = hs.Misses; 
+            result.misses = hs.Misses;
         }
         else
         {

@@ -256,6 +256,7 @@ public class GameController : Singleton<GameController>
     }
 
     private void ResetGameState() {
+        ScoreSystem.Instance.ResetAnim();
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
         spawnQueue.Clear();

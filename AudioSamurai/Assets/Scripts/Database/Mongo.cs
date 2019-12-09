@@ -90,6 +90,7 @@ public class Mongo : Singleton<Mongo>
             if (dox.Name.Equals(playerName))
             {
                 player = dox;
+                hsCollection = player.ScoreCollection;
             }
         }
     }
