@@ -5,6 +5,7 @@ using System.Linq;
 using EncryptStringSample;
 using UnityEngine;
 using System;
+using System.Threading.Tasks;
 
 public class Mongo : Singleton<Mongo>
 {
@@ -18,7 +19,7 @@ public class Mongo : Singleton<Mongo>
     private PlayerRef player;
     private HighScoresCollection hsCollection;
     private List<PlayerRef> playerList;
-    
+    private List<int> leaderBoards;
     public void Init()
     {
         client = new MongoClient(MONGO_URI);
@@ -27,7 +28,7 @@ public class Mongo : Singleton<Mongo>
         ResetValues();
     }
 
-    public void InsertUpdates(string playerName, HighScore highScore)
+    public void InsertUpdates(HighScore highScore)
     {
         UpdatePlayerData(player, highScore);
     }
@@ -42,7 +43,7 @@ public class Mongo : Singleton<Mongo>
     public HighScoresCollection UpdateCollectionItem(HighScoresCollection highScoresCollection, HighScore highScore)
     {
         var obj = highScoresCollection.Hiscores.FirstOrDefault(x => x.MapId == highScore.MapId);
-        if(obj != null)
+        if (obj != null)
         {
             obj.Score = highScore.Score;
             obj.HighestCombo = highScore.HighestCombo;
@@ -54,14 +55,14 @@ public class Mongo : Singleton<Mongo>
         }
         else
         {
-            highScoresCollection.Hiscores.Add(new HighScore(highScore.MapId, highScore.Score, highScore.HighestCombo,highScore.MaxCombo, highScore.Perfects, highScore.Normals, highScore.Poors, highScore.Misses));
+            highScoresCollection.Hiscores.Add(new HighScore(highScore.MapId, highScore.Score, highScore.HighestCombo, highScore.MaxCombo, highScore.Perfects, highScore.Normals, highScore.Poors, highScore.Misses));
         }
         return highScoresCollection;
     }
 
-    public PlayerRef GetPlayerByCredentials(string playerName, string pw)
+    public async Task<PlayerRef> GetPlayerByCredentials(string playerName, string pw)
     {
-        playerList = playerCollection.Find(new BsonDocument()).ToList();
+        playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
         foreach (var dox in playerList)
         {
             if (dox.Name.Equals(playerName))
@@ -82,9 +83,9 @@ public class Mongo : Singleton<Mongo>
         return player;
     }
 
-    public void SetDataIfLogin(string playerName)
+    public async void SetDataIfLogin(string playerName)
     {
-        playerList = playerCollection.Find(new BsonDocument()).ToList();
+        playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
         foreach (var dox in playerList)
         {
             if (dox.Name.Equals(playerName))
@@ -95,9 +96,9 @@ public class Mongo : Singleton<Mongo>
         }
     }
 
-    public bool CheckIfAvailable(string playerName)
+    public async Task<bool> CheckIfAvailable(string playerName)
     {
-        playerList = playerCollection.Find(new BsonDocument()).ToList();
+        playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
         if (playerList.Count > 0)
         {
             foreach (var dox in playerList)
@@ -117,7 +118,6 @@ public class Mongo : Singleton<Mongo>
         {
             SignInSuccess = true;
         }
-        Debug.Log(SignInSuccess);
         return SignInSuccess;
     }
 
@@ -132,6 +132,45 @@ public class Mongo : Singleton<Mongo>
         return scoreObj;
     }
 
+    public async Task<Array> GetLeaderBoards(string mapName)
+    {
+        SetupLeaderboards();
+        playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
+        foreach (var dox in playerList)
+        {
+            var scoreObj = dox.ScoreCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
+            if (scoreObj != null)
+            {
+                for (int i = 0; i < leaderBoards.Count; i++)
+                {
+                    if (scoreObj.Score > leaderBoards[i])
+                    {
+                        leaderBoards.Remove(i);
+                        leaderBoards.Add(scoreObj.Score); 
+                        break;   
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            else
+            {
+                continue;
+            }
+        }
+        Array arr = leaderBoards.ToArray();
+        Array.Sort(arr);
+        Array.Reverse(arr);
+        Debug.Log(arr.GetValue(0));
+        Debug.Log(arr.GetValue(1));
+        Debug.Log(arr.GetValue(2));
+        Debug.Log(arr.GetValue(3));
+        Debug.Log(arr.GetValue(4));
+        return arr;
+    }
+
     public async void RegisterNewPlayer(string playerName, string pw)
     {
         try
@@ -140,16 +179,12 @@ public class Mongo : Singleton<Mongo>
             player.Password = PasswordHandler.Encrypt(pw, player.Name);
             await playerCollection.InsertOneAsync(player);
             hsCollection = player.ScoreCollection;
-        } catch(Exception e)
+        }
+        catch (Exception e)
         {
             Debug.LogWarning(e);
         }
-        
-    }
 
-    public string GetPlayerName()
-    {
-        return player.Name;
     }
 
     public void ResetValues()
@@ -157,5 +192,15 @@ public class Mongo : Singleton<Mongo>
         player = new PlayerRef();
         LoginSuccess = false;
         SignInSuccess = false;
+
+    }
+    public void SetupLeaderboards()
+    {
+        leaderBoards = new List<int>();
+        leaderBoards.Add(0);
+        leaderBoards.Add(0);
+        leaderBoards.Add(0);
+        leaderBoards.Add(0);
+        leaderBoards.Add(0);
     }
 }

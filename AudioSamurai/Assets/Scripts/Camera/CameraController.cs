@@ -17,7 +17,6 @@ public class CameraController : Singleton<CameraController>
         Login,
         HelpMenu,
         Pause
-
     }
 
     public CameraState cameraState = CameraState.Menu;

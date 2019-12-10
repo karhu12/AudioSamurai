@@ -152,10 +152,16 @@ public class SongSelection : MonoBehaviour
 
                 selectedChildView = child;
                 child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
+                SetLeaderBoards(child);
                 FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
             }
         }
+    }
+
+    public async void SetLeaderBoards(SongmapChildView child)
+    {
+        System.Array x = await Mongo.Instance.GetLeaderBoards(child.songmap.GetSongmapName());
     }
 
     public void OnPlayClick()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,10 +40,10 @@ public class LoginMenu : MonoBehaviour
         }
     }
 
-    public void TryToLogin()
+    public async void TryToLogin()
     {
         SetCredentialValues(LogInUI);
-        Mongo.Instance.GetPlayerByCredentials(username, password);
+        await Mongo.Instance.GetPlayerByCredentials(username, password);
         if(Mongo.Instance.LoginSuccess)
         {
             SuccessfulLogin();
@@ -54,12 +55,13 @@ public class LoginMenu : MonoBehaviour
         }
     }
 
-    public void TryToSignIn()
-    {
+    public async void TryToSignIn()
+    { 
         SetCredentialValues(SignInUI);
         if (!username.Equals("") && !password.Equals(""))
         {
-            if (Mongo.Instance.CheckIfAvailable(username))
+            bool result = await Mongo.Instance.CheckIfAvailable(username);
+            if (result)
             {
                 Mongo.Instance.RegisterNewPlayer(username, password);
                 SuccessfulSignIn();
