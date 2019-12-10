@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 
 public class PlayerRef
@@ -48,5 +49,17 @@ public class HighScore
         this.Normals = normals;
         this.Poors = poors;
         this.Misses = misses;
+    }
+}
+
+public class LeaderBoardItem
+{
+    public string Name { get; set; }
+    public int Score { get; set; }
+
+    public LeaderBoardItem(string name, int score)
+    {
+        this.Name = name;
+        this.Score = score;
     }
 }
