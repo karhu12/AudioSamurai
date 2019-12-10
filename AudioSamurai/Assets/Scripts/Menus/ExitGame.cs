@@ -10,35 +10,24 @@ public class ExitGame : MonoBehaviour
 
     void Update()
     {
-        
-
         if (Input.anyKeyDown)
         {
-            if (Application.isEditor)
-            {
+            #if UNITY_EDITOR
                 EditorApplication.isPlaying = false;
-            }
-
-            else
-            {
+            #else
                 Application.Quit();
-            }
+            #endif
         }
-
         else
         {
             countdownTime -= Time.deltaTime;
             if (countdownTime <= 0)
             {
-                if (Application.isEditor)
-                {
+                #if UNITY_EDITOR
                     EditorApplication.isPlaying = false;
-                }
-
-                else
-                {
+                #else
                     Application.Quit();
-                }
+                #endif
             }
         }
     }

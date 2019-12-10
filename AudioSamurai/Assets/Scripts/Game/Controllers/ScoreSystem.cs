@@ -131,11 +131,13 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     public void AddScore(int scoreToAdd)
     {
-        if (GameController.Instance.State == GameController.GameState.Playing)
+        if (GameController.Instance.State == GameController.GameState.Playing) 
         {
-            if (ModeManager.Instance.GetMode() == 2)
-                scoreToAdd = scoreToAdd / NO_FAIL_MODE_PENALTY_DIVIDER;
-            score += scoreToAdd * (combo + 1);
+            int scoreAfterMultipliers = scoreToAdd;
+            if (ModeManager.Instance.GetMode() == ModeManager.NO_FAIL_MOD)
+                scoreAfterMultipliers = scoreAfterMultipliers / NO_FAIL_MODE_PENALTY_DIVIDER;
+
+            score += scoreAfterMultipliers * (combo + 1);
             combo += 1;
             comboAnim.Play("comboAnimation");
             gameResult.HighestCombo = combo;

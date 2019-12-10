@@ -15,6 +15,7 @@ public class CameraController : Singleton<CameraController>
         GameResult,
         FailMenu,
         Login,
+        HelpMenu,
         Pause
 
     }
