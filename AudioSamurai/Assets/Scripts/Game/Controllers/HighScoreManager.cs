@@ -20,17 +20,36 @@ public class HighScoreManager : Singleton<HighScoreManager>
     /* Returns gameResult of given map if it exists. Otherwise returns default empty result. */
     public GameResult GetGameResult(String mapName)
     {
-        string gameResult = PlayerPrefs.GetString(mapName);
-
-        if (string.IsNullOrEmpty(gameResult))
+        GameResult result = new GameResult();
+        if (LoginManager.Instance.GetLoginStatus() == LoginManager.LOGGED_IN)
         {
-            PlayerPrefs.SetString(mapName, GameResult.GetEmptyResultSerialization());
-            PlayerPrefs.Save();
-            gameResult = PlayerPrefs.GetString(mapName);
+            HighScore hs;
+            hs = Mongo.Instance.GetPlayersMapScore(mapName);
+            result.MapName = hs.MapId;
+            result.HighestCombo = hs.HighestCombo;
+            result.MaxCombo = hs.MaxCombo;
+            result.Score = hs.Score;
+            result.perfects = hs.Perfects;
+            result.normals = hs.Normals;
+            result.poors = hs.Poors;
+            result.misses = hs.Misses;
         }
-
-        GameResult result = GameResult.Deserialize(gameResult);
-        result.MapName = mapName;
+        else
+        {
+            string gameResult = PlayerPrefs.GetString(mapName);
+            if (string.IsNullOrEmpty(gameResult))
+            {
+                result.MapName = mapName;
+                PlayerPrefs.SetString(mapName, GameResult.GetEmptyResultSerialization());
+                PlayerPrefs.Save();
+                gameResult = PlayerPrefs.GetString(mapName);
+            }
+            result = GameResult.Deserialize(gameResult);
+        }
+        if (result.Score > 0)
+        {
+            result.CalculateResult();
+        }
         return result;
     }
 
@@ -44,7 +63,17 @@ public class HighScoreManager : Singleton<HighScoreManager>
 
     /* Saves given result as new highscore. */
     private void SetNewGameResult(GameResult result) {
-        PlayerPrefs.SetString(result.MapName, result.Serialize());
-        PlayerPrefs.Save();
+        switch (LoginManager.Instance.GetLoginStatus())
+        {
+            case LoginManager.LOGGED_IN:
+                Mongo.Instance.InsertUpdates(Mongo.Instance.GetPlayerName(), new HighScore(result.MapName, result.Score, result.HighestCombo, result.MaxCombo, result.perfects, result.normals, result.poors, result.misses));
+                break;
+
+            case LoginManager.OFFLINE:
+                PlayerPrefs.SetString(result.MapName, result.Serialize());
+                PlayerPrefs.Save();
+                break;
+
+        }
     }
 }

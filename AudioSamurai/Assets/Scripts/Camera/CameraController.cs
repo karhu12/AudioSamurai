@@ -14,8 +14,10 @@ public class CameraController : Singleton<CameraController>
         Game,   
         GameResult,
         FailMenu,
+        Login,
         HelpMenu,
         Pause
+
     }
 
     public CameraState cameraState = CameraState.Menu;
