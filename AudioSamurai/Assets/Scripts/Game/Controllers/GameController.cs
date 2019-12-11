@@ -140,6 +140,7 @@ public class GameController : Singleton<GameController>
     public int CalculateHitScore(float hitTiming, float originalHitTime) {
         float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
         float hitTime = Math.Abs(originalHitTime - hitTiming);
+        //Debug.Log($"Hit time : {hitTime}");
         if (hitTime < accHitTime) {
             return (int)ScoreSystem.HitType.Perfect;
         }
@@ -256,6 +257,7 @@ public class GameController : Singleton<GameController>
     }
 
     private void ResetGameState() {
+        ScoreSystem.Instance.ResetAnim();
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
         spawnQueue.Clear();
@@ -283,8 +285,6 @@ public class GameController : Singleton<GameController>
     /* Coroutine that ensures everything is setup for playing. */
     private IEnumerator GameStartCoroutine() {
         yield return InitialCoroutine();
-        if (!hud.gameObject.activeSelf)
-            hud.gameObject.SetActive(true);
         yield return CountdownCoroutine();
         SongmapController.Instance.AudioSource.Play();
         State = GameState.Playing;
@@ -297,6 +297,8 @@ public class GameController : Singleton<GameController>
         SongmapController.Instance.AudioSource.Pause();
         SongmapController.Instance.AudioSource.time = 0;
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Game);
+        if (!hud.gameObject.activeSelf)
+            hud.gameObject.SetActive(true);
         yield return new WaitForSeconds(1); // Wait for the camera to get in place.
     }
 
@@ -306,12 +308,12 @@ public class GameController : Singleton<GameController>
         FindObjectOfType<AudioManager>().Play("Countdown");
         for (int second = seconds; second > 0; second--)
         {
-            Debug.Log($"Countdown: {second}");
-            FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.2f, 3.77f, 0.82f), $"{second}", Color.red);
+            //Debug.Log($"Countdown: {second}");
+            FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), $"{second}", Color.red);
             yield return new WaitForSeconds(1);
         }
-        Debug.Log("Go!");
-        FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.2f, 3.77f, 0.82f), "Go", Color.green);
+        //Debug.Log("Go!");
+        FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), "Go", Color.green);
         yield return new WaitForSeconds(1);
     }
 

@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LoginMenu : MonoBehaviour
 {
@@ -17,11 +19,14 @@ public class LoginMenu : MonoBehaviour
     {
 
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
+        Mongo.Instance.Init();
+        //ToDo: Login music
 
         /* Checks if already logged in */
         switch (LoginManager.Instance.GetLoginStatus())
         {
             case LoginManager.LOGGED_IN:
+                Mongo.Instance.SetDataIfLogin(PlayerPrefs.GetString(LoginManager.USERNAME_PREF));
                 onLogin = false;
                 CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
                 break;
@@ -34,30 +39,44 @@ public class LoginMenu : MonoBehaviour
         }
     }
 
-
     public void TryToLogin()
     {
-        /*
-         * Todo: Check username and password from database
-         *  if successful SuccesfullLogin();
-         *  else FailedToLogin();
-         */
-        SuccesfullLogin();
+        SetCredentialValues(LogInUI);
+        Mongo.Instance.GetPlayerByCredentials(username, password);
+        if(Mongo.Instance.LoginSuccess)
+        {
+            SuccessfulLogin();
+            Debug.Log("Logged in");
+        }
+        else
+        {
+            Debug.Log("Error while logging. Try again.");
+        }
     }
 
     public void TryToSignIn()
     {
-        /*
-         * Todo: Check username and password from database
-         *  if username is already taken save FailedToSignIn();
-         *  else SuccesfullSignIn(); 
-         */
-        SuccesfullSignIn();
+        SetCredentialValues(SignInUI);
+        if (!username.Equals("") && !password.Equals(""))
+        {
+            if (Mongo.Instance.CheckIfAvailable(username))
+            {
+                Mongo.Instance.RegisterNewPlayer(username, password);
+                SuccessfulSignIn();
+                Debug.Log("User created.");
+            }
+            else
+            {
+                FailedToSignIn();
+                Debug.Log("Username taken. Try again.");
+            }
+        }
     }
 
-    public void SuccesfullLogin()
+    public void SuccessfulLogin()
     {
         LoginManager.Instance.LogIn(LoginManager.LOGGED_IN,username);
+        Clear(LogInUI);
     }
 
     public void FailedToLogin()
@@ -65,13 +84,14 @@ public class LoginMenu : MonoBehaviour
         //complain about Login
     }
 
-    public void SuccesfullSignIn()
+    public void SuccessfulSignIn()
     {
         onLogin = false;
         SignInUI.SetActive(false);
         SuccessfulSign.SetActive(true);
         OfflineButton.SetActive(false);
         //Save username and password
+        Clear(SignInUI);
     }
 
     public void FailedToSignIn()
@@ -91,6 +111,7 @@ public class LoginMenu : MonoBehaviour
         SuccessfulSign.SetActive(false);
         if (onLogin)
         {
+            Clear(LogInUI);
             LogInUI.SetActive(false);
             onLogin = false;
             SignInUI.SetActive(true);
@@ -98,6 +119,7 @@ public class LoginMenu : MonoBehaviour
         }
         else
         {
+            Clear(SignInUI);
             SignInUI.SetActive(false);
             onSignin = false;
             LogInUI.SetActive(true);
@@ -106,14 +128,21 @@ public class LoginMenu : MonoBehaviour
         OfflineButton.SetActive(true);
     }
 
-
-    public void ReadUsername(string text)
+    public void SetCredentialValues(GameObject gameObject)
     {
-        username = text;
+        Transform pass = gameObject.transform.Find("Password").Find("InputFieldPass");
+        Transform user = gameObject.transform.Find("User").Find("InputFieldUser");
+        password = pass.GetComponent<InputField>().text;
+        username = user.GetComponent<InputField>().text;
     }
 
-    public void ReadPassword(string text)
+    public void Clear(GameObject gameObject)
     {
-        password = text;
+        Transform pass = gameObject.transform.Find("Password").Find("InputFieldPass");
+        Transform user = gameObject.transform.Find("User").Find("InputFieldUser");
+        pass.GetComponent<InputField>().text = "";
+        user.GetComponent<InputField>().text = "";
+        password = "";
+        username = "";   
     }
 }

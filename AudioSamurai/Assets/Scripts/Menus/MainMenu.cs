@@ -54,6 +54,11 @@ public class MainMenu : MonoBehaviour
         onMainMenu = true;
     }
      
+    public void LoadHelpMenu()
+    {
+        FindObjectOfType<AudioManager>().Play("Click");
+        CameraController.Instance.SetCameraToState(CameraController.CameraState.HelpMenu);
+    }
     public void LoadSettings()
     {
         if (LoginManager.Instance.GetLoginStatus() == LoginManager.OFFLINE)
@@ -69,5 +74,4 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(sceneName: "Credits");
         //CameraController.Instance.SetCameraToState(CameraController.CameraState.Quit);
     }
-
 }

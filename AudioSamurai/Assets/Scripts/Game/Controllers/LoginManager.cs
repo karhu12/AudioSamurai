@@ -34,6 +34,7 @@ public class LoginManager : Singleton<LoginManager>
         PlayerPrefs.SetInt(LOGIN_PREF, LOGGED_OUT);
         PlayerPrefs.SetString(USERNAME_PREF, "");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
+        Mongo.Instance.ResetValues();
     }
 
 }
