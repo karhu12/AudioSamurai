@@ -181,6 +181,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     public void ResetAnim()
     {
+        if(comboAnim.isActiveAndEnabled)
         comboAnim.Play("resetState");         
     }
 }

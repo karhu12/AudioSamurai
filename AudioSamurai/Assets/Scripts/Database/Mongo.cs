@@ -11,6 +11,7 @@ public class Mongo : Singleton<Mongo>
 {
     public bool LoginSuccess { get; private set; }
     public bool SignInSuccess { get; private set; }
+    public bool TaskFinished { get; private set; }
     private const string MONGO_URI = "mongodb+srv://admin:audiosamurai123@cluster0-cofmk.mongodb.net/test?retryWrites=true&w=majority";
     private const string DATABASE_NAME = "highscoredb";
     private MongoClient client;
@@ -67,9 +68,10 @@ public class Mongo : Singleton<Mongo>
     }
 
     //Verify if user put the correct credentials on login menu and return a playerobject matching those credentials from the cloud if he did.
-    public async Task<PlayerRef> GetPlayerByCredentials(string playerName, string pw)
+    public PlayerRef GetPlayerByCredentials(string playerName, string pw)
     {
-        playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
+        TaskFinished = false;
+        playerList = playerCollection.Find(new BsonDocument()).ToList();
         foreach (var playerObject in playerList)
         {
             if (playerObject.Name.Equals(playerName))
@@ -87,13 +89,15 @@ public class Mongo : Singleton<Mongo>
                 }
             }
         }
+        TaskFinished = true;
         return player;
     }
 
     //Used in a situation where the player has already logged in when the game starts. Login controller saves the login state to player prefs.
-    public async void SetDataIfLogin(string playerName)
+    public void SetDataIfLogin(string playerName)
     {
-        playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
+        LoginSuccess = true;
+        playerList = playerCollection.Find(new BsonDocument()).ToList();
         foreach (var playerObject in playerList)
         {
             if (playerObject.Name.Equals(playerName))

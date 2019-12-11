@@ -181,7 +181,7 @@ public class SongSelection : MonoBehaviour
             view.ToggleChildren(false);
         }
         selectedView = null;
-        if (selectedChildView != null)
+        if (selectedChildView != null && selectedChildView.gameObject != null)
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
         selectedChildView = null;
         playSongButton.gameObject.SetActive(false);

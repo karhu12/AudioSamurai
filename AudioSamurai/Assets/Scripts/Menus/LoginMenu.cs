@@ -18,7 +18,6 @@ public class LoginMenu : MonoBehaviour
     private string username, password;
     void Start()
     {
-
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
         Mongo.Instance.Init();
         //ToDo: Login music
@@ -36,15 +35,14 @@ public class LoginMenu : MonoBehaviour
                 onLogin = false;
                 CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
                 break;
-                
         }
     }
 
-    public async void TryToLogin()
+    public void TryToLogin()
     {
         SetCredentialValues(LogInUI);
-        await Mongo.Instance.GetPlayerByCredentials(username, password);
-        if(Mongo.Instance.LoginSuccess)
+        Mongo.Instance.GetPlayerByCredentials(username, password);
+        if(Mongo.Instance.LoginSuccess && Mongo.Instance.TaskFinished)
         {
             SuccessfulLogin();
             Debug.Log("Logged in");
@@ -92,7 +90,6 @@ public class LoginMenu : MonoBehaviour
         SignInUI.SetActive(false);
         SuccessfulSign.SetActive(true);
         OfflineButton.SetActive(false);
-        //Save username and password
         Clear(SignInUI);
     }
 
