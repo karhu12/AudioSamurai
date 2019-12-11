@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
     public static bool onMainMenu = true;
     
     public GameObject mainMenuUI;
+    public TextMeshProUGUI LoginButtonText;
 
     private void Start()
     {
@@ -58,6 +61,10 @@ public class MainMenu : MonoBehaviour
     }
     public void LoadSettings()
     {
+        if (LoginManager.Instance.GetLoginStatus() == LoginManager.OFFLINE)
+            LoginButtonText.text = "Log in";
+        else
+            LoginButtonText.text = "Log out";
         FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
     }
@@ -67,5 +74,4 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(sceneName: "Credits");
         //CameraController.Instance.SetCameraToState(CameraController.CameraState.Quit);
     }
-
 }

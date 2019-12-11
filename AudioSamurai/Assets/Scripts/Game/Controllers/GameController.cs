@@ -140,7 +140,7 @@ public class GameController : Singleton<GameController>
     public int CalculateHitScore(float hitTiming, float originalHitTime) {
         float accHitTime = SelectedSongmap.GetHitAccuracyLevel(GameController.Instance.CurrentTiming);
         float hitTime = Math.Abs(originalHitTime - hitTiming);
-        Debug.Log($"Hit time : {hitTime}");
+        //Debug.Log($"Hit time : {hitTime}");
         if (hitTime < accHitTime) {
             return (int)ScoreSystem.HitType.Perfect;
         }
@@ -257,6 +257,7 @@ public class GameController : Singleton<GameController>
     }
 
     private void ResetGameState() {
+        ScoreSystem.Instance.ResetAnim();
         MapObjectManager.Instance.Cleanup();
         SongmapController.Instance.AudioSource.Stop();
         spawnQueue.Clear();
@@ -307,11 +308,11 @@ public class GameController : Singleton<GameController>
         FindObjectOfType<AudioManager>().Play("Countdown");
         for (int second = seconds; second > 0; second--)
         {
-            Debug.Log($"Countdown: {second}");
+            //Debug.Log($"Countdown: {second}");
             FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), $"{second}", Color.red);
             yield return new WaitForSeconds(1);
         }
-        Debug.Log("Go!");
+        //Debug.Log("Go!");
         FloatingTextManager.Instance.PlaceFloatingText(new Vector3(3.3f, 3.75f, .79f), "Go", Color.green);
         yield return new WaitForSeconds(1);
     }
