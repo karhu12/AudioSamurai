@@ -14,6 +14,7 @@ public class SongSelection : MonoBehaviour
     public GameObject songmapChildPrefab;
     public GameObject songmapPrefab;
     public Button playSongButton;
+    public Button highscoreButton;
     public ScrollRect scrollView;
     public RectTransform content;
 
@@ -40,6 +41,7 @@ public class SongSelection : MonoBehaviour
         }
         views.Clear();
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
@@ -67,6 +69,7 @@ public class SongSelection : MonoBehaviour
         SongmapController.Instance.AudioSource.Stop();
         views.Clear();
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
@@ -109,6 +112,7 @@ public class SongSelection : MonoBehaviour
     public void OnSongmapParentClick(Text title)
     {
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
         if (selectedChildView != null && selectedChildView.gameObject != null)
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
 
@@ -155,6 +159,7 @@ public class SongSelection : MonoBehaviour
                 SetLeaderBoards(child);
                 FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
+                highscoreButton.gameObject.SetActive(true);
             }
         }
     }
@@ -187,6 +192,7 @@ public class SongSelection : MonoBehaviour
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
         selectedChildView = null;
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
 
         if (SongmapController.Instance.AudioSource.isPlaying)
         {
