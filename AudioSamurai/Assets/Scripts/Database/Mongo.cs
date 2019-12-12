@@ -11,17 +11,15 @@ public class Mongo : Singleton<Mongo>
 {
     public bool LoginSuccess { get; private set; }
     public bool SignInSuccess { get; private set; }
-    public bool TaskFinished { get; private set; }
-    private const string MONGO_URI = "mongodb+srv://admin:audiosamurai123@cluster0-cofmk.mongodb.net/test?retryWrites=true&w=majority";
-    private const string DATABASE_NAME = "highscoredb";
+    private const string MONGO_URI = "mongodb+srv://admin:audiosamurai123@cluster0-cofmk.mongodb.net/test?retryWrites=true&w=majority"; //YOUR MONGODB CONNECTION STRING
+    private const string DATABASE_NAME = "highscoredb"; //YOUR DATABASE NAME
     private MongoClient client;
     private IMongoDatabase db;
     private IMongoCollection<PlayerRef> playerCollection;
     private PlayerRef player;
     private HighScoresCollection hsCollection;
     private List<PlayerRef> playerList;
-    private List<int> leaderBoards;
-    private List<LeaderBoardItem> lb;
+    private List<LeaderBoardItem> leaderboards;
 
     //Establish connection to the database and get collection of playeritems. Initialize key variables in ResetValues method.
     public void Init()
@@ -67,10 +65,9 @@ public class Mongo : Singleton<Mongo>
         return highScoresCollection;
     }
 
-    //Verify if user put the correct credentials on login menu and return a playerobject matching those credentials from the cloud if he did.
+    //Verify if user put the correct credentials on login menu and return a playerobject matching those credentials from the database if he did.
     public PlayerRef GetPlayerByCredentials(string playerName, string pw)
     {
-        TaskFinished = false;
         playerList = playerCollection.Find(new BsonDocument()).ToList();
         foreach (var playerObject in playerList)
         {
@@ -89,11 +86,10 @@ public class Mongo : Singleton<Mongo>
                 }
             }
         }
-        TaskFinished = true;
         return player;
     }
 
-    //Used in a situation where the player has already logged in when the game starts. Login controller saves the login state to player prefs.
+    //Used in a situation where the player has already logged in when the game starts. (Once logged in, you log out only if log out button is pressed manually.)
     public void SetDataIfLogin(string playerName)
     {
         LoginSuccess = true;
@@ -108,7 +104,7 @@ public class Mongo : Singleton<Mongo>
         }
     }
 
-    //Check if a username is available when trying to sign up (Check that there isn't duplicate in the database already)
+    //Check if a username is available when trying to sign up (Check that there isn't a duplicate in the database already)
     public async Task<bool> CheckIfAvailable(string playerName)
     {
         playerList = await playerCollection.Find(new BsonDocument()).ToListAsync();
@@ -134,7 +130,7 @@ public class Mongo : Singleton<Mongo>
         return SignInSuccess;
     }
 
-    //Get player's current highscore in a map. If there is no match for highscore, default zero-valued highscore is created.
+    //Get player's current highscore in a map. If there is no highscore to return, default zero-valued highscore is created instead.
     public HighScore GetPlayersMapScore(string mapName)
     {
         var playerObj = player;
@@ -156,12 +152,12 @@ public class Mongo : Singleton<Mongo>
             var scoreObj = playerObject.ScoreCollection.Hiscores.FirstOrDefault(x => x.MapId == mapName);
             if (scoreObj != null)
             {
-                for (int i = 0; i < lb.Count; i++)
+                for (int i = 0; i < leaderboards.Count; i++)
                 {
-                    if (scoreObj.Score > lb[i].Score)
+                    if (scoreObj.Score > leaderboards[i].Score)
                     {
-                        lb.Remove(lb[i]);
-                        lb.Add(new LeaderBoardItem(playerObject.Name, scoreObj.Score));
+                        leaderboards.Remove(leaderboards[i]);
+                        leaderboards.Add(new LeaderBoardItem(playerObject.Name, scoreObj.Score));
                         break;   
                     }
                     else
@@ -175,7 +171,7 @@ public class Mongo : Singleton<Mongo>
                 continue;
             }
         }
-        var sorted = lb.OrderByDescending(x => x.Score).ToList();
+        var sorted = leaderboards.OrderByDescending(x => x.Score).ToList();
         return sorted;
     }
 
@@ -196,7 +192,7 @@ public class Mongo : Singleton<Mongo>
 
     }
 
-    //Initialize key functions after crucial operations like log in and log out
+    //Initialize key variables after crucial operations like log in and log out.
     public void ResetValues()
     {
         player = new PlayerRef();
@@ -207,11 +203,11 @@ public class Mongo : Singleton<Mongo>
     //Create an empty list with a length of 5 empty leaderboard items.
     public void SetupLeaderboards()
     {
-        lb = new List<LeaderBoardItem>();
-        lb.Add(new LeaderBoardItem("", 0));
-        lb.Add(new LeaderBoardItem("", 0));
-        lb.Add(new LeaderBoardItem("", 0));
-        lb.Add(new LeaderBoardItem("", 0));
-        lb.Add(new LeaderBoardItem("", 0));
+        leaderboards = new List<LeaderBoardItem>();
+        leaderboards.Add(new LeaderBoardItem("", 0));
+        leaderboards.Add(new LeaderBoardItem("", 0));
+        leaderboards.Add(new LeaderBoardItem("", 0));
+        leaderboards.Add(new LeaderBoardItem("", 0));
+        leaderboards.Add(new LeaderBoardItem("", 0));
     }
 }

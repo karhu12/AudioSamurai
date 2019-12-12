@@ -47,10 +47,9 @@ public class LoginMenu : MonoBehaviour
     {
         SetCredentialValues(LogInUI);
         Mongo.Instance.GetPlayerByCredentials(username, password);
-        if(Mongo.Instance.LoginSuccess && Mongo.Instance.TaskFinished)
+        if(Mongo.Instance.LoginSuccess)
         {
             SuccessfulLogin();
-            Debug.Log("Logged in");
         }
         else
         {
@@ -68,12 +67,10 @@ public class LoginMenu : MonoBehaviour
             {
                 Mongo.Instance.RegisterNewPlayer(username, password);
                 SuccessfulSignIn();
-                Debug.Log("User created.");
             }
             else
             {
                 FailedToSignIn();
-                Debug.Log("Username taken. Try again.");
             }
         }
     }
@@ -95,13 +92,12 @@ public class LoginMenu : MonoBehaviour
 
     public void FailedToLogin()
     {
-        StartCoroutine(ShowErrorMessage("Login failed. Username or password was invalid"));
-        Debug.Log("Error while logging. Try again.");
+        StartCoroutine(ShowErrorMessage("Login failed. Username or password was invalid."));
     }
 
     public void FailedToSignIn()
     {
-        StartCoroutine(ShowErrorMessage("Sign in failed. Username is already taken"));
+        StartCoroutine(ShowErrorMessage("Sign in failed. Username is already taken."));
     }
 
     public IEnumerator ShowErrorMessage(String message)

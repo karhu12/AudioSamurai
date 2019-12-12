@@ -162,6 +162,8 @@ public class SongSelection : MonoBehaviour
     public async void SetLeaderBoards(SongmapChildView child)
     {
         var x = await Mongo.Instance.GetLeaderBoards(child.songmap.GetSongmapName());
+        for(int i = 0; i < x.Count; i++)
+            Debug.Log(x[i].Score + " " + x[i].Name);
     }
 
     public void OnPlayClick()
