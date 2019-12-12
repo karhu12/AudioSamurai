@@ -131,6 +131,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     public void AddScore(int scoreToAdd)
     {
+        comboAnim.Rebind();
         if (GameController.Instance.State == GameController.GameState.Playing) 
         {
             int scoreAfterMultipliers = scoreToAdd;
