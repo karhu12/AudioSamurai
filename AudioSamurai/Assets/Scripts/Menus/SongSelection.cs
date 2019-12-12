@@ -12,14 +12,13 @@ public class SongSelection : MonoBehaviour
 
     public GameObject songmapParentPrefab;
     public GameObject songmapChildPrefab;
-    public GameObject songmapPrefab;
+    public GameObject songmapPrefab; 
     public Button playSongButton;
     public Button highscoreButton;
     public ScrollRect scrollView;
     public RectTransform content;
 
     List<SongmapView> views = new List<SongmapView>();
-
 
     IReadOnlyDictionary<string, List<Songmap>> maps;
     SongmapView selectedView;
@@ -156,7 +155,7 @@ public class SongSelection : MonoBehaviour
 
                 selectedChildView = child;
                 child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
-                SetLeaderBoards(child);
+                FetchMapLeaderBoards(child);
                 FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
                 highscoreButton.gameObject.SetActive(true);
@@ -164,11 +163,11 @@ public class SongSelection : MonoBehaviour
         }
     }
 
-    public async void SetLeaderBoards(SongmapChildView child)
+    public async void FetchMapLeaderBoards(SongmapChildView child)
     {
-        var x = await Mongo.Instance.GetLeaderBoards(child.songmap.GetSongmapName());
-        for(int i = 0; i < x.Count; i++)
-            Debug.Log(x[i].Score + " " + x[i].Name);
+        var list = await Mongo.Instance.GetLeaderBoards(child.songmap.GetSongmapName());
+        LeaderBoardManager.Instance.MapName = child.title.text;
+        LeaderBoardManager.Instance.Leaderboards = list;
     }
 
     public void OnPlayClick()
