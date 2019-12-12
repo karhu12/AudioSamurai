@@ -11,7 +11,7 @@ public class MainMenu : MonoBehaviour
     
     public GameObject mainMenuUI;
     public TextMeshProUGUI LoginButtonText;
-    public TextMeshProUGUI usernameText;
+    public TextMeshProUGUI UsernameLabel;
 
     private void Start()
     {
@@ -62,17 +62,16 @@ public class MainMenu : MonoBehaviour
     }
     public void LoadSettings()
     {
-        if (LoginManager.Instance.GetLoginStatus() == LoginManager.OFFLINE)
+        if (LoginManager.Instance.GetLoginStatus() == LoginManager.LOGGED_IN)
         {
-            LoginButtonText.text = "Log in";
-            usernameText.text = "";
+            LoginButtonText.text = "Log out";
+            UsernameLabel.text = "Playing as " + LoginManager.Instance.GetUsername();
         }
         else
         {
-            LoginButtonText.text = "Log out";
-            usernameText.text = "Logged in as " + PlayerPrefs.GetString(LoginManager.USERNAME_PREF);
+            UsernameLabel.text = "Playing Offline";
+            LoginButtonText.text = "Log in";
         }
-            
         FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
     }

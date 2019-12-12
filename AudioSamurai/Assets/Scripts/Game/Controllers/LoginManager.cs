@@ -37,4 +37,9 @@ public class LoginManager : Singleton<LoginManager>
         Mongo.Instance.ResetValues();
     }
 
+    public string GetUsername()
+    {
+        return PlayerPrefs.GetString(USERNAME_PREF);
+    }
+
 }

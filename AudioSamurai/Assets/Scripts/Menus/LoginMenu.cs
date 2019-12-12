@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class LoginMenu : MonoBehaviour
 {
@@ -14,10 +15,14 @@ public class LoginMenu : MonoBehaviour
     public GameObject SignInUI;
     public GameObject SuccessfulSign;
     public GameObject OfflineButton;
+    public GameObject ErrorMessageObj;
+    public TextMeshProUGUI ErrorMessage;
+    public Animator animator;
 
     private string username, password;
     void Start()
     {
+        animator = ErrorMessage.GetComponent<Animator>();
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);
         Mongo.Instance.Init();
         //ToDo: Login music
@@ -49,7 +54,7 @@ public class LoginMenu : MonoBehaviour
         }
         else
         {
-            Debug.Log("Error while logging. Try again.");
+            FailedToLogin();
         }
     }
 
@@ -79,11 +84,6 @@ public class LoginMenu : MonoBehaviour
         Clear(LogInUI);
     }
 
-    public void FailedToLogin()
-    {
-        //complain about Login
-    }
-
     public void SuccessfulSignIn()
     {
         onLogin = false;
@@ -93,9 +93,24 @@ public class LoginMenu : MonoBehaviour
         Clear(SignInUI);
     }
 
+    public void FailedToLogin()
+    {
+        StartCoroutine(ShowErrorMessage("Login failed. Username or password was invalid"));
+        Debug.Log("Error while logging. Try again.");
+    }
+
     public void FailedToSignIn()
     {
-        //complain about Sign in
+        StartCoroutine(ShowErrorMessage("Sign in failed. Username is already taken"));
+    }
+
+    public IEnumerator ShowErrorMessage(String message)
+    {
+        ErrorMessageObj.SetActive(true);
+        ErrorMessage.text = message;
+        animator.SetTrigger("Visible");
+        yield return new WaitForSeconds(3);
+        animator.SetTrigger("Vanish");
     }
 
     public void PlayOffline()
