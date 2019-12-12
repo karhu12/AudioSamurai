@@ -66,14 +66,13 @@ public class HighScoreManager : Singleton<HighScoreManager>
         switch (LoginManager.Instance.GetLoginStatus())
         {
             case LoginManager.LOGGED_IN:
-                Mongo.Instance.InsertUpdates(Mongo.Instance.GetPlayerName(), new HighScore(result.MapName, result.Score, result.HighestCombo, result.MaxCombo, result.perfects, result.normals, result.poors, result.misses));
+                Mongo.Instance.InsertUpdates(new HighScore(result.MapName, result.Score, result.HighestCombo, result.MaxCombo, result.perfects, result.normals, result.poors, result.misses));
                 break;
 
             case LoginManager.OFFLINE:
                 PlayerPrefs.SetString(result.MapName, result.Serialize());
                 PlayerPrefs.Save();
                 break;
-
         }
     }
 }

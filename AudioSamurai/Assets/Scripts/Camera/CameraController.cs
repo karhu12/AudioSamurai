@@ -16,8 +16,8 @@ public class CameraController : Singleton<CameraController>
         FailMenu,
         Login,
         HelpMenu,
+        Highscore,
         Pause
-
     }
 
     public CameraState cameraState = CameraState.Menu;

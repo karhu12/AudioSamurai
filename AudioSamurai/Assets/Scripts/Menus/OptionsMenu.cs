@@ -47,7 +47,6 @@ public class OptionsMenu : MonoBehaviour
                 PlayerPrefs.Save();
             }
         ));
-
     }
 
     void Start()
@@ -81,7 +80,6 @@ public class OptionsMenu : MonoBehaviour
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
-
     }
 
     public void SetResolution(int resolutionIndex)
@@ -138,9 +136,5 @@ public class OptionsMenu : MonoBehaviour
     public void LogOut()
     {
         LoginManager.Instance.LogOut();
-        /*PlayerPrefs.SetInt(LOGIN_PREF, 0);
-        PlayerPrefs.DeleteKey(USERNAME_PREF);
-        CameraController.Instance.SetCameraToState(CameraController.CameraState.Login);*/
     }
-
 }
