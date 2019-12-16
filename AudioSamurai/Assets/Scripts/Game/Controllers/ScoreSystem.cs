@@ -109,6 +109,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
     private void Start()
     {
         comboAnim = comboText.GetComponent<Animator>();
+        comboAnim.keepAnimatorControllerStateOnDisable = true;     
         combo = 0;
         score = 0;
     }
@@ -130,6 +131,7 @@ public class ScoreSystem : Singleton<ScoreSystem>
 
     public void AddScore(int scoreToAdd)
     {
+        comboAnim.Rebind();
         if (GameController.Instance.State == GameController.GameState.Playing) 
         {
             int scoreAfterMultipliers = scoreToAdd;
@@ -176,5 +178,11 @@ public class ScoreSystem : Singleton<ScoreSystem>
     public void ResetScore() {
         score = 0;
         gameResult.Reset();
+    }
+
+    public void ResetAnim()
+    {
+        if(comboAnim.isActiveAndEnabled)
+        comboAnim.Play("resetState");         
     }
 }

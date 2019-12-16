@@ -12,18 +12,17 @@ public class SongSelection : MonoBehaviour
 
     public GameObject songmapParentPrefab;
     public GameObject songmapChildPrefab;
-    public GameObject songmapPrefab;
+    public GameObject songmapPrefab; 
     public Button playSongButton;
+    public Button highscoreButton;
     public ScrollRect scrollView;
     public RectTransform content;
 
     List<SongmapView> views = new List<SongmapView>();
 
-
     IReadOnlyDictionary<string, List<Songmap>> maps;
     SongmapView selectedView;
     SongmapChildView selectedChildView;
-
 
     private void Start()
     {
@@ -41,6 +40,7 @@ public class SongSelection : MonoBehaviour
         }
         views.Clear();
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
@@ -68,6 +68,7 @@ public class SongSelection : MonoBehaviour
         SongmapController.Instance.AudioSource.Stop();
         views.Clear();
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
         maps = SongmapController.Instance.GetSongmaps(SongmapController.SongmapSortType.DIFF, SongmapController.SongmapSortDirection.ASC);
 
         foreach (Transform child in content)
@@ -110,6 +111,7 @@ public class SongSelection : MonoBehaviour
     public void OnSongmapParentClick(Text title)
     {
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
         if (selectedChildView != null && selectedChildView.gameObject != null)
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
 
@@ -153,10 +155,19 @@ public class SongSelection : MonoBehaviour
 
                 selectedChildView = child;
                 child.gameObject.GetComponent<Image>().color = SELECTED_COLOR;
+                FetchMapLeaderBoards(child);
                 FindObjectOfType<AudioManager>().Play("Click");
                 playSongButton.gameObject.SetActive(true);
+                highscoreButton.gameObject.SetActive(true);
             }
         }
+    }
+
+    public async void FetchMapLeaderBoards(SongmapChildView child)
+    {
+        var list = await Mongo.Instance.GetLeaderBoards(child.songmap.GetSongmapName());
+        LeaderBoardManager.Instance.MapName = child.title.text;
+        LeaderBoardManager.Instance.Leaderboards = list;
     }
 
     public void OnPlayClick()
@@ -176,10 +187,11 @@ public class SongSelection : MonoBehaviour
             view.ToggleChildren(false);
         }
         selectedView = null;
-        if (selectedChildView != null)
+        if (selectedChildView != null && selectedChildView.gameObject != null)
             selectedChildView.gameObject.GetComponent<Image>().color = UNSELECTED_COLOR;
         selectedChildView = null;
         playSongButton.gameObject.SetActive(false);
+        highscoreButton.gameObject.SetActive(false);
 
         if (SongmapController.Instance.AudioSource.isPlaying)
         {
@@ -304,7 +316,7 @@ public class SongmapChildView : View
         difficulty.text = map.DifficultyTitle;
         gameResult = HighScoreManager.Instance.GetGameResult(map.GetSongmapName());
         
-        if (gameResult.Score >= 0)
+        if (gameResult.Score > 0)
         {
             highScore.text = HighScoreManager.GetFormattedHighscore(gameResult);
             accuracy.text = $"{gameResult.RoundedHitPercentage} %";
@@ -313,7 +325,7 @@ public class SongmapChildView : View
             highScorePanel.gameObject.SetActive(false);
         }
 
-        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses >= 0)
+        if (gameResult.perfects + gameResult.normals + gameResult.poors + gameResult.misses > 0)
         {
             grade.texture = ScoreSystem.Instance.GetResultGradeTexture(gameResult.ResultGrade);
             gradeTitle.text = gameResult.ResultGrade.ToString();
