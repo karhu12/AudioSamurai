@@ -132,9 +132,4 @@ public class OptionsMenu : MonoBehaviour
         FindObjectOfType<AudioManager>().Play("ClickDeny");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.Menu);
     }
-
-    public void LogOut()
-    {
-        LoginManager.Instance.LogOut();
-    }
 }

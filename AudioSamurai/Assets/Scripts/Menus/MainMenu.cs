@@ -15,44 +15,25 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
-            FindObjectOfType<AudioManager>().Play("MenuMusic");
+        FindObjectOfType<AudioManager>().Play("MenuMusic");
     }
+
+    public void RefreshPlayer() {
+        if (LoginManager.Instance.GetLoginStatus() == LoginManager.LOGGED_IN) {
+            LoginButtonText.text = "Log out";
+            UsernameLabel.text = "Playing as " + LoginManager.Instance.GetUsername();
+        }
+        else {
+            UsernameLabel.text = "Playing Offline";
+            LoginButtonText.text = "Log in";
+        }
+    }
+
     // Update is called once per frame
     public void OnStart()
     {
         FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.SongSelection);
-    }
-
-    public void CheckMenuStatus()
-    {
-        if (onMainMenu)
-        {
-            CloseMainMenu();
-        }
-        else
-        {
-            ShowMainMenu();
-        }
-    }
-
-    void ShowMainMenu()
-    {
-        mainMenuUI.SetActive(true);
-        onMainMenu = true;
-    }
-
-    void CloseMainMenu()
-    {
-        mainMenuUI.SetActive(false);
-        onMainMenu = false;
-        FindObjectOfType<AudioManager>().Pause("MenuMusic");
-    }
-
-    public void LoadMenu()
-    {
-        mainMenuUI.SetActive(true);
-        onMainMenu = true;
     }
      
     public void LoadHelpMenu()
@@ -60,18 +41,9 @@ public class MainMenu : MonoBehaviour
         FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.HelpMenu);
     }
+
     public void LoadSettings()
     {
-        if (LoginManager.Instance.GetLoginStatus() == LoginManager.LOGGED_IN)
-        {
-            LoginButtonText.text = "Log out";
-            UsernameLabel.text = "Playing as " + LoginManager.Instance.GetUsername();
-        }
-        else
-        {
-            UsernameLabel.text = "Playing Offline";
-            LoginButtonText.text = "Log in";
-        }
         FindObjectOfType<AudioManager>().Play("Click");
         CameraController.Instance.SetCameraToState(CameraController.CameraState.OptionsMenu);
     }
@@ -79,6 +51,9 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         SceneManager.LoadScene(sceneName: "Credits");
-        //CameraController.Instance.SetCameraToState(CameraController.CameraState.Quit);
+    }
+
+    public void LogOut() {
+        LoginManager.Instance.LogOut();
     }
 }
